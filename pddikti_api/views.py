@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 import requests
 
-BASE_URL = "https://pddikti.kemdikbud.go.id/api/pencarian"
+BASE_URL = settings.PDDIKTI_API_URL
 
 def make_api_request(endpoint, keyword):
     api_url = f"{BASE_URL}/{endpoint}/{keyword}"
