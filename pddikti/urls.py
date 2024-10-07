@@ -19,7 +19,8 @@ from django.urls import include, path, re_path
 from django.views.generic.base import RedirectView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include('pddikti_api.urls')),
+    # path('admin/', admin.site.urls),
+    path('', RedirectView.as_view(url='/api/', permanent=True)),
     re_path(r'^.*/$', RedirectView.as_view(url='/api/', permanent=True)),
+    path('api/', include('pddikti_api.urls')),
 ]
