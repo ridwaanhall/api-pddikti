@@ -1,0 +1,240 @@
+{
+    "message": "Welcome to the PDDIKTI API!",
+    "endpoints": {
+        "Search Endpoints": {
+            "Search All": {
+                "url": "/search/all/<str:keyword>/",
+                "method": "GET",
+                "description": "Search across all categories using the provided keyword.",
+                "parameters": {
+                    "keyword": "string: The keyword to search for."
+                }
+            },
+            "Search PT": {
+                "url": "/search/pt/<str:keyword>/",
+                "method": "GET",
+                "description": "Search for PT (Perguruan Tinggi) using the provided keyword.",
+                "parameters": {
+                    "keyword": "string: The keyword to search for."
+                }
+            },
+            "Search Prodi": {
+                "url": "/search/prodi/<str:keyword>/",
+                "method": "GET",
+                "description": "Search for Prodi (Program Studi) using the provided keyword.",
+                "parameters": {
+                    "keyword": "string: The keyword to search for."
+                }
+            },
+            "Search Dosen": {
+                "url": "/search/dosen/<str:keyword>/",
+                "method": "GET",
+                "description": "Search for Dosen (Lecturer) using the provided keyword.",
+                "parameters": {
+                    "keyword": "string: The keyword to search for."
+                }
+            },
+            "Search Mahasiswa": {
+                "url": "/search/mhs/<str:keyword>/",
+                "method": "GET",
+                "description": "Search for Mahasiswa (Student) using the provided keyword.",
+                "parameters": {
+                    "keyword": "string: The keyword to search for."
+                }
+            }
+        },
+        "PT Endpoints": {
+            "PT Detail": {
+                "url": "/pt/detail/<str:id_pt>/",
+                "method": "GET",
+                "description": "Get details of a specific PT.",
+                "parameters": {
+                    "id_pt": "string: The ID of the PT."
+                }
+            },
+            "PT Prodi": {
+                "url": "/pt/prodi/<str:id_pt>/<str:id_thsmt>/",
+                "method": "GET",
+                "description": "Get Prodi details of a specific PT for a given semester.",
+                "parameters": {
+                    "id_pt": "string: The ID of the PT.",
+                    "id_thsmt": "string: The ID of the semester."
+                }
+            },
+            "PT Rasio": {
+                "url": "/pt/rasio/<str:id_pt>/",
+                "method": "GET",
+                "description": "Get the ratio of lecturers to students for a specific PT.",
+                "parameters": {
+                    "id_pt": "string: The ID of the PT."
+                }
+            },
+            "PT Mahasiswa": {
+                "url": "/pt/mahasiswa/<str:id_pt>/",
+                "method": "GET",
+                "description": "Get the mean number of graduates and new students for a specific PT.",
+                "parameters": {
+                    "id_pt": "string: The ID of the PT."
+                }
+            },
+            "PT Waktu Studi": {
+                "url": "/pt/waktu-studi/<str:id_pt>/",
+                "method": "GET",
+                "description": "Get the mean study duration for a specific PT.",
+                "parameters": {
+                    "id_pt": "string: The ID of the PT."
+                }
+            },
+            "PT Riwayat": {
+                "url": "/pt/riwayat/<str:id_pt>/",
+                "method": "GET",
+                "description": "Get the history of a specific PT.",
+                "parameters": {
+                    "id_pt": "string: The ID of the PT."
+                }
+            },
+            "PT Biaya Kuliah": {
+                "url": "/pt/biaya-kuliah/<str:id_pt>/",
+                "method": "GET",
+                "description": "Get the tuition fees for a specific PT.",
+                "parameters": {
+                    "id_pt": "string: The ID of the PT."
+                }
+            },
+            "PT Fasilitas": {
+                "url": "/pt/fasilitas/<str:id_pt>/",
+                "method": "GET",
+                "description": "Get the facilities of a specific PT.",
+                "parameters": {
+                    "id_pt": "string: The ID of the PT."
+                }
+            },
+            "PT Logo": {
+                "url": "/pt/logo/<str:id_pt>/",
+                "method": "GET",
+                "description": "Get the logo of a specific PT.",
+                "parameters": {
+                    "id_pt": "string: The ID of the PT."
+                }
+            }
+        },
+        "Prodi Endpoints": {
+            "Prodi Detail": {
+                "url": "/prodi/detail/<str:id_prodi>/",
+                "method": "GET",
+                "description": "Get details of a specific Prodi.",
+                "parameters": {
+                    "id_prodi": "string: The ID of the Prodi."
+                }
+            },
+            "Prodi Desc": {
+                "url": "/prodi/desc/<str:id_prodi>/",
+                "method": "GET",
+                "description": "Get the description of a specific Prodi.",
+                "parameters": {
+                    "id_prodi": "string: The ID of the Prodi."
+                }
+            },
+            "Prodi Num Students Lecturers": {
+                "url": "/prodi/num-students-lecturers/<str:id_prodi>/",
+                "method": "GET",
+                "description": "Get the number of students and lecturers for a specific Prodi.",
+                "parameters": {
+                    "id_prodi": "string: The ID of the Prodi."
+                }
+            },
+            "Prodi Riwayat": {
+                "url": "/prodi/riwayat/<str:id_prodi>/",
+                "method": "GET",
+                "description": "Get the history of a specific Prodi.",
+                "parameters": {
+                    "id_prodi": "string: The ID of the Prodi."
+                }
+            },
+            "Prodi Biaya Kuliah": {
+                "url": "/prodi/biaya-kuliah/<str:id_prodi>/",
+                "method": "GET",
+                "description": "Get the tuition fees for a specific Prodi.",
+                "parameters": {
+                    "id_prodi": "string: The ID of the Prodi."
+                }
+            },
+            "Prodi Dosen Homebase": {
+                "url": "/prodi/dosen-homebase/<str:id_prodi>/<str:id_thsmt>/",
+                "method": "GET",
+                "description": "Get the homebase lecturers for a specific Prodi for a given semester.",
+                "parameters": {
+                    "id_prodi": "string: The ID of the Prodi.",
+                    "id_thsmt": "string: The ID of the semester."
+                }
+            },
+            "Prodi Dosen Penghitung Ratio": {
+                "url": "/prodi/dosen-penghitung-ratio/<str:id_prodi>/<str:id_thsmt>/",
+                "method": "GET",
+                "description": "Get the lecturers who count towards the ratio for a specific Prodi for a given semester.",
+                "parameters": {
+                    "id_prodi": "string: The ID of the Prodi.",
+                    "id_thsmt": "string: The ID of the semester."
+                }
+            }
+        },
+        "Dosen Endpoints": {
+            "Dosen Profile": {
+                "url": "/dosen/profile/<str:id_dosen>/",
+                "method": "GET",
+                "description": "Get the profile of a specific Dosen.",
+                "parameters": {
+                    "id_dosen": "string: The ID of the Dosen."
+                }
+            },
+            "Dosen Study History": {
+                "url": "/dosen/study-history/<str:id_dosen>/",
+                "method": "GET",
+                "description": "Get the study history of a specific Dosen.",
+                "parameters": {
+                    "id_dosen": "string: The ID of the Dosen."
+                }
+            },
+            "Dosen Teaching History": {
+                "url": "/dosen/teaching-history/<str:id_dosen>/",
+                "method": "GET",
+                "description": "Get the teaching history of a specific Dosen.",
+                "parameters": {
+                    "id_dosen": "string: The ID of the Dosen."
+                }
+            },
+            "Dosen Portofolio Penelitian": {
+                "url": "/dosen/portofolio/penelitian/<str:id_dosen>/",
+                "method": "GET",
+                "description": "Get the research portfolio of a specific Dosen.",
+                "parameters": {
+                    "id_dosen": "string: The ID of the Dosen."
+                }
+            },
+            "Dosen Portofolio Pengabdian": {
+                "url": "/dosen/portofolio/pengabdian/<str:id_dosen>/",
+                "method": "GET",
+                "description": "Get the community service portfolio of a specific Dosen.",
+                "parameters": {
+                    "id_dosen": "string: The ID of the Dosen."
+                }
+            },
+            "Dosen Portofolio Karya": {
+                "url": "/dosen/portofolio/karya/<str:id_dosen>/",
+                "method": "GET",
+                "description": "Get the works portfolio of a specific Dosen.",
+                "parameters": {
+                    "id_dosen": "string: The ID of the Dosen."
+                }
+            },
+            "Dosen Portofolio Paten": {
+                "url": "/dosen/portofolio/paten/<str:id_dosen>/",
+                "method": "GET",
+                "description": "Get the patents portfolio of a specific Dosen.",
+                "parameters": {
+                    "id_dosen": "string: The ID of the Dosen."
+                }
+            }
+        }
+    }
+}
