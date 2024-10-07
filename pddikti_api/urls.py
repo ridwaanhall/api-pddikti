@@ -32,4 +32,12 @@ urlpatterns = [
     path('prodi/dosen-homebase/<str:id_prodi>/<str:id_thsmt>/', views.ProdiDosenHomebase.as_view(), name='prodi-dosen-homebase'),
     path('prodi/dosen-penghitung-ratio/<str:id_prodi>/<str:id_thsmt>/', views.ProdiDosenPenghitungRatio.as_view(), name='prodi-dosen-penghitung-ratio'),
     
+    # dosen
+    path('dosen/profile/<str:id_dosen>/', views.DosenProfile.as_view(), name='dosen-profile'),
+    path('dosen/study-history/<str:id_dosen>/', views.DosenRiwayatPendidikan.as_view(), name='dosen-riwayat-pendidikan'),
+    path('dosen/dosen/teaching-history/<str:id_dosen>/', views.DosenRiwayatMengajar.as_view(), name='dosen-riwayat-mengajar'),
+    path('dosen/portofolio/penelitian/<str:id_dosen>/', views.DosenPortofolioPenelitian.as_view(), name='dosen-portofolio-penelitian'),
+    path('dosen/portofolio/pengabdian/<str:id_dosen>/', views.DosenPortofolioPengabdian.as_view(), name='dosen-portofolio-pengabdian'),
+    path('dosen/portofolio/karya/<str:id_dosen>/', views.DosenPortofolioKarya.as_view(), name='dosen-portofolio-karya'),
+    path('dosen/portofolio/paten/<str:id_dosen>/', views.DosenPortofolioPaten.as_view(), name='dosen-portofolio-paten'),
 ]
