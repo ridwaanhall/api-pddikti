@@ -20,7 +20,7 @@ from django.views.generic.base import RedirectView
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
+    path('api/', include('pddikti_api.urls')),
     path('', RedirectView.as_view(url='/api/', permanent=True)),
     re_path(r'^.*/$', RedirectView.as_view(url='/api/', permanent=True)),
-    path('api/', include('pddikti_api.urls')),
 ]
