@@ -1,4 +1,5 @@
 import json
+from urllib.parse import unquote
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from rest_framework.views import APIView
@@ -9,7 +10,8 @@ import requests
 BASE_URL = settings.PDDIKTI_API_URL
 
 def make_api_request(endpoint, keyword):
-    api_url = f"{BASE_URL}/{endpoint}/{keyword}"
+    decoded_keyword = unquote(keyword)
+    api_url = f"{BASE_URL}/{endpoint}/{decoded_keyword}"
     headers = {
         'x-api-key': settings.API_KEY
     }
@@ -17,12 +19,15 @@ def make_api_request(endpoint, keyword):
     try:
         response = requests.get(api_url, headers=headers, timeout=15)
         response.raise_for_status()
+        print(response.json())
+        print(api_url)
         return response.json()
     except requests.exceptions.RequestException as e:
         return {'error': str(e)}
     
 def make_api_request_2(endpoint, id, id_thsmt):
-    api_url = f"{BASE_URL}/{endpoint}/{id}/{id_thsmt}"
+    decoded_keyword = unquote(id)
+    api_url = f"{BASE_URL}/{endpoint}/{decoded_keyword}/{id_thsmt}"
     headers = {
         'x-api-key': settings.API_KEY
     }
@@ -35,7 +40,8 @@ def make_api_request_2(endpoint, id, id_thsmt):
         return {'error': str(e)}
     
 def make_api_request_3(endpoint, id, id_thsmt):
-    api_url = f"{BASE_URL}/{endpoint}/{id}?semester={id_thsmt}"
+    decoded_keyword = unquote(id)
+    api_url = f"{BASE_URL}/{endpoint}/{decoded_keyword}?semester={id_thsmt}"
     headers = {
         'x-api-key': settings.API_KEY
     }
@@ -48,7 +54,8 @@ def make_api_request_3(endpoint, id, id_thsmt):
         return {'error': str(e)}
     
 def make_api_request_img(endpoint, id):
-    api_url = f"{BASE_URL}/{endpoint}/{id}"
+    decoded_keyword = unquote(id)
+    api_url = f"{BASE_URL}/{endpoint}/{decoded_keyword}"
     headers = {
         'x-api-key': settings.API_KEY
     }
