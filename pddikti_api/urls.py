@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     # api overview
-    path('', views.api_overview, name='api-overview'),
+    path('', views.APIOverview.as_view(), name='api-overview'),
     
     # search
     path('search/all/<str:keyword>/', views.SearchAll.as_view(), name='search-all'),
