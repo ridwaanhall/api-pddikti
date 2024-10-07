@@ -14,7 +14,7 @@ def make_api_request(endpoint, keyword):
     }
 
     try:
-        response = requests.get(api_url, headers=headers, timeout=10)
+        response = requests.get(api_url, headers=headers, timeout=15)
         response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as e:
@@ -27,7 +27,7 @@ def make_api_request_2(endpoint, id, id_thsmt):
     }
 
     try:
-        response = requests.get(api_url, headers=headers, timeout=10)
+        response = requests.get(api_url, headers=headers, timeout=15)
         response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as e:
@@ -40,7 +40,7 @@ def make_api_request_3(endpoint, id, id_thsmt):
     }
 
     try:
-        response = requests.get(api_url, headers=headers, timeout=10)
+        response = requests.get(api_url, headers=headers, timeout=15)
         response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as e:
@@ -53,7 +53,7 @@ def make_api_request_img(endpoint, id):
     }
 
     try:
-        response = requests.get(api_url, headers=headers, timeout=10)
+        response = requests.get(api_url, headers=headers, timeout=15)
         response.raise_for_status()
         return response.content
     except requests.exceptions.RequestException as e:
@@ -174,4 +174,40 @@ class ProdiDosenHomebase(APIView):
 class ProdiDosenPenghitungRatio(APIView):
     def get(self, _, id_prodi, id_thsmt):
         data = make_api_request_3('dosen/penghitung-ratio', id_prodi, id_thsmt)
+        return Response(data)
+
+# dosen
+class DosenProfile(APIView):
+    def get(self, _, id_dosen):
+        data = make_api_request('dosen/profile', id_dosen)
+        return Response(data)
+    
+class DosenRiwayatPendidikan(APIView):
+    def get(self, _, id_dosen):
+        data = make_api_request('dosen/study-history', id_dosen)
+        return Response(data)
+    
+class DosenRiwayatMengajar(APIView):
+    def get(self, _, id_dosen):
+        data = make_api_request('dosen/teaching-history', id_dosen)
+        return Response(data)
+    
+class DosenPortofolioPenelitian(APIView):
+    def get(self, _, id_dosen):
+        data = make_api_request('dosen/portofolio/penelitian', id_dosen)
+        return Response(data)
+    
+class DosenPortofolioPengabdian(APIView):
+    def get(self, _, id_dosen):
+        data = make_api_request('dosen/portofolio/pengabdian', id_dosen)
+        return Response(data)
+    
+class DosenPortofolioKarya(APIView):
+    def get(self, _, id_dosen):
+        data = make_api_request('dosen/portofolio/karya', id_dosen)
+        return Response(data)
+
+class DosenPortofolioPaten(APIView):
+    def get(self, _, id_dosen):
+        data = make_api_request('dosen/portofolio/paten', id_dosen)
         return Response(data)
