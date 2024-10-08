@@ -64,5 +64,9 @@ urlpatterns = [
     path('dosen/count-ikatan/', views.DosenCountIkatan.as_view(), name='dosen-count-ikatan'),
     
     # pt
-    
+    path('pt/count/', views.PTCount.as_view(), name='pt-count'),
+    path('pt/count-province/', views.PTProvinceCount.as_view(), name='pt-count-province'),
+    path('pt/count-kelompok-pembina/', views.PTKelompokPembinaCount.as_view(), name='pt-kelompok-pembina-count'),
+    path('pt/count-akreditasi/', views.PTAkreditasiCount.as_view(), name='pt-akreditasi-count'),
+    path('pt/count-bentuk-pt/', views.PTBentukPerguruanTinggiCount.as_view(), name='pt-bentuk-pt-count'),
 ]
