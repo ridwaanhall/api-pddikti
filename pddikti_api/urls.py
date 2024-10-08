@@ -40,4 +40,29 @@ urlpatterns = [
     path('dosen/portofolio/pengabdian/<str:id_dosen>/', views.DosenPortofolioPengabdian.as_view(), name='dosen-portofolio-pengabdian'),
     path('dosen/portofolio/karya/<str:id_dosen>/', views.DosenPortofolioKarya.as_view(), name='dosen-portofolio-karya'),
     path('dosen/portofolio/paten/<str:id_dosen>/', views.DosenPortofolioPaten.as_view(), name='dosen-portofolio-paten'),
+    
+    # mahasiswa
+    path('mhs/detail/<str:id_mhs>/', views.MhsDetail.as_view(), name='mhs-detail'),
+    
+    # statistics
+    # mahaasiswa
+    path('mhs/count/', views.MhsCount.as_view(), name='mhs-count'),
+    path('mhs/count-active/', views.MhsCountActive.as_view(), name='mhs-count-active'),
+    path('mhs/count-gender/', views.MhsCountGender.as_view(), name='mhs-count-gender'),
+    path('mhs/count-bidang-ilmu/', views.MhsCountBidangIlmu.as_view(), name='mhs-count-bidang-ilmu'),
+    path('mhs/count-status/', views.MhsCountStatus.as_view(), name='mhs-count-status'),
+    path('mhs/count-jenjang/', views.MhsCountJenjang.as_view(), name='mhs-count-jenjang'),
+    path('mhs/count-kelompok-lembaga/', views.MhsCountKelompokLembaga.as_view(), name='mhs-count-kelompok-lembaga'),
+    
+    # dosen
+    path('dosen/count/', views.DosenCount.as_view(), name='dosen-count'),
+    path('dosen/count-active/', views.DosenCountActive.as_view(), name='dosen-count-active'),
+    path('dosen/count-gender/', views.DosenCountGender.as_view(), name='dosen-count-gender'),
+    path('dosen/count-bidang/', views.DosenCountBidang.as_view(), name='dosen-count-bidang'),
+    path('dosen/count-keaktifan/', views.DosenCountKeaktifan.as_view(), name='dosen-count-keaktifan'),
+    path('dosen/count-jenjang/', views.DosenCountJenjang.as_view(), name='dosen-count-jenjang'),
+    path('dosen/count-ikatan/', views.DosenCountIkatan.as_view(), name='dosen-count-ikatan'),
+    
+    # pt
+    
 ]
