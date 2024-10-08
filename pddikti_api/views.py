@@ -19,8 +19,6 @@ def make_api_request(endpoint, keyword):
     try:
         response = requests.get(api_url, headers=headers, timeout=15)
         response.raise_for_status()
-        print(response.json())
-        print(api_url)
         return response.json()
     except requests.exceptions.RequestException as e:
         return {'error': str(e)}
@@ -52,7 +50,20 @@ def make_api_request_3(endpoint, id, id_thsmt):
         return response.json()
     except requests.exceptions.RequestException as e:
         return {'error': str(e)}
-    
+
+def make_api_request_no_keyword(endpoint):
+    api_url = f"{BASE_URL}/{endpoint}"
+    headers = {
+        'x-api-key': settings.API_KEY
+    }
+
+    try:
+        response = requests.get(api_url, headers=headers, timeout=15)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        return {'error': str(e)}
+
 def make_api_request_img(endpoint, id):
     decoded_keyword = unquote(id)
     api_url = f"{BASE_URL}/{endpoint}/{decoded_keyword}"
@@ -218,4 +229,81 @@ class DosenPortofolioKarya(APIView):
 class DosenPortofolioPaten(APIView):
     def get(self, _, id_dosen):
         data = make_api_request('dosen/portofolio/paten', id_dosen)
+        return Response(data)
+    
+# mahasiswa
+class MhsDetail(APIView):
+    def get(self, _, id_mhs):
+        data = make_api_request_no_keyword('detail/mhs', id_mhs)
+        return Response(data)
+
+# statistic mhs
+class MhsCount(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('mahasiswa/count')
+        return Response(data)
+
+class MhsCountActive(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('mahasiswa/count-active')
+        return Response(data)
+    
+class MhsCountGender(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('visualisasi/mahasiswa-jenis-kelamin')
+        
+class MhsCountBidangIlmu(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('visualisasi/mahasiswa-bidang')
+        return Response(data)
+    
+class MhsCountStatus(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('visualisasi/mahasiswa-status')
+        return Response(data)
+    
+class MhsCountJenjang(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('visualisasi/mahasiswa-jenjang')
+        return Response(data)
+    
+class MhsCountKelompokLembaga(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('visualisasi/mahasiswa-kelompok-lembaga')
+        return Response(data)
+    
+# statistic dosen
+class DosenCount(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('dosen/count')
+        return Response(data)
+    
+class DosenCountActive(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('dosen/count-active')
+        return Response(data)
+
+class DosenCountGender(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('visualisasi/dosen-jenis-kelamin')
+        return Response(data)
+    
+class DosenCountBidang(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('visualisasi/dosen-bidang')
+        return Response(data)
+    
+class DosenCountKeaktifan(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('visualisasi/dosen-keaktifan')
+        return Response(data)
+    
+class DosenCountJenjang(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('visualisasi/dosen-jenjang')
+        return Response(data)
+    
+class DosenCountIkatan(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('visualisasi/dosen-ikatan')
         return Response(data)
