@@ -307,3 +307,29 @@ class DosenCountIkatan(APIView):
     def get(self, _):
         data = make_api_request_no_keyword('visualisasi/dosen-ikatan')
         return Response(data)
+
+# pt
+class PTCount(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('pt/count')
+        return Response(data)
+    
+class PTProvinceCount(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('visualisasi/pt-provinsi')
+        return Response(data)
+    
+class PTKelompokPembinaCount(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('visualisasi/pt-kelompok-pembina')
+        return Response(data)
+    
+class PTAkreditasiCount(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('visualisasi/pt-akreditasi')
+        return Response(data)
+    
+class PTBentukPerguruanTinggiCount(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('visualisasi/pt-bentuk')
+        return Response(data)
