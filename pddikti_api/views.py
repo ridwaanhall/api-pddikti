@@ -20,9 +20,15 @@ def make_api_request(endpoint, keyword):
         response = requests.get(api_url, headers=headers, timeout=15)
         response.raise_for_status()
         return response.json()
-    except requests.exceptions.RequestException as e:
-        return {'error': str(e)}
-    
+    except requests.exceptions.HTTPError as http_err:
+        return {'error': 'HTTP error occurred', 'details': str(http_err)}
+    except requests.exceptions.ConnectionError as conn_err:
+        return {'error': 'Connection error occurred', 'details': str(conn_err)}
+    except requests.exceptions.Timeout as timeout_err:
+        return {'error': 'Request timed out', 'details': str(timeout_err)}
+    except requests.exceptions.RequestException as req_err:
+        return {'error': 'An error occurred', 'details': str(req_err)}
+
 def make_api_request_2(endpoint, id, id_thsmt):
     decoded_keyword = unquote(id)
     api_url = f"{BASE_URL}/{endpoint}/{decoded_keyword}/{id_thsmt}"
@@ -34,9 +40,15 @@ def make_api_request_2(endpoint, id, id_thsmt):
         response = requests.get(api_url, headers=headers, timeout=15)
         response.raise_for_status()
         return response.json()
-    except requests.exceptions.RequestException as e:
-        return {'error': str(e)}
-    
+    except requests.exceptions.HTTPError as http_err:
+        return {'error': 'HTTP error occurred', 'details': str(http_err)}
+    except requests.exceptions.ConnectionError as conn_err:
+        return {'error': 'Connection error occurred', 'details': str(conn_err)}
+    except requests.exceptions.Timeout as timeout_err:
+        return {'error': 'Request timed out', 'details': str(timeout_err)}
+    except requests.exceptions.RequestException as req_err:
+        return {'error': 'An error occurred', 'details': str(req_err)}
+
 def make_api_request_3(endpoint, id, id_thsmt):
     decoded_keyword = unquote(id)
     api_url = f"{BASE_URL}/{endpoint}/{decoded_keyword}?semester={id_thsmt}"
@@ -48,8 +60,14 @@ def make_api_request_3(endpoint, id, id_thsmt):
         response = requests.get(api_url, headers=headers, timeout=15)
         response.raise_for_status()
         return response.json()
-    except requests.exceptions.RequestException as e:
-        return {'error': str(e)}
+    except requests.exceptions.HTTPError as http_err:
+        return {'error': 'HTTP error occurred', 'details': str(http_err)}
+    except requests.exceptions.ConnectionError as conn_err:
+        return {'error': 'Connection error occurred', 'details': str(conn_err)}
+    except requests.exceptions.Timeout as timeout_err:
+        return {'error': 'Request timed out', 'details': str(timeout_err)}
+    except requests.exceptions.RequestException as req_err:
+        return {'error': 'An error occurred', 'details': str(req_err)}
 
 def make_api_request_no_keyword(endpoint):
     api_url = f"{BASE_URL}/{endpoint}"
@@ -61,8 +79,14 @@ def make_api_request_no_keyword(endpoint):
         response = requests.get(api_url, headers=headers, timeout=15)
         response.raise_for_status()
         return response.json()
-    except requests.exceptions.RequestException as e:
-        return {'error': str(e)}
+    except requests.exceptions.HTTPError as http_err:
+        return {'error': 'HTTP error occurred', 'details': str(http_err)}
+    except requests.exceptions.ConnectionError as conn_err:
+        return {'error': 'Connection error occurred', 'details': str(conn_err)}
+    except requests.exceptions.Timeout as timeout_err:
+        return {'error': 'Request timed out', 'details': str(timeout_err)}
+    except requests.exceptions.RequestException as req_err:
+        return {'error': 'An error occurred', 'details': str(req_err)}
 
 def make_api_request_img(endpoint, id):
     decoded_keyword = unquote(id)
@@ -75,7 +99,13 @@ def make_api_request_img(endpoint, id):
         response = requests.get(api_url, headers=headers, timeout=15)
         response.raise_for_status()
         return response.content
-    except requests.exceptions.RequestException as e:
+    except requests.exceptions.HTTPError as http_err:
+        return None
+    except requests.exceptions.ConnectionError as conn_err:
+        return None
+    except requests.exceptions.Timeout as timeout_err:
+        return None
+    except requests.exceptions.RequestException as req_err:
         return None
 
 class APIOverview(APIView):
