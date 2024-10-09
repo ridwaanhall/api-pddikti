@@ -176,6 +176,66 @@
                     "id_prodi": "string: The ID of the Prodi.",
                     "id_thsmt": "string: The ID of the semester."
                 }
+            },
+            "Prodi Bidang Ilmu Agama": {
+                "url": "/prodi/bidang-ilmu/agama/",
+                "method": "GET",
+                "description": "Get Prodi details for the Agama field of study.",
+                "parameters": {}
+            },
+            "Prodi Bidang Ilmu Ekonomi": {
+                "url": "/prodi/bidang-ilmu/ekonomi/",
+                "method": "GET",
+                "description": "Get Prodi details for the Ekonomi field of study.",
+                "parameters": {}
+            },
+            "Prodi Bidang Ilmu Humaniora": {
+                "url": "/prodi/bidang-ilmu/humaniora/",
+                "method": "GET",
+                "description": "Get Prodi details for the Humaniora field of study.",
+                "parameters": {}
+            },
+            "Prodi Bidang Ilmu Kesehatan": {
+                "url": "/prodi/bidang-ilmu/kesehatan/",
+                "method": "GET",
+                "description": "Get Prodi details for the Kesehatan field of study.",
+                "parameters": {}
+            },
+            "Prodi Bidang Ilmu MIPA": {
+                "url": "/prodi/bidang-ilmu/mipa/",
+                "method": "GET",
+                "description": "Get Prodi details for the MIPA field of study.",
+                "parameters": {}
+            },
+            "Prodi Bidang Ilmu Pendidikan": {
+                "url": "/prodi/bidang-ilmu/pendidikan/",
+                "method": "GET",
+                "description": "Get Prodi details for the Pendidikan field of study.",
+                "parameters": {}
+            },
+            "Prodi Bidang Ilmu Pertanian": {
+                "url": "/prodi/bidang-ilmu/pertanian/",
+                "method": "GET",
+                "description": "Get Prodi details for the Pertanian field of study.",
+                "parameters": {}
+            },
+            "Prodi Bidang Ilmu Seni": {
+                "url": "/prodi/bidang-ilmu/seni/",
+                "method": "GET",
+                "description": "Get Prodi details for the Seni field of study.",
+                "parameters": {}
+            },
+            "Prodi Bidang Ilmu Sosial": {
+                "url": "/prodi/bidang-ilmu/sosial/",
+                "method": "GET",
+                "description": "Get Prodi details for the Sosial field of study.",
+                "parameters": {}
+            },
+            "Prodi Bidang Ilmu Teknik": {
+                "url": "/prodi/bidang-ilmu/teknik/",
+                "method": "GET",
+                "description": "Get Prodi details for the Teknik field of study.",
+                "parameters": {}
             }
         },
         "Dosen Endpoints": {
@@ -234,6 +294,170 @@
                 "parameters": {
                     "id_dosen": "string: The ID of the Dosen."
                 }
+            },
+            "Dosen Count": {
+                "url": "/dosen/count/",
+                "method": "GET",
+                "description": "Get the total count of Dosen.",
+                "parameters": {}
+            },
+            "Dosen Count Active": {
+                "url": "/dosen/count-active/",
+                "method": "GET",
+                "description": "Get the count of active Dosen.",
+                "parameters": {}
+            },
+            "Dosen Count Gender": {
+                "url": "/dosen/count-gender/",
+                "method": "GET",
+                "description": "Get the count of Dosen by gender.",
+                "parameters": {}
+            },
+            "Dosen Count Bidang": {
+                "url": "/dosen/count-bidang/",
+                "method": "GET",
+                "description": "Get the count of Dosen by field.",
+                "parameters": {}
+            },
+            "Dosen Count Keaktifan": {
+                "url": "/dosen/count-keaktifan/",
+                "method": "GET",
+                "description": "Get the count of Dosen by activity status.",
+                "parameters": {}
+            },
+            "Dosen Count Jenjang": {
+                "url": "/dosen/count-jenjang/",
+                "method": "GET",
+                "description": "Get the count of Dosen by education level.",
+                "parameters": {}
+            },
+            "Dosen Count Ikatan": {
+                "url": "/dosen/count-ikatan/",
+                "method": "GET",
+                "description": "Get the count of Dosen by employment status.",
+                "parameters": {}
+            }
+        },
+        "Mahasiswa Endpoints": {
+            "Mahasiswa Detail": {
+                "url": "/mhs/detail/<str:id_mhs>/",
+                "method": "GET",
+                "description": "Get details of a specific Mahasiswa.",
+                "parameters": {
+                    "id_mhs": "string: The ID of the Mahasiswa."
+                }
+            },
+            "Mahasiswa Count": {
+                "url": "/mhs/count/",
+                "method": "GET",
+                "description": "Get the total count of Mahasiswa.",
+                "parameters": {}
+            },
+            "Mahasiswa Count Active": {
+                "url": "/mhs/count-active/",
+                "method": "GET",
+                "description": "Get the count of active Mahasiswa.",
+                "parameters": {}
+            },
+            "Mahasiswa Count Gender": {
+                "url": "/mhs/count-gender/",
+                "method": "GET",
+                "description": "Get the count of Mahasiswa by gender.",
+                "parameters": {}
+            },
+            "Mahasiswa Count Bidang Ilmu": {
+                "url": "/mhs/count-bidang-ilmu/",
+                "method": "GET",
+                "description": "Get the count of Mahasiswa by field of study.",
+                "parameters": {}
+            },
+            "Mahasiswa Count Status": {
+                "url": "/mhs/count-status/",
+                "method": "GET",
+                "description": "Get the count of Mahasiswa by status.",
+                "parameters": {}
+            },
+            "Mahasiswa Count Jenjang": {
+                "url": "/mhs/count-jenjang/",
+                "method": "GET",
+                "description": "Get the count of Mahasiswa by education level.",
+                "parameters": {}
+            },
+            "Mahasiswa Count Kelompok Lembaga": {
+                "url": "/mhs/count-kelompok-lembaga/",
+                "method": "GET",
+                "description": "Get the count of Mahasiswa by institution group.",
+                "parameters": {}
+            }
+        },
+        "PT Statistics Endpoints": {
+            "PT Count": {
+                "url": "/pt/count/",
+                "method": "GET",
+                "description": "Get the total count of PT.",
+                "parameters": {}
+            },
+            "PT Count Province": {
+                "url": "/pt/count-province/",
+                "method": "GET",
+                "description": "Get the count of PT by province.",
+                "parameters": {}
+            },
+            "PT Kelompok Pembina Count": {
+                "url": "/pt/count-kelompok-pembina/",
+                "method": "GET",
+                "description": "Get the count of PT by supervisory group.",
+                "parameters": {}
+            },
+            "PT Akreditasi Count": {
+                "url": "/pt/count-akreditasi/",
+                "method": "GET",
+                "description": "Get the count of PT by accreditation.",
+                "parameters": {}
+            },
+            "PT Bentuk Perguruan Tinggi Count": {
+                "url": "/pt/count-bentuk-pt/",
+                "method": "GET",
+                "description": "Get the count of PT by type.",
+                "parameters": {}
+            }
+        },
+        "Prodi Statistics Endpoints": {
+            "Prodi Count": {
+                "url": "/prodi/count/",
+                "method": "GET",
+                "description": "Get the total count of Prodi.",
+                "parameters": {}
+            },
+            "Prodi Bidang Ilmu Terbanyak Count": {
+                "url": "/prodi/bidang-ilmu-terbanyak/",
+                "method": "GET",
+                "description": "Get the count of Prodi by most common fields of study.",
+                "parameters": {}
+            },
+            "Prodi Kelompok Pembina Count": {
+                "url": "/prodi/kelompok-pembina/",
+                "method": "GET",
+                "description": "Get the count of Prodi by supervisory group.",
+                "parameters": {}
+            },
+            "Prodi Bidang Ilmu Count": {
+                "url": "/prodi/bidang-ilmu/",
+                "method": "GET",
+                "description": "Get the count of Prodi by field of study.",
+                "parameters": {}
+            },
+            "Prodi Akreditasi Count": {
+                "url": "/prodi/akreditasi/",
+                "method": "GET",
+                "description": "Get the count of Prodi by accreditation.",
+                "parameters": {}
+            },
+            "Prodi Jenjang Count": {
+                "url": "/prodi/jenjang/",
+                "method": "GET",
+                "description": "Get the count of Prodi by education level.",
+                "parameters": {}
             }
         }
     }
