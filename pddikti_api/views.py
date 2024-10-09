@@ -363,3 +363,85 @@ class PTBentukPerguruanTinggiCount(APIView):
     def get(self, _):
         data = make_api_request_no_keyword('visualisasi/pt-bentuk')
         return Response(data)
+    
+# prodi
+class ProdiCount(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('prodi/count')
+        return Response(data)
+    
+class ProdiBidangIlmuTerbanyakCount(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('prodi/bidang-ilmu')
+        return Response(data)
+    
+class ProdiKelompokPembinaCount(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('visualisasi/prodi-kelompok-pembina')
+        return Response(data)
+    
+class ProdiBidangIlmuCount(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('visualisasi/prodi-bidang-ilmu')
+        return Response(data)
+    
+class ProdiAkreditasiCOunt(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('visualisasi/prodi-akreditasi')
+        return Response(data)
+    
+class ProdiJenjangCount(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('visualisasi/prodi-jenjang')
+        return Response(data)
+
+# prodi bidang ilmu
+class ProdiBidangIlmuAgama(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('prodi/bidang-ilmu/Agama')
+        return Response(data)
+    
+class ProdiBidangIlmuEkonomi(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('prodi/bidang-ilmu/Ekonomi')
+        return Response(data)
+    
+class ProdiBidangIlmuHumaniora(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('prodi/bidang-ilmu/Humaniora')
+        return Response(data)
+    
+class ProdiBidangIlmukesehatan(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('prodi/bidang-ilmu/Kesehatan')
+        return Response(data)
+    
+class ProdiBidangIlmuMIPA(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('prodi/bidang-ilmu/MIPA')
+        return Response(data)
+
+class ProdiBidangIlmuPendidikan(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('prodi/bidang-ilmu/Pendidikan')
+        return Response(data)
+
+class ProdiBidangIlmuPertanian(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('prodi/bidang-ilmu/Pertanian')
+        return Response(data)
+
+class ProdiBidangIlmuSeni(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('prodi/bidang-ilmu/Seni')
+        return Response(data)
+
+class ProdiBidangIlmuSosial(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('prodi/bidang-ilmu/Sosial')
+        return Response(data)
+
+class ProdiBidangIlmuTeknik(APIView):
+    def get(self, _):
+        data = make_api_request_no_keyword('prodi/bidang-ilmu/Teknik')
+        return Response(data)

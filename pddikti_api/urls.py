@@ -41,7 +41,7 @@ urlpatterns = [
     path('dosen/portofolio/karya/<str:id_dosen>/', views.DosenPortofolioKarya.as_view(), name='dosen-portofolio-karya'),
     path('dosen/portofolio/paten/<str:id_dosen>/', views.DosenPortofolioPaten.as_view(), name='dosen-portofolio-paten'),
     
-    # mahasiswa
+    # mahasiswa detail
     path('mhs/detail/<str:id_mhs>/', views.MhsDetail.as_view(), name='mhs-detail'),
     
     # statistics
@@ -69,4 +69,26 @@ urlpatterns = [
     path('pt/count-kelompok-pembina/', views.PTKelompokPembinaCount.as_view(), name='pt-kelompok-pembina-count'),
     path('pt/count-akreditasi/', views.PTAkreditasiCount.as_view(), name='pt-akreditasi-count'),
     path('pt/count-bentuk-pt/', views.PTBentukPerguruanTinggiCount.as_view(), name='pt-bentuk-pt-count'),
+    
+    # prodi
+    path('prodi/count/', views.ProdiCount.as_view(), name='prodi-count'),
+    path('prodi/bidang-ilmu-terbanyak/', views.ProdiBidangIlmuTerbanyakCount.as_view(), name='prodi-bidang-ilmu-terbanyak-count'),
+    path('prodi/kelompok-pembina/', views.ProdiKelompokPembinaCount.as_view(), name='prodi-kelompok-pembina-count'),
+    path('prodi/bidang-ilmu/', views.ProdiBidangIlmuCount.as_view(), name='prodi-bidang-ilmu-count'),
+    path('prodi/akreditasi/', views.ProdiAkreditasiCOunt.as_view(), name='prodi-akreditasi-count'),
+    path('prodi/jenjang/', views.ProdiJenjangCount.as_view(), name='prodi-jenjang-count'),
+    
+    # prodi ilmu
+    # search filter
+    # path('prodi/search/filter/', views.ProdiSearchFilter.as_view(), name='prodi-search-filter'),
+    path('prodi/bidang-ilmu/agama/', views.ProdiBidangIlmuAgama.as_view(), name='prodi-bidang-ilmu-agama'),
+    path('prodi/bidang-ilmu/ekonomi/', views.ProdiBidangIlmuEkonomi.as_view(), name='prodi-bidang-ilmu-ekonomi'),
+    path('prodi/bidang-ilmu/humaniora/', views.ProdiBidangIlmuHumaniora.as_view(), name='prodi-bidang-ilmu-humaniora'),
+    path('prodi/bidang-ilmu/kesehatan/', views.ProdiBidangIlmukesehatan.as_view(), name='prodi-bidang-ilmu-kesehatan'),
+    path('prodi/bidang-ilmu/mipa/', views.ProdiBidangIlmuMIPA.as_view(), name='prodi-bidang-ilmu-mipa'),
+    path('prodi/bidang-ilmu/pendidikan/', views.ProdiBidangIlmuPendidikan.as_view(), name='prodi-bidang-ilmu-pendidikan'),
+    path('prodi/bidang-ilmu/pertanian/', views.ProdiBidangIlmuPertanian.as_view(), name='prodi-bidang-ilmu-pertanian'),
+    path('prodi/bidang-ilmu/seni/', views.ProdiBidangIlmuSeni.as_view(), name='prodi-bidang-ilmu-seni'),
+    path('prodi/bidang-ilmu/sosial/', views.ProdiBidangIlmuSosial.as_view(), name='prodi-bidang-ilmu-sosial'),
+    path('prodi/bidang-ilmu/teknik/', views.ProdiBidangIlmuTeknik.as_view(), name='prodi-bidang-ilmu-teknik'),
 ]
