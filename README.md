@@ -1,5 +1,7 @@
 # PDDIKTI API
 
+[![wakatime](https://wakatime.com/badge/user/018b799e-de53-4f7a-bb65-edc2df9f26d8/project/e637f4e3-a75d-49c8-beb0-0f19f8eb52cd.svg)](https://wakatime.com/badge/user/018b799e-de53-4f7a-bb65-edc2df9f26d8/project/e637f4e3-a75d-49c8-beb0-0f19f8eb52cd)
+
 ## INFO
 
 > **INFO:** The API has been updated based on new url <https://pddikti.kemdiktisaintek.go.id/>
