@@ -2,7 +2,7 @@
 
 ## INFO
 
-> **INFO:** The API has been updated <https://pddikti.kemdiktisaintek.go.id/>
+> **INFO:** The API has been updated based on new url <https://pddikti.kemdiktisaintek.go.id/>
 
 ## How to use?
 
