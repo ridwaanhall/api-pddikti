@@ -16,11 +16,11 @@ from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# PDDIKTI API URL
 PDDIKTI_API_URL = config('PDDIKTI_API_URL')
-
-# API key for PDDIKTI API
 API_KEY = config('API_KEY')
+HOST_KEY = config('HOST_KEY')
+ORIGIN_KEY = config('ORIGIN_KEY')
+REFERER_KEY = config('REFERER_KEY')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
