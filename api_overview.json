@@ -2,7 +2,7 @@
     "info": {
         "base_url": "https://api-pddikti.vercel.app",
         "version": "2.2.1",
-        "description": "API for retrieving information about Perguruan Tinggi, Program Studi, Dosen, and Mahasiswa in Indonesia.",
+        "description": "This API provides access to data from the Pangkalan Data Pendidikan Tinggi (PDDikti), the Indonesian Higher Education Database. It allows users to search for and retrieve detailed information about universities, study programs, lecturers, and students.",
         "author": "ridwaanhall"
     },
     "api_overview": {
