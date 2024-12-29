@@ -1,7 +1,7 @@
 {
     "info": {
         "base_url": "https://api-pddikti.vercel.app",
-        "version": "2.1.0",
+        "version": "2.2.1",
         "description": "API for retrieving information about Perguruan Tinggi, Program Studi, Dosen, and Mahasiswa in Indonesia.",
         "author": "ridwaanhall"
     },
