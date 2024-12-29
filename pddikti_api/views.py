@@ -13,24 +13,24 @@ def make_api_request(endpoint, keyword):
     decoded_keyword = unquote(keyword)
     api_url = f"{BASE_URL}/{endpoint}/{decoded_keyword}"
     headers = {
-        'x-api-key': settings.API_KEY,
-        'Accept': '*/*',
-        'Accept-Encoding': 'gzip, deflate, br, zstd',
-        'Accept-Language': 'en-US,en;q=0.9,mt;q=0.8',
-        'Access-Control-Request-Headers': 'x-user-ip',
-        'Access-Control-Request-Method': 'GET',
-        'Connection': 'keep-alive',
-        'Host': 'api-pddikti.kemdiktisaintek.go.id',
-        'Origin': 'https://pddikti.kemdiktisaintek.go.id',
-        'Referer': 'https://pddikti.kemdiktisaintek.go.id/',
-        'Sec-Fetch-Dest': 'empty',
-        'Sec-Fetch-Mode': 'cors',
-        'Sec-Fetch-Site': 'same-site',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0'
+        # 'x-api-key': settings.API_KEY,
+        # 'Accept': '*/*',
+        # 'Accept-Encoding': 'gzip, deflate, br, zstd',
+        # 'Accept-Language': 'en-US,en;q=0.9,mt;q=0.8',
+        # 'Access-Control-Request-Headers': 'x-user-ip',
+        # 'Access-Control-Request-Method': 'GET',
+        # 'Connection': 'keep-alive',
+        'Host': settings.HOST_KEY,
+        'Origin': settings.ORIGIN_KEY,
+        'Referer': settings.REFERER_KEY,
+        # 'Sec-Fetch-Dest': 'empty',
+        # 'Sec-Fetch-Mode': 'cors',
+        # 'Sec-Fetch-Site': 'same-site',
+        # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0'
     }
 
     try:
-        response = requests.get(api_url, headers=headers, timeout=15)
+        response = requests.get(api_url, headers=headers, timeout=30)
         response.raise_for_status()
         return response.json()
     except requests.exceptions.HTTPError as http_err:
@@ -46,24 +46,24 @@ def make_api_request_2(endpoint, id, id_thsmt):
     decoded_keyword = unquote(id)
     api_url = f"{BASE_URL}/{endpoint}/{decoded_keyword}/{id_thsmt}"
     headers = {
-        'x-api-key': settings.API_KEY,
-        'Accept': '*/*',
-        'Accept-Encoding': 'gzip, deflate, br, zstd',
-        'Accept-Language': 'en-US,en;q=0.9,mt;q=0.8',
-        'Access-Control-Request-Headers': 'x-user-ip',
-        'Access-Control-Request-Method': 'GET',
-        'Connection': 'keep-alive',
-        'Host': 'api-pddikti.kemdiktisaintek.go.id',
-        'Origin': 'https://pddikti.kemdiktisaintek.go.id',
-        'Referer': 'https://pddikti.kemdiktisaintek.go.id/',
-        'Sec-Fetch-Dest': 'empty',
-        'Sec-Fetch-Mode': 'cors',
-        'Sec-Fetch-Site': 'same-site',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0'
+        # 'x-api-key': settings.API_KEY,
+        # 'Accept': '*/*',
+        # 'Accept-Encoding': 'gzip, deflate, br, zstd',
+        # 'Accept-Language': 'en-US,en;q=0.9,mt;q=0.8',
+        # 'Access-Control-Request-Headers': 'x-user-ip',
+        # 'Access-Control-Request-Method': 'GET',
+        # 'Connection': 'keep-alive',
+        'Host': settings.HOST_KEY,
+        'Origin': settings.ORIGIN_KEY,
+        'Referer': settings.REFERER_KEY,
+        # 'Sec-Fetch-Dest': 'empty',
+        # 'Sec-Fetch-Mode': 'cors',
+        # 'Sec-Fetch-Site': 'same-site',
+        # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0'
     }
 
     try:
-        response = requests.get(api_url, headers=headers, timeout=15)
+        response = requests.get(api_url, headers=headers, timeout=30)
         response.raise_for_status()
         return response.json()
     except requests.exceptions.HTTPError as http_err:
@@ -79,24 +79,24 @@ def make_api_request_3(endpoint, id, id_thsmt):
     decoded_keyword = unquote(id)
     api_url = f"{BASE_URL}/{endpoint}/{decoded_keyword}?semester={id_thsmt}"
     headers = {
-        'x-api-key': settings.API_KEY,
-        'Accept': '*/*',
-        'Accept-Encoding': 'gzip, deflate, br, zstd',
-        'Accept-Language': 'en-US,en;q=0.9,mt;q=0.8',
-        'Access-Control-Request-Headers': 'x-user-ip',
-        'Access-Control-Request-Method': 'GET',
-        'Connection': 'keep-alive',
-        'Host': 'api-pddikti.kemdiktisaintek.go.id',
-        'Origin': 'https://pddikti.kemdiktisaintek.go.id',
-        'Referer': 'https://pddikti.kemdiktisaintek.go.id/',
-        'Sec-Fetch-Dest': 'empty',
-        'Sec-Fetch-Mode': 'cors',
-        'Sec-Fetch-Site': 'same-site',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0'
+        # 'x-api-key': settings.API_KEY,
+        # 'Accept': '*/*',
+        # 'Accept-Encoding': 'gzip, deflate, br, zstd',
+        # 'Accept-Language': 'en-US,en;q=0.9,mt;q=0.8',
+        # 'Access-Control-Request-Headers': 'x-user-ip',
+        # 'Access-Control-Request-Method': 'GET',
+        # 'Connection': 'keep-alive',
+        'Host': settings.HOST_KEY,
+        'Origin': settings.ORIGIN_KEY,
+        'Referer': settings.REFERER_KEY,
+        # 'Sec-Fetch-Dest': 'empty',
+        # 'Sec-Fetch-Mode': 'cors',
+        # 'Sec-Fetch-Site': 'same-site',
+        # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0'
     }
 
     try:
-        response = requests.get(api_url, headers=headers, timeout=15)
+        response = requests.get(api_url, headers=headers, timeout=30)
         response.raise_for_status()
         return response.json()
     except requests.exceptions.HTTPError as http_err:
@@ -111,24 +111,24 @@ def make_api_request_3(endpoint, id, id_thsmt):
 def make_api_request_no_keyword(endpoint):
     api_url = f"{BASE_URL}/{endpoint}"
     headers = {
-        'x-api-key': settings.API_KEY,
-        'Accept': '*/*',
-        'Accept-Encoding': 'gzip, deflate, br, zstd',
-        'Accept-Language': 'en-US,en;q=0.9,mt;q=0.8',
-        'Access-Control-Request-Headers': 'x-user-ip',
-        'Access-Control-Request-Method': 'GET',
-        'Connection': 'keep-alive',
-        'Host': 'api-pddikti.kemdiktisaintek.go.id',
-        'Origin': 'https://pddikti.kemdiktisaintek.go.id',
-        'Referer': 'https://pddikti.kemdiktisaintek.go.id/',
-        'Sec-Fetch-Dest': 'empty',
-        'Sec-Fetch-Mode': 'cors',
-        'Sec-Fetch-Site': 'same-site',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0'
+        # 'x-api-key': settings.API_KEY,
+        # 'Accept': '*/*',
+        # 'Accept-Encoding': 'gzip, deflate, br, zstd',
+        # 'Accept-Language': 'en-US,en;q=0.9,mt;q=0.8',
+        # 'Access-Control-Request-Headers': 'x-user-ip',
+        # 'Access-Control-Request-Method': 'GET',
+        # 'Connection': 'keep-alive',
+        'Host': settings.HOST_KEY,
+        'Origin': settings.ORIGIN_KEY,
+        'Referer': settings.REFERER_KEY,
+        # 'Sec-Fetch-Dest': 'empty',
+        # 'Sec-Fetch-Mode': 'cors',
+        # 'Sec-Fetch-Site': 'same-site',
+        # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0'
     }
 
     try:
-        response = requests.get(api_url, headers=headers, timeout=15)
+        response = requests.get(api_url, headers=headers, timeout=30)
         response.raise_for_status()
         return response.json()
     except requests.exceptions.HTTPError as http_err:
@@ -144,24 +144,24 @@ def make_api_request_img(endpoint, id):
     decoded_keyword = unquote(id)
     api_url = f"{BASE_URL}/{endpoint}/{decoded_keyword}"
     headers = {
-        'x-api-key': settings.API_KEY,
-        'Accept': '*/*',
-        'Accept-Encoding': 'gzip, deflate, br, zstd',
-        'Accept-Language': 'en-US,en;q=0.9,mt;q=0.8',
-        'Access-Control-Request-Headers': 'x-user-ip',
-        'Access-Control-Request-Method': 'GET',
-        'Connection': 'keep-alive',
-        'Host': 'api-pddikti.kemdiktisaintek.go.id',
-        'Origin': 'https://pddikti.kemdiktisaintek.go.id',
-        'Referer': 'https://pddikti.kemdiktisaintek.go.id/',
-        'Sec-Fetch-Dest': 'empty',
-        'Sec-Fetch-Mode': 'cors',
-        'Sec-Fetch-Site': 'same-site',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0'
+        # 'x-api-key': settings.API_KEY,
+        # 'Accept': '*/*',
+        # 'Accept-Encoding': 'gzip, deflate, br, zstd',
+        # 'Accept-Language': 'en-US,en;q=0.9,mt;q=0.8',
+        # 'Access-Control-Request-Headers': 'x-user-ip',
+        # 'Access-Control-Request-Method': 'GET',
+        # 'Connection': 'keep-alive',
+        'Host': settings.HOST_KEY,
+        'Origin': settings.ORIGIN_KEY,
+        'Referer': settings.REFERER_KEY,
+        # 'Sec-Fetch-Dest': 'empty',
+        # 'Sec-Fetch-Mode': 'cors',
+        # 'Sec-Fetch-Site': 'same-site',
+        # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0'
     }
 
     try:
-        response = requests.get(api_url, headers=headers, timeout=15)
+        response = requests.get(api_url, headers=headers, timeout=30)
         response.raise_for_status()
         return response.content
     except requests.exceptions.HTTPError as http_err:
@@ -329,7 +329,7 @@ class DosenPortofolioPaten(APIView):
 # mahasiswa
 class MhsDetail(APIView):
     def get(self, _, id_mhs):
-        data = make_api_request_no_keyword('detail/mhs', id_mhs)
+        data = make_api_request('detail/mhs', id_mhs)
         return Response(data)
 
 # statistic mhs
