@@ -1,457 +1,561 @@
 import json
+from typing import Any, Dict, Optional, Union
 from urllib.parse import unquote
-from django.conf import settings
-from django.http import HttpResponse, JsonResponse
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
+
 import requests
+from django.conf import settings
+from django.http import HttpResponse
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 BASE_URL = settings.PDDIKTI_API_URL
 
-def make_api_request(endpoint, keyword):
-    decoded_keyword = unquote(keyword)
-    api_url = f"{BASE_URL}/{endpoint}/{decoded_keyword}"
-    headers = {
-        'Host': settings.HOST_KEY,
-        'Origin': settings.ORIGIN_KEY,
-        'Referer': settings.REFERER_KEY,
-    }
 
-    try:
-        response = requests.get(api_url, headers=headers, timeout=30)
-        response.raise_for_status()
-        return response.json()
-    except requests.exceptions.HTTPError as http_err:
-        return {'error': 'HTTP error occurred', 'details': str(http_err)}
-    except requests.exceptions.ConnectionError as conn_err:
-        return {'error': 'Connection error occurred', 'details': str(conn_err)}
-    except requests.exceptions.Timeout as timeout_err:
-        return {'error': 'Request timed out', 'details': str(timeout_err)}
-    except requests.exceptions.RequestException as req_err:
-        return {'error': 'An error occurred', 'details': str(req_err)}
+class APIClient:
+    """
+    A class to handle making requests to the PDDIKTI API.
+    """
+    def __init__(self):
+        self.headers = {
+            'Host': settings.HOST_KEY,
+            'Origin': settings.ORIGIN_KEY,
+            'Referer': settings.REFERER_KEY,
+        }
+        self.timeout = 30
 
-def make_api_request_2(endpoint, id, id_thsmt):
-    decoded_keyword = unquote(id)
-    api_url = f"{BASE_URL}/{endpoint}/{decoded_keyword}/{id_thsmt}"
-    headers = {
-        'Host': settings.HOST_KEY,
-        'Origin': settings.ORIGIN_KEY,
-        'Referer': settings.REFERER_KEY,
-    }
+    def _handle_response(self, response: requests.Response) -> Any:
+        """
+        Handles the response from the API.
 
-    try:
-        response = requests.get(api_url, headers=headers, timeout=30)
-        response.raise_for_status()
-        return response.json()
-    except requests.exceptions.HTTPError as http_err:
-        return {'error': 'HTTP error occurred', 'details': str(http_err)}
-    except requests.exceptions.ConnectionError as conn_err:
-        return {'error': 'Connection error occurred', 'details': str(conn_err)}
-    except requests.exceptions.Timeout as timeout_err:
-        return {'error': 'Request timed out', 'details': str(timeout_err)}
-    except requests.exceptions.RequestException as req_err:
-        return {'error': 'An error occurred', 'details': str(req_err)}
+        Args:
+            response (requests.Response): The response object from the API.
 
-def make_api_request_3(endpoint, id, id_thsmt):
-    decoded_keyword = unquote(id)
-    api_url = f"{BASE_URL}/{endpoint}/{decoded_keyword}?semester={id_thsmt}"
-    headers = {
-        'Host': settings.HOST_KEY,
-        'Origin': settings.ORIGIN_KEY,
-        'Referer': settings.REFERER_KEY,
-    }
+        Returns:
+             Any: The JSON response data or None for images.
+        """
+        try:
+            response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
+            if "image" in response.headers.get('Content-Type',''):
+                return response.content  # Return raw content for images
+            return response.json()
+        except requests.exceptions.HTTPError as http_err:
+            return {
+                'code': response.status_code,
+                'error': 'HTTP error occurred', 
+                'details': str(http_err),
+                'message': response.json()
+            }
+        except requests.exceptions.ConnectionError as conn_err:
+            return {
+                'code': response.status_code,
+                'error': 'Connection error occurred',
+                'details': str(conn_err),
+                'message': response.json()
+            }
+        except requests.exceptions.Timeout as timeout_err:
+            return {
+                'code': response.status_code,
+                'error': 'Request timed out',
+                'details': str(timeout_err),
+                'message': response.json()
+            }
+        except requests.exceptions.RequestException as req_err:
+            return {
+                'code': response.status_code,
+                'error': 'An error occurred',
+                'details': str(req_err),
+                'message': response.json()
+            }
+    
+    def _make_request(self, url: str) -> Any:
+      """
+        Makes an API request with error handling
 
-    try:
-        response = requests.get(api_url, headers=headers, timeout=30)
-        response.raise_for_status()
-        return response.json()
-    except requests.exceptions.HTTPError as http_err:
-        return {'error': 'HTTP error occurred', 'details': str(http_err)}
-    except requests.exceptions.ConnectionError as conn_err:
-        return {'error': 'Connection error occurred', 'details': str(conn_err)}
-    except requests.exceptions.Timeout as timeout_err:
-        return {'error': 'Request timed out', 'details': str(timeout_err)}
-    except requests.exceptions.RequestException as req_err:
-        return {'error': 'An error occurred', 'details': str(req_err)}
+        Args:
+            url (str): The complete URL for the request.
 
-def make_api_request_no_keyword(endpoint):
-    api_url = f"{BASE_URL}/{endpoint}"
-    headers = {
-        'Host': settings.HOST_KEY,
-        'Origin': settings.ORIGIN_KEY,
-        'Referer': settings.REFERER_KEY,
-    }
+        Returns:
+            Any: The data received from the API or error object.
+        """
+      try:
+          response = requests.get(url, headers=self.headers, timeout=self.timeout)
+          return self._handle_response(response)
+      except Exception as e:
+            return {'error': 'An unexpected error occurred', 'details': str(e)}
 
-    try:
-        response = requests.get(api_url, headers=headers, timeout=30)
-        response.raise_for_status()
-        return response.json()
-    except requests.exceptions.HTTPError as http_err:
-        return {'error': 'HTTP error occurred', 'details': str(http_err)}
-    except requests.exceptions.ConnectionError as conn_err:
-        return {'error': 'Connection error occurred', 'details': str(conn_err)}
-    except requests.exceptions.Timeout as timeout_err:
-        return {'error': 'Request timed out', 'details': str(timeout_err)}
-    except requests.exceptions.RequestException as req_err:
-        return {'error': 'An error occurred', 'details': str(req_err)}
+    def get(self, endpoint: str, **kwargs: str) -> Any:
+        """
+        Makes a GET request to the PDDIKTI API.
 
-def make_api_request_img(endpoint, id):
-    decoded_keyword = unquote(id)
-    api_url = f"{BASE_URL}/{endpoint}/{decoded_keyword}"
-    headers = {
-        'Host': settings.HOST_KEY,
-        'Origin': settings.ORIGIN_KEY,
-        'Referer': settings.REFERER_KEY,
-    }
+        Args:
+            endpoint (str): The API endpoint.
+            **kwargs (str): Optional parameters for the URL.
 
-    try:
-        response = requests.get(api_url, headers=headers, timeout=30)
-        response.raise_for_status()
-        return response.content
-    except requests.exceptions.HTTPError as http_err:
-        return None
-    except requests.exceptions.ConnectionError as conn_err:
-        return None
-    except requests.exceptions.Timeout as timeout_err:
-        return None
-    except requests.exceptions.RequestException as req_err:
-        return None
+        Returns:
+           Any: The API response data or None if there was an error.
+        """
+        url = f"{BASE_URL}/{endpoint}"
+        if kwargs:
+            params = '&'.join([f"{k}={unquote(v)}" for k, v in kwargs.items()])
+            url = f"{url}?{params}"
+            
+        return self._make_request(url)
 
-class APIOverview(APIView):
+    def get_with_keyword(self, endpoint: str, keyword: str) -> Any:
+        """
+        Makes a GET request with a keyword in the URL.
+
+        Args:
+            endpoint (str): The API endpoint.
+            keyword (str): The keyword for the request.
+
+        Returns:
+             Any: The API response data or None if there was an error.
+        """
+        decoded_keyword = unquote(keyword)
+        url = f"{BASE_URL}/{endpoint}/{decoded_keyword}"
+        return self._make_request(url)
+    
+    def get_with_id_and_semester(self, endpoint: str, id: str, id_thsmt: str) -> Any:
+      """
+        Makes a GET request with ID and semester parameters
+
+        Args:
+             endpoint (str): The API endpoint.
+             id (str): The ID for the request.
+             id_thsmt (str): The semester ID.
+
+        Returns:
+            Any: The API response data or None if there was an error.
+        """
+      decoded_keyword = unquote(id)
+      url = f"{BASE_URL}/{endpoint}/{decoded_keyword}/{id_thsmt}"
+      return self._make_request(url)
+
+
+class BaseAPIView(APIView):
+    """
+     Base class for API views, providing common functionality.
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.api_client = APIClient()
+
+    def handle_api_response(self, data: Any) -> Response:
+        """
+        Handles the API response and returns a Response object
+
+        Args:
+             data (Any): The data received from the API.
+
+        Returns:
+            Response: The API response for client
+        """
+        return Response(data)
+
+
+# API Views
+
+class APIOverview(BaseAPIView):
     def get(self, _):
         with open('api_overview.json', 'r') as file:
             data = json.load(file)
-        return Response(data)
+        return self.handle_api_response(data)
 
-# SearchAll, SearchPT, SearchProdi, SearchDosen, and SearchMahasiswa classes are API views that handle GET requests.
-class SearchAll(APIView):
-    def get(self, _, keyword):
-        data = make_api_request('pencarian/all', keyword)
-        return Response(data)
 
-class SearchPT(APIView):
+# Search
+class SearchAll(BaseAPIView):
     def get(self, _, keyword):
-        data = make_api_request('pencarian/pt', keyword)
-        return Response(data)
+        data = self.api_client.get_with_keyword('pencarian/all', keyword)
+        return self.handle_api_response(data)
 
-class SearchProdi(APIView):
-    def get(self, _, keyword):
-        data = make_api_request('pencarian/prodi', keyword)
-        return Response(data)
 
-class SearchDosen(APIView):
+class SearchPT(BaseAPIView):
     def get(self, _, keyword):
-        data = make_api_request('pencarian/dosen', keyword)
-        return Response(data)
+        data = self.api_client.get_with_keyword('pencarian/pt', keyword)
+        return self.handle_api_response(data)
 
-class SearchMahasiswa(APIView):
+
+class SearchProdi(BaseAPIView):
     def get(self, _, keyword):
-        data = make_api_request('pencarian/mhs', keyword)
-        return Response(data)
-    
+        data = self.api_client.get_with_keyword('pencarian/prodi', keyword)
+        return self.handle_api_response(data)
+
+
+class SearchDosen(BaseAPIView):
+    def get(self, _, keyword):
+        data = self.api_client.get_with_keyword('pencarian/dosen', keyword)
+        return self.handle_api_response(data)
+
+
+class SearchMahasiswa(BaseAPIView):
+    def get(self, _, keyword):
+        data = self.api_client.get_with_keyword('pencarian/mhs', keyword)
+        return self.handle_api_response(data)
+
+
 # PT
-class PTDetail(APIView):
+class PTDetail(BaseAPIView):
     def get(self, _, id_pt):
-        data = make_api_request('pt/detail', id_pt)
-        return Response(data)
+        data = self.api_client.get_with_keyword('pt/detail', id_pt)
+        return self.handle_api_response(data)
 
-class PTProdi(APIView):
+
+class PTProdi(BaseAPIView):
     def get(self, _, id_pt, id_thsmt):
-        data = make_api_request_2('pt/prodi', id_pt, id_thsmt)
-        return Response(data)
-    
-class PTRasioDosenMahasiswa(APIView):
+        data = self.api_client.get_with_id_and_semester('pt/prodi', id_pt, id_thsmt)
+        return self.handle_api_response(data)
+
+
+class PTRasioDosenMahasiswa(BaseAPIView):
     def get(self, _, id_pt):
-        data = make_api_request('pt/rasio', id_pt)
-        return Response(data)
-    
-class PTMeanLulusMaba(APIView):
+        data = self.api_client.get_with_keyword('pt/rasio', id_pt)
+        return self.handle_api_response(data)
+
+
+class PTMeanLulusMaba(BaseAPIView):
     def get(self, _, id_pt):
-        data = make_api_request('pt/mahasiswa', id_pt)
-        return Response(data)
-    
-class PTMeanMasaStudi(APIView):
+        data = self.api_client.get_with_keyword('pt/mahasiswa', id_pt)
+        return self.handle_api_response(data)
+
+
+class PTMeanMasaStudi(BaseAPIView):
     def get(self, _, id_pt):
-        data = make_api_request('pt/waktu-studi', id_pt)
-        return Response(data)
-    
-class PTRiwayat(APIView):
+        data = self.api_client.get_with_keyword('pt/waktu-studi', id_pt)
+        return self.handle_api_response(data)
+
+
+class PTRiwayat(BaseAPIView):
     def get(self, _, id_pt):
-        data = make_api_request('pt/name-histories', id_pt)
-        return Response(data)
-    
-class PTBiayaKuliah(APIView):
+        data = self.api_client.get_with_keyword('pt/name-histories', id_pt)
+        return self.handle_api_response(data)
+
+
+class PTBiayaKuliah(BaseAPIView):
     def get(self, _, id_pt):
-        data = make_api_request('pt/cost-range', id_pt)
-        return Response(data)
-    
-class PTFasilitas(APIView):
+        data = self.api_client.get_with_keyword('pt/cost-range', id_pt)
+        return self.handle_api_response(data)
+
+
+class PTFasilitas(BaseAPIView):
     def get(self, _, id_pt):
-        data = make_api_request('pt/sarpras-file-name', id_pt)
-        return Response(data)
-    
-class PTLogo(APIView):
+        data = self.api_client.get_with_keyword('pt/sarpras-file-name', id_pt)
+        return self.handle_api_response(data)
+
+
+class PTLogo(BaseAPIView):
     def get(self, request, id_pt):
-        img_data = make_api_request_img('pt/logo', id_pt)
+        img_data = self.api_client.get_with_keyword('pt/logo', id_pt)
         if img_data:
             return HttpResponse(img_data, content_type="image/png")
         else:
             return HttpResponse(status=404)
-        
+
+
 # prodi
-class ProdiDetail(APIView):
+class ProdiDetail(BaseAPIView):
     def get(self, _, id_prodi):
-        data = make_api_request('prodi/detail', id_prodi)
-        return Response(data)
-    
-class ProdiDesc(APIView):
+        data = self.api_client.get_with_keyword('prodi/detail', id_prodi)
+        return self.handle_api_response(data)
+
+
+class ProdiDesc(BaseAPIView):
     def get(self, _, id_prodi):
-        data = make_api_request('prodi/desc', id_prodi)
-        return Response(data)
-    
-class ProdiJumlahMHSDosen(APIView):
+        data = self.api_client.get_with_keyword('prodi/desc', id_prodi)
+        return self.handle_api_response(data)
+
+
+class ProdiJumlahMHSDosen(BaseAPIView):
     def get(self, _, id_prodi):
-        data = make_api_request('prodi/num-students-lecturers', id_prodi)
-        return Response(data)
-    
-class ProdiRiwayat(APIView):
+        data = self.api_client.get_with_keyword('prodi/num-students-lecturers', id_prodi)
+        return self.handle_api_response(data)
+
+
+class ProdiRiwayat(BaseAPIView):
     def get(self, _, id_prodi):
-        data = make_api_request('prodi/name-histories', id_prodi)
-        return Response(data)
-    
-class ProdiBiayaKuliah(APIView):
+        data = self.api_client.get_with_keyword('prodi/name-histories', id_prodi)
+        return self.handle_api_response(data)
+
+
+class ProdiBiayaKuliah(BaseAPIView):
     def get(self, _, id_prodi):
-        data = make_api_request('prodi/cost-range', id_prodi)
-        return Response(data)
-    
-class ProdiDosenHomebase(APIView):
+        data = self.api_client.get_with_keyword('prodi/cost-range', id_prodi)
+        return self.handle_api_response(data)
+
+
+class ProdiDosenHomebase(BaseAPIView):
     def get(self, _, id_prodi, id_thsmt):
-        data = make_api_request_3('dosen/homebase', id_prodi, id_thsmt)
-        return Response(data)
-    
-class ProdiDosenPenghitungRatio(APIView):
+       data = self.api_client.get('dosen/homebase', id=id_prodi, semester=id_thsmt)
+       return self.handle_api_response(data)
+
+
+class ProdiDosenPenghitungRatio(BaseAPIView):
     def get(self, _, id_prodi, id_thsmt):
-        data = make_api_request_3('dosen/penghitung-ratio', id_prodi, id_thsmt)
-        return Response(data)
+        data = self.api_client.get('dosen/penghitung-ratio', id=id_prodi, semester=id_thsmt)
+        return self.handle_api_response(data)
+
 
 # dosen
-class DosenProfile(APIView):
+class DosenProfile(BaseAPIView):
     def get(self, _, id_dosen):
-        data = make_api_request('dosen/profile', id_dosen)
-        return Response(data)
-    
-class DosenRiwayatPendidikan(APIView):
-    def get(self, _, id_dosen):
-        data = make_api_request('dosen/study-history', id_dosen)
-        return Response(data)
-    
-class DosenRiwayatMengajar(APIView):
-    def get(self, _, id_dosen):
-        data = make_api_request('dosen/teaching-history', id_dosen)
-        return Response(data)
-    
-class DosenPortofolioPenelitian(APIView):
-    def get(self, _, id_dosen):
-        data = make_api_request('dosen/portofolio/penelitian', id_dosen)
-        return Response(data)
-    
-class DosenPortofolioPengabdian(APIView):
-    def get(self, _, id_dosen):
-        data = make_api_request('dosen/portofolio/pengabdian', id_dosen)
-        return Response(data)
-    
-class DosenPortofolioKarya(APIView):
-    def get(self, _, id_dosen):
-        data = make_api_request('dosen/portofolio/karya', id_dosen)
-        return Response(data)
+        data = self.api_client.get_with_keyword('dosen/profile', id_dosen)
+        return self.handle_api_response(data)
 
-class DosenPortofolioPaten(APIView):
+
+class DosenRiwayatPendidikan(BaseAPIView):
     def get(self, _, id_dosen):
-        data = make_api_request('dosen/portofolio/paten', id_dosen)
-        return Response(data)
-    
+        data = self.api_client.get_with_keyword('dosen/study-history', id_dosen)
+        return self.handle_api_response(data)
+
+
+class DosenRiwayatMengajar(BaseAPIView):
+    def get(self, _, id_dosen):
+        data = self.api_client.get_with_keyword('dosen/teaching-history', id_dosen)
+        return self.handle_api_response(data)
+
+
+class DosenPortofolioPenelitian(BaseAPIView):
+    def get(self, _, id_dosen):
+        data = self.api_client.get_with_keyword('dosen/portofolio/penelitian', id_dosen)
+        return self.handle_api_response(data)
+
+
+class DosenPortofolioPengabdian(BaseAPIView):
+    def get(self, _, id_dosen):
+        data = self.api_client.get_with_keyword('dosen/portofolio/pengabdian', id_dosen)
+        return self.handle_api_response(data)
+
+
+class DosenPortofolioKarya(BaseAPIView):
+    def get(self, _, id_dosen):
+        data = self.api_client.get_with_keyword('dosen/portofolio/karya', id_dosen)
+        return self.handle_api_response(data)
+
+
+class DosenPortofolioPaten(BaseAPIView):
+    def get(self, _, id_dosen):
+        data = self.api_client.get_with_keyword('dosen/portofolio/paten', id_dosen)
+        return self.handle_api_response(data)
+
+
 # mahasiswa
-class MhsDetail(APIView):
+class MhsDetail(BaseAPIView):
     def get(self, _, id_mhs):
-        data = make_api_request('detail/mhs', id_mhs)
-        return Response(data)
+        data = self.api_client.get_with_keyword('detail/mhs', id_mhs)
+        return self.handle_api_response(data)
+
 
 # statistic mhs
-class MhsCount(APIView):
+class MhsCount(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('mahasiswa/count')
-        return Response(data)
+        data = self.api_client.get('mahasiswa/count')
+        return self.handle_api_response(data)
 
-class MhsCountActive(APIView):
+
+class MhsCountActive(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('mahasiswa/count-active')
-        return Response(data)
-    
-class MhsCountGender(APIView):
+        data = self.api_client.get('mahasiswa/count-active')
+        return self.handle_api_response(data)
+
+
+class MhsCountGender(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('visualisasi/mahasiswa-jenis-kelamin')
+        data = self.api_client.get('visualisasi/mahasiswa-jenis-kelamin')
+        return self.handle_api_response(data)
         
-class MhsCountBidangIlmu(APIView):
-    def get(self, _):
-        data = make_api_request_no_keyword('visualisasi/mahasiswa-bidang')
-        return Response(data)
-    
-class MhsCountStatus(APIView):
-    def get(self, _):
-        data = make_api_request_no_keyword('visualisasi/mahasiswa-status')
-        return Response(data)
-    
-class MhsCountJenjang(APIView):
-    def get(self, _):
-        data = make_api_request_no_keyword('visualisasi/mahasiswa-jenjang')
-        return Response(data)
-    
-class MhsCountKelompokLembaga(APIView):
-    def get(self, _):
-        data = make_api_request_no_keyword('visualisasi/mahasiswa-kelompok-lembaga')
-        return Response(data)
-    
-# statistic dosen
-class DosenCount(APIView):
-    def get(self, _):
-        data = make_api_request_no_keyword('dosen/count')
-        return Response(data)
-    
-class DosenCountActive(APIView):
-    def get(self, _):
-        data = make_api_request_no_keyword('dosen/count-active')
-        return Response(data)
 
-class DosenCountGender(APIView):
+
+class MhsCountBidangIlmu(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('visualisasi/dosen-jenis-kelamin')
-        return Response(data)
-    
-class DosenCountBidang(APIView):
+        data = self.api_client.get('visualisasi/mahasiswa-bidang')
+        return self.handle_api_response(data)
+
+
+class MhsCountStatus(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('visualisasi/dosen-bidang')
-        return Response(data)
-    
-class DosenCountKeaktifan(APIView):
+        data = self.api_client.get('visualisasi/mahasiswa-status')
+        return self.handle_api_response(data)
+
+
+class MhsCountJenjang(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('visualisasi/dosen-keaktifan')
-        return Response(data)
-    
-class DosenCountJenjang(APIView):
+        data = self.api_client.get('visualisasi/mahasiswa-jenjang')
+        return self.handle_api_response(data)
+
+
+class MhsCountKelompokLembaga(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('visualisasi/dosen-jenjang')
-        return Response(data)
-    
-class DosenCountIkatan(APIView):
+        data = self.api_client.get('visualisasi/mahasiswa-kelompok-lembaga')
+        return self.handle_api_response(data)
+
+
+# statistic dosen
+class DosenCount(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('visualisasi/dosen-ikatan')
-        return Response(data)
+        data = self.api_client.get('dosen/count')
+        return self.handle_api_response(data)
+
+
+class DosenCountActive(BaseAPIView):
+    def get(self, _):
+        data = self.api_client.get('dosen/count-active')
+        return self.handle_api_response(data)
+
+
+class DosenCountGender(BaseAPIView):
+    def get(self, _):
+        data = self.api_client.get('visualisasi/dosen-jenis-kelamin')
+        return self.handle_api_response(data)
+
+
+class DosenCountBidang(BaseAPIView):
+    def get(self, _):
+        data = self.api_client.get('visualisasi/dosen-bidang')
+        return self.handle_api_response(data)
+
+
+class DosenCountKeaktifan(BaseAPIView):
+    def get(self, _):
+        data = self.api_client.get('visualisasi/dosen-keaktifan')
+        return self.handle_api_response(data)
+
+
+class DosenCountJenjang(BaseAPIView):
+    def get(self, _):
+        data = self.api_client.get('visualisasi/dosen-jenjang')
+        return self.handle_api_response(data)
+
+
+class DosenCountIkatan(BaseAPIView):
+    def get(self, _):
+        data = self.api_client.get('visualisasi/dosen-ikatan')
+        return self.handle_api_response(data)
+
 
 # pt
-class PTCount(APIView):
+class PTCount(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('pt/count')
-        return Response(data)
-    
-class PTProvinceCount(APIView):
+        data = self.api_client.get('pt/count')
+        return self.handle_api_response(data)
+
+
+class PTProvinceCount(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('visualisasi/pt-provinsi')
-        return Response(data)
-    
-class PTKelompokPembinaCount(APIView):
+        data = self.api_client.get('visualisasi/pt-provinsi')
+        return self.handle_api_response(data)
+
+
+class PTKelompokPembinaCount(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('visualisasi/pt-kelompok-pembina')
-        return Response(data)
-    
-class PTAkreditasiCount(APIView):
+        data = self.api_client.get('visualisasi/pt-kelompok-pembina')
+        return self.handle_api_response(data)
+
+
+class PTAkreditasiCount(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('visualisasi/pt-akreditasi')
-        return Response(data)
-    
-class PTBentukPerguruanTinggiCount(APIView):
+        data = self.api_client.get('visualisasi/pt-akreditasi')
+        return self.handle_api_response(data)
+
+
+class PTBentukPerguruanTinggiCount(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('visualisasi/pt-bentuk')
-        return Response(data)
-    
+        data = self.api_client.get('visualisasi/pt-bentuk')
+        return self.handle_api_response(data)
+
+
 # prodi
-class ProdiCount(APIView):
+class ProdiCount(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('prodi/count')
-        return Response(data)
-    
-class ProdiBidangIlmuTerbanyakCount(APIView):
+        data = self.api_client.get('prodi/count')
+        return self.handle_api_response(data)
+
+
+class ProdiBidangIlmuTerbanyakCount(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('prodi/bidang-ilmu')
-        return Response(data)
-    
-class ProdiKelompokPembinaCount(APIView):
+        data = self.api_client.get('prodi/bidang-ilmu')
+        return self.handle_api_response(data)
+
+
+class ProdiKelompokPembinaCount(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('visualisasi/prodi-kelompok-pembina')
-        return Response(data)
-    
-class ProdiBidangIlmuCount(APIView):
+        data = self.api_client.get('visualisasi/prodi-kelompok-pembina')
+        return self.handle_api_response(data)
+
+
+class ProdiBidangIlmuCount(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('visualisasi/prodi-bidang-ilmu')
-        return Response(data)
-    
-class ProdiAkreditasiCOunt(APIView):
+        data = self.api_client.get('visualisasi/prodi-bidang-ilmu')
+        return self.handle_api_response(data)
+
+
+class ProdiAkreditasiCOunt(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('visualisasi/prodi-akreditasi')
-        return Response(data)
-    
-class ProdiJenjangCount(APIView):
+        data = self.api_client.get('visualisasi/prodi-akreditasi')
+        return self.handle_api_response(data)
+
+
+class ProdiJenjangCount(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('visualisasi/prodi-jenjang')
-        return Response(data)
+        data = self.api_client.get('visualisasi/prodi-jenjang')
+        return self.handle_api_response(data)
+
 
 # prodi bidang ilmu
-class ProdiBidangIlmuAgama(APIView):
+class ProdiBidangIlmuAgama(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('prodi/bidang-ilmu/Agama')
-        return Response(data)
-    
-class ProdiBidangIlmuEkonomi(APIView):
-    def get(self, _):
-        data = make_api_request_no_keyword('prodi/bidang-ilmu/Ekonomi')
-        return Response(data)
-    
-class ProdiBidangIlmuHumaniora(APIView):
-    def get(self, _):
-        data = make_api_request_no_keyword('prodi/bidang-ilmu/Humaniora')
-        return Response(data)
-    
-class ProdiBidangIlmukesehatan(APIView):
-    def get(self, _):
-        data = make_api_request_no_keyword('prodi/bidang-ilmu/Kesehatan')
-        return Response(data)
-    
-class ProdiBidangIlmuMIPA(APIView):
-    def get(self, _):
-        data = make_api_request_no_keyword('prodi/bidang-ilmu/MIPA')
-        return Response(data)
+        data = self.api_client.get('prodi/bidang-ilmu/Agama')
+        return self.handle_api_response(data)
 
-class ProdiBidangIlmuPendidikan(APIView):
-    def get(self, _):
-        data = make_api_request_no_keyword('prodi/bidang-ilmu/Pendidikan')
-        return Response(data)
 
-class ProdiBidangIlmuPertanian(APIView):
+class ProdiBidangIlmuEkonomi(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('prodi/bidang-ilmu/Pertanian')
-        return Response(data)
+        data = self.api_client.get('prodi/bidang-ilmu/Ekonomi')
+        return self.handle_api_response(data)
 
-class ProdiBidangIlmuSeni(APIView):
-    def get(self, _):
-        data = make_api_request_no_keyword('prodi/bidang-ilmu/Seni')
-        return Response(data)
 
-class ProdiBidangIlmuSosial(APIView):
+class ProdiBidangIlmuHumaniora(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('prodi/bidang-ilmu/Sosial')
-        return Response(data)
+        data = self.api_client.get('prodi/bidang-ilmu/Humaniora')
+        return self.handle_api_response(data)
 
-class ProdiBidangIlmuTeknik(APIView):
+
+class ProdiBidangIlmukesehatan(BaseAPIView):
     def get(self, _):
-        data = make_api_request_no_keyword('prodi/bidang-ilmu/Teknik')
-        return Response(data)
+        data = self.api_client.get('prodi/bidang-ilmu/Kesehatan')
+        return self.handle_api_response(data)
+
+
+class ProdiBidangIlmuMIPA(BaseAPIView):
+    def get(self, _):
+        data = self.api_client.get('prodi/bidang-ilmu/MIPA')
+        return self.handle_api_response(data)
+
+
+class ProdiBidangIlmuPendidikan(BaseAPIView):
+    def get(self, _):
+        data = self.api_client.get('prodi/bidang-ilmu/Pendidikan')
+        return self.handle_api_response(data)
+
+
+class ProdiBidangIlmuPertanian(BaseAPIView):
+    def get(self, _):
+        data = self.api_client.get('prodi/bidang-ilmu/Pertanian')
+        return self.handle_api_response(data)
+
+
+class ProdiBidangIlmuSeni(BaseAPIView):
+    def get(self, _):
+        data = self.api_client.get('prodi/bidang-ilmu/Seni')
+        return self.handle_api_response(data)
+
+
+class ProdiBidangIlmuSosial(BaseAPIView):
+    def get(self, _):
+        data = self.api_client.get('prodi/bidang-ilmu/Sosial')
+        return self.handle_api_response(data)
+
+
+class ProdiBidangIlmuTeknik(BaseAPIView):
+    def get(self, _):
+        data = self.api_client.get('prodi/bidang-ilmu/Teknik')
+        return self.handle_api_response(data)
