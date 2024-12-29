@@ -42,28 +42,24 @@ class APIClient:
             return {
                 'code': response.status_code,
                 'error': 'HTTP error occurred', 
-                'details': str(http_err),
                 'message': response.json()
             }
         except requests.exceptions.ConnectionError as conn_err:
             return {
                 'code': response.status_code,
                 'error': 'Connection error occurred',
-                'details': str(conn_err),
                 'message': response.json()
             }
         except requests.exceptions.Timeout as timeout_err:
             return {
                 'code': response.status_code,
                 'error': 'Request timed out',
-                'details': str(timeout_err),
                 'message': response.json()
             }
         except requests.exceptions.RequestException as req_err:
             return {
                 'code': response.status_code,
                 'error': 'An error occurred',
-                'details': str(req_err),
                 'message': response.json()
             }
     
