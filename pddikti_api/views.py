@@ -13,7 +13,7 @@ BASE_URL = settings.RIDWAANHALL_MAIN_API
 
 class APIClient:
     """
-    A class to handle making requests to the PDDIKTI API.
+    A class to handle making requests to the RIDWAANHALL API.
     """
 
     def __init__(self):
@@ -88,7 +88,7 @@ class APIClient:
 
     def get(self, endpoint: str, **kwargs: str) -> Any:
         """
-        Makes a GET request to the PDDIKTI API.
+        Makes a GET request to the RIDWAANHALL API.
 
         Args:
             endpoint (str): The API endpoint.
