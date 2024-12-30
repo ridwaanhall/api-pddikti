@@ -16,11 +16,16 @@ from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-PDDIKTI_API_URL = config('PDDIKTI_API_URL')
+RIDWAANHALL_MAIN_API = config('RIDWAANHALL_MAIN_API')
 API_KEY = config('API_KEY')
-HOST_KEY = config('HOST_KEY')
-ORIGIN_KEY = config('ORIGIN_KEY')
-REFERER_KEY = config('REFERER_KEY')
+
+RIDWAANHALL_API_X=config('RIDWAANHALL_API_X')
+RIDWAANHALL_X=config('RIDWAANHALL_X')
+RIDWAANHALL_HASH_X=config('RIDWAANHALL_HASH_X')
+
+RIDWAANHALL_API_KEY=config('RIDWAANHALL_API_KEY')
+RIDWAANHALL_KEY=config('RIDWAANHALL_KEY')
+RIDWAANHALL_HASH_KEY=config('RIDWAANHALL_HASH_KEY')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
