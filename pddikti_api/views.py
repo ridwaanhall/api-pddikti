@@ -148,7 +148,7 @@ class APIClient:
             Any: The API response data or None if there was an error.
         """
         decoded_keyword = unquote(id)
-        url = f"{BASE_URL}/{endpoint}/{decoded_keyword}/?semester={id_thsmt}"
+        url = f"{BASE_URL}/{endpoint}/{decoded_keyword}?semester={id_thsmt}"
         return self._make_request(url)
 
 
