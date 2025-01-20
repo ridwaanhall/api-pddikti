@@ -294,8 +294,8 @@ class ProdiDosenHomebase(BaseAPIView):
 
 class ProdiDosenPenghitungRatio(BaseAPIView):
     def get(self, _, id_prodi, id_thsmt):
-        data = self.api_client.get(
-            "dosen/penghitung-ratio", id=id_prodi, semester=id_thsmt
+        data = self.api_client.get_with_id_and_param_semester(
+            "dosen/penghitung-ratio", id_prodi, id_thsmt
         )
         return self.handle_api_response(data)
 
