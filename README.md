@@ -8,16 +8,14 @@
 
 ## How to use?
 
-read documentation at this [https://api-pddikti.vercel.app](https://api-pddikti.vercel.app)
-
-## Overview
-
-![API Overview](images/api-overview.png)
-
----
+read api documentation at this [https://pddikti-docs.vercel.app](https://pddikti-docs.vercel.app)
 
 ## API Documentation
 
 [https://pddikti-docs.vercel.app](https://pddikti-docs.vercel.app)
 
 ![API Documentation](https://github.com/user-attachments/assets/a30872f0-e3d5-45de-a7a1-86609a145fe4)
+
+## Overview
+
+![API Overview](images/api-overview.png)
