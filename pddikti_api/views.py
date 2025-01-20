@@ -135,6 +135,22 @@ class APIClient:
         url = f"{BASE_URL}/{endpoint}/{decoded_keyword}/{id_thsmt}"
         return self._make_request(url)
 
+    def get_with_id_and_param_semester(self, endpoint: str, id: str, id_thsmt: str) -> Any:
+        """
+        Makes a GET request with ID and semester parameters
+
+        Args:
+             endpoint (str): The API endpoint.
+             id (str): The ID for the request.
+             id_thsmt (str): The semester ID.
+
+        Returns:
+            Any: The API response data or None if there was an error.
+        """
+        decoded_keyword = unquote(id)
+        url = f"{BASE_URL}/{endpoint}/{decoded_keyword}/?semester={id_thsmt}"
+        return self._make_request(url)
+
 
 class BaseAPIView(APIView):
     """
@@ -273,7 +289,7 @@ class ProdiBiayaKuliah(BaseAPIView):
 
 class ProdiDosenHomebase(BaseAPIView):
     def get(self, _, id_prodi, id_thsmt):
-        data = self.api_client.get_with_id_and_semester("dosen/homebase", id_prodi, id_thsmt)
+        data = self.api_client.get_with_id_and_param_semester("dosen/homebase", id_prodi, id_thsmt)
         return self.handle_api_response(data)
 
 class ProdiDosenPenghitungRatio(BaseAPIView):
