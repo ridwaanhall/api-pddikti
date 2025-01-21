@@ -46,37 +46,37 @@ urlpatterns = [
     
     # statistics
     # mahaasiswa
-    path('mhs/count/', views.MhsCount.as_view(), name='mhs-count'),
-    path('mhs/count-active/', views.MhsCountActive.as_view(), name='mhs-count-active'),
-    path('mhs/count-gender/', views.MhsCountGender.as_view(), name='mhs-count-gender'),
-    path('mhs/count-bidang-ilmu/', views.MhsCountBidangIlmu.as_view(), name='mhs-count-bidang-ilmu'),
-    path('mhs/count-status/', views.MhsCountStatus.as_view(), name='mhs-count-status'),
-    path('mhs/count-jenjang/', views.MhsCountJenjang.as_view(), name='mhs-count-jenjang'),
-    path('mhs/count-kelompok-lembaga/', views.MhsCountKelompokLembaga.as_view(), name='mhs-count-kelompok-lembaga'),
+    path('stats/mhs-count/', views.MhsCount.as_view(), name='mhs-count'),
+    path('stats/mhs-count-active/', views.MhsCountActive.as_view(), name='mhs-count-active'),
+    path('stats/mhs-count-gender/', views.MhsCountGender.as_view(), name='mhs-count-gender'),
+    path('stats/mhs-count-bidang-ilmu/', views.MhsCountBidangIlmu.as_view(), name='mhs-count-bidang-ilmu'),
+    path('stats/mhs-count-status/', views.MhsCountStatus.as_view(), name='mhs-count-status'),
+    path('stats/mhs-count-jenjang/', views.MhsCountJenjang.as_view(), name='mhs-count-jenjang'),
+    path('stats/mhs-count-kelompok-lembaga/', views.MhsCountKelompokLembaga.as_view(), name='mhs-count-kelompok-lembaga'),
     
     # dosen
-    path('dosen/count/', views.DosenCount.as_view(), name='dosen-count'),
-    path('dosen/count-active/', views.DosenCountActive.as_view(), name='dosen-count-active'),
-    path('dosen/count-gender/', views.DosenCountGender.as_view(), name='dosen-count-gender'),
-    path('dosen/count-bidang/', views.DosenCountBidang.as_view(), name='dosen-count-bidang'),
-    path('dosen/count-keaktifan/', views.DosenCountKeaktifan.as_view(), name='dosen-count-keaktifan'),
-    path('dosen/count-jenjang/', views.DosenCountJenjang.as_view(), name='dosen-count-jenjang'),
-    path('dosen/count-ikatan/', views.DosenCountIkatan.as_view(), name='dosen-count-ikatan'),
+    path('stats/dosen-count/', views.DosenCount.as_view(), name='dosen-count'),
+    path('stats/dosen-count-active/', views.DosenCountActive.as_view(), name='dosen-count-active'),
+    path('stats/dosen-count-gender/', views.DosenCountGender.as_view(), name='dosen-count-gender'),
+    path('stats/dosen-count-bidang/', views.DosenCountBidang.as_view(), name='dosen-count-bidang'),
+    path('stats/dosen-count-keaktifan/', views.DosenCountKeaktifan.as_view(), name='dosen-count-keaktifan'),
+    path('stats/dosen-count-jenjang/', views.DosenCountJenjang.as_view(), name='dosen-count-jenjang'),
+    path('stats/dosen-count-ikatan/', views.DosenCountIkatan.as_view(), name='dosen-count-ikatan'),
     
     # pt
-    path('pt/count/', views.PTCount.as_view(), name='pt-count'),
-    path('pt/count-province/', views.PTProvinceCount.as_view(), name='pt-count-province'),
-    path('pt/count-kelompok-pembina/', views.PTKelompokPembinaCount.as_view(), name='pt-kelompok-pembina-count'),
-    path('pt/count-akreditasi/', views.PTAkreditasiCount.as_view(), name='pt-akreditasi-count'),
-    path('pt/count-bentuk-pt/', views.PTBentukPerguruanTinggiCount.as_view(), name='pt-bentuk-pt-count'),
+    path('stats/pt-count/', views.PTCount.as_view(), name='pt-count'),
+    path('stats/pt-count-province/', views.PTProvinceCount.as_view(), name='pt-count-province'),
+    path('stats/pt-count-kelompok-pembina/', views.PTKelompokPembinaCount.as_view(), name='pt-kelompok-pembina-count'),
+    path('stats/pt-count-akreditasi/', views.PTAkreditasiCount.as_view(), name='pt-akreditasi-count'),
+    path('stats/pt-count-bentuk-pt/', views.PTBentukPerguruanTinggiCount.as_view(), name='pt-bentuk-pt-count'),
     
     # prodi
-    path('prodi/count/', views.ProdiCount.as_view(), name='prodi-count'),
-    path('prodi/bidang-ilmu-terbanyak/', views.ProdiBidangIlmuTerbanyakCount.as_view(), name='prodi-bidang-ilmu-terbanyak-count'),
-    path('prodi/kelompok-pembina/', views.ProdiKelompokPembinaCount.as_view(), name='prodi-kelompok-pembina-count'),
-    path('prodi/bidang-ilmu/', views.ProdiBidangIlmuCount.as_view(), name='prodi-bidang-ilmu-count'),
-    path('prodi/akreditasi/', views.ProdiAkreditasiCOunt.as_view(), name='prodi-akreditasi-count'),
-    path('prodi/jenjang/', views.ProdiJenjangCount.as_view(), name='prodi-jenjang-count'),
+    path('stats/prodi-count/', views.ProdiCount.as_view(), name='prodi-count'),
+    path('stats/prodi-bidang-ilmu-terbanyak/', views.ProdiBidangIlmuTerbanyakCount.as_view(), name='prodi-bidang-ilmu-terbanyak-count'),
+    path('stats/prodi-kelompok-pembina/', views.ProdiKelompokPembinaCount.as_view(), name='prodi-kelompok-pembina-count'),
+    path('stats/prodi-bidang-ilmu/', views.ProdiBidangIlmuCount.as_view(), name='prodi-bidang-ilmu-count'),
+    path('stats/prodi-akreditasi/', views.ProdiAkreditasiCOunt.as_view(), name='prodi-akreditasi-count'),
+    path('stats/prodi-jenjang/', views.ProdiJenjangCount.as_view(), name='prodi-jenjang-count'),
     
     # prodi ilmu
     # search filter
