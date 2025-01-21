@@ -4,11 +4,11 @@
 
 ## INFO
 
-> **INFO:** The API has been updated based on new url <https://pddikti.kemdiktisaintek.go.id/>
+> API ini telah di-update berdasarkan data baru di <https://pddikti.kemdiktisaintek.go.id/>
 
-## How to use?
+## Bagaimana cara menggunakan API?
 
-read api documentation at this [https://pddikti-docs.vercel.app](https://pddikti-docs.vercel.app)
+Baca dokumentasi berbahasa indonesia ini [PDDikti Docs](https://pddikti-docs.vercel.app)
 
 ## API Documentation
 
@@ -16,6 +16,8 @@ read api documentation at this [https://pddikti-docs.vercel.app](https://pddikti
 
 ![API Documentation](https://github.com/user-attachments/assets/a30872f0-e3d5-45de-a7a1-86609a145fe4)
 
-## Overview
+## Tampilan pada API Endpoint
+
+[https://api-pddikti.vercel.app](https://api-pddikti.vercel.app)
 
 ![API Overview](images/api-overview.png)
