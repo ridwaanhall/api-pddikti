@@ -6,8 +6,8 @@
         "author": "ridwaanhall"
     },
     "urls": {
-        "API Documentation":"https://pddikti-docs.vercel.app/",
-        "API Check":"https://api-pddikti.vercel.app/",
-        "WEBSITE":"https://pddikti.kemdiktisaintek.go.id/",
+        "API Documentation": "https://pddikti-docs.vercel.app/",
+        "API Check": "https://api-pddikti.vercel.app/",
+        "WEBSITE": "https://pddikti.kemdiktisaintek.go.id/"
     }
 }
