@@ -72,11 +72,11 @@ urlpatterns = [
     
     # prodi
     path('stats/prodi-count/', views.ProdiCount.as_view(), name='prodi-count'),
-    path('stats/prodi-bidang-ilmu-terbanyak/', views.ProdiBidangIlmuTerbanyakCount.as_view(), name='prodi-bidang-ilmu-terbanyak-count'),
-    path('stats/prodi-kelompok-pembina/', views.ProdiKelompokPembinaCount.as_view(), name='prodi-kelompok-pembina-count'),
-    path('stats/prodi-bidang-ilmu/', views.ProdiBidangIlmuCount.as_view(), name='prodi-bidang-ilmu-count'),
-    path('stats/prodi-akreditasi/', views.ProdiAkreditasiCOunt.as_view(), name='prodi-akreditasi-count'),
-    path('stats/prodi-jenjang/', views.ProdiJenjangCount.as_view(), name='prodi-jenjang-count'),
+    path('stats/prodi-count-bidang-ilmu-terbanyak/', views.ProdiBidangIlmuTerbanyakCount.as_view(), name='prodi-bidang-ilmu-terbanyak-count'),
+    path('stats/prodi-count-kelompok-pembina/', views.ProdiKelompokPembinaCount.as_view(), name='prodi-kelompok-pembina-count'),
+    path('stats/prodi-count-bidang-ilmu/', views.ProdiBidangIlmuCount.as_view(), name='prodi-bidang-ilmu-count'),
+    path('stats/prodi-count-akreditasi/', views.ProdiAkreditasiCOunt.as_view(), name='prodi-akreditasi-count'),
+    path('stats/prodi-count-jenjang/', views.ProdiJenjangCount.as_view(), name='prodi-jenjang-count'),
     
     # prodi ilmu
     # search filter
