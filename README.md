@@ -8,7 +8,7 @@
 
 ## Bagaimana cara menggunakan API?
 
-Baca dokumentasi berbahasa indonesia ini [PDDikti Docs](https://pddikti-docs.vercel.app)
+Baca dokumentasi berbahasa indonesia ini [PDDikti Docs](https://pddikti-docs.vercel.app). mudah dan gampang digunakan.
 
 ## API Documentation
 
