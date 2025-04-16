@@ -43,6 +43,7 @@ else:
     ALLOWED_HOSTS = [
         '.vercel.app',
         '.ridwaanhall.me',
+        '.ridwaanhall.com',
     ]
 
 # Application definition
