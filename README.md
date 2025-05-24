@@ -8,11 +8,11 @@
 
 ## Bagaimana cara menggunakan API?
 
-Baca dokumentasi berbahasa indonesia ini [PDDikti Docs](https://pddikti-docs.vercel.app). mudah dan gampang digunakan.
+Baca dokumentasi berbahasa indonesia ini [PDDikti Docs](https://pddikti-docs.ridwaanhall.com). mudah dan gampang digunakan.
 
 ## API Documentation
 
-[https://pddikti-docs.vercel.app](https://pddikti-docs.vercel.app)
+[https://pddikti-docs.ridwaanhall.com](https://pddikti-docs.ridwaanhall.com)
 
 ![API Documentation](https://github.com/user-attachments/assets/a30872f0-e3d5-45de-a7a1-86609a145fe4)
 

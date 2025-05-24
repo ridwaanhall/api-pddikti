@@ -1,13 +1,13 @@
 {
     "info": {
-        "base_url": "https://api-pddikti.vercel.app/",
+        "base_url": "https://api-pddikti.ridwaanhall.com/",
         "version": "3.0.0",
         "description": "This API provides access to data from the Pangkalan Data Pendidikan Tinggi (PDDikti), the Indonesian Higher Education Database. It allows users to search for and retrieve detailed information about universities, study programs, lecturers, and students.",
         "author": "ridwaanhall"
     },
     "urls": {
-        "Penjelasan setiap API": "https://pddikti-docs.vercel.app/",
-        "API": "https://api-pddikti.vercel.app/",
+        "Penjelasan setiap API": "https://pddikti-docs.ridwaanhall.com/",
+        "API": "https://api-pddikti.ridwaanhall.com/",
         "Website": "https://pddikti.kemdiktisaintek.go.id/"
     }
 }
