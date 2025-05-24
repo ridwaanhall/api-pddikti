@@ -25,5 +25,12 @@ jobs:
         run: |
           python manage.py test
         env:
+          RIDWAANHALL_MAIN_API: ${{ secrets.RIDWAANHALL_MAIN_API }}
+          API_KEY: ${{ secrets.API_KEY }}
+          RIDWAANHALL_API_X: ${{ secrets.RIDWAANHALL_API_X }}
+          RIDWAANHALL_X: ${{ secrets.RIDWAANHALL_X }}
+          RIDWAANHALL_HASH_X: ${{ secrets.RIDWAANHALL_HASH_X }}
+          RIDWAANHALL_API_KEY: ${{ secrets.RIDWAANHALL_API_KEY }}
+          RIDWAANHALL_KEY: ${{ secrets.RIDWAANHALL_KEY }}
+          RIDWAANHALL_HASH_KEY: ${{ secrets.RIDWAANHALL_HASH_KEY }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          KODE_AKSES: ${{ secrets.KODE_AKSES }}
