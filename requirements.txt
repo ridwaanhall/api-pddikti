@@ -9,7 +9,7 @@ packaging==24.1
 python-decouple==3.8
 pytz==2024.2
 PyYAML==6.0.2
-requests==2.32.3
+requests==2.32.4
 sqlparse==0.5.1
 tzdata==2024.2
 uritemplate==4.1.1
