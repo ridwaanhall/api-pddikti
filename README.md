@@ -10,7 +10,9 @@
 
 Karena tingginya trafik dan belum ada dukungan donasi untuk biaya hosting, mulai **10 Juli 2025** API ini **TIDAK DAPAT DIAKSES**.  
 Agar API dan website ini tetap berjalan, dibutuhkan minimal **$50 USD/bulan** untuk biaya hosting.  
-**Kamu bisa donasi mulai dari 1 USD** untuk mendukung layanan ini tetap aktif!  
+
+**Kamu bisa donasi mulai dari 1 USD** untuk mendukung layanan ini tetap aktif!
+
 Silakan dukung saya di [GitHub Sponsors](https://github.com/sponsors/ridwaanhall).
 
 ---
