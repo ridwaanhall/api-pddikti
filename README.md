@@ -13,7 +13,7 @@ Agar API dan website ini tetap berjalan, dibutuhkan minimal **$50 USD/bulan** un
 
 **Kamu bisa donasi mulai dari 1 USD** untuk mendukung layanan ini tetap aktif!
 
-Silakan dukung saya di [GitHub Sponsors](https://github.com/sponsors/ridwaanhall).
+[![Dukung Disini](https://img.shields.io/badge/-Dukung%20Disini-blue?style=for-the-badge)](https://github.com/sponsors/ridwaanhall/)
 
 ---
 
