@@ -1,13 +1,13 @@
 {
-    "info": {
-        "base_url": "https://api-pddikti.ridwaanhall.com/",
-        "version": "3.0.0",
-        "description": "This API provides access to data from the Pangkalan Data Pendidikan Tinggi (PDDikti), the Indonesian Higher Education Database. It allows users to search for and retrieve detailed information about universities, study programs, lecturers, and students.",
-        "author": "ridwaanhall"
+    "status": "tidak digunakan lagi",
+    "message": "API ini tidak lagi tersedia karena kurangnya dukungan dan pemeliharaan yang berkelanjutan.",
+    "details": {
+        "reason": "Proyek dihentikan karena pendanaan dan dukungan yang tidak memadai",
+        "alternative": "Silakan pertimbangkan untuk menggunakan API alternatif atau support dengan mengirimkan dukungan 1 USD"
     },
-    "urls": {
-        "Penjelasan setiap API": "https://pddikti-docs.ridwaanhall.com/",
-        "API": "https://api-pddikti.ridwaanhall.com/",
-        "Website": "https://pddikti.kemdiktisaintek.go.id/"
-    }
+    "maintainer": {
+        "name": "ridwaanhall",
+        "support_url": "https://github.com/sponsors/ridwaanhall"
+    },
+    "last_updated": "2024-01-01"
 }
