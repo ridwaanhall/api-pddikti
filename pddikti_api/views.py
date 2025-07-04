@@ -1,3 +1,5 @@
+# DEPRECATED: Most endpoints have been removed and this API is no longer supported.
+
 import json
 from typing import Any, Dict, Optional, Union
 from urllib.parse import unquote

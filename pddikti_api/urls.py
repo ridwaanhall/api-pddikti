@@ -1,7 +1,7 @@
 from django.urls import path
-from . import views
+from .views import APIOverview
 
 urlpatterns = [
     # api overview
-    path('', views.APIOverview.as_view(), name='api-overview'),
+    path('', APIOverview.as_view(), name='api-overview'),
 ]
