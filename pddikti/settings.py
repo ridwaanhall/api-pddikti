@@ -27,6 +27,9 @@ RIDWAANHALL_API_KEY=config('RIDWAANHALL_API_KEY')
 RIDWAANHALL_KEY=config('RIDWAANHALL_KEY')
 RIDWAANHALL_HASH_KEY=config('RIDWAANHALL_HASH_KEY')
 
+# API Status Control
+API_STATUS = config('API_STATUS', default=True, cast=bool)
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -71,6 +74,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'pddikti_api.middleware.APIStatusMiddleware',
 ]
 
 ROOT_URLCONF = 'pddikti.urls'
