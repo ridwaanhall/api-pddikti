@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 BASE_URL = settings.RIDWAANHALL_MAIN_API
+API_STATUS = settings.API_STATUS
 
 
 class APIClient:
@@ -179,6 +180,25 @@ class APIOverview(BaseAPIView):
     def get(self, _):
         with open("api_overview.json", "r") as file:
             data = json.load(file)
+        
+        # Add professional service status without exposing internal configuration
+        if API_STATUS:
+            data["service_status"] = {
+                "status": "Operational",
+                "message": "All API endpoints are fully operational and accessible.",
+            }
+        else:
+            data["service_status"] = {
+                "status": "Limited Service",
+                "message": "Due to high traffic volume, some endpoints are temporarily unavailable.",
+            }
+            data["service_notice"] = {
+                "notice": "We are experiencing high traffic volumes",
+                "action": "Some services are temporarily limited for stability",
+                "estimated_resolution": "Normal service will resume when traffic normalizes",
+                "support": "Please try again later or contact support if urgent"
+            }
+        
         return self.handle_api_response(data)
 
 
