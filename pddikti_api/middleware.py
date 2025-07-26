@@ -49,21 +49,25 @@ class APIStatusMiddleware:
                     # Return JsonResponse with REST framework style structure
                     response = JsonResponse(response_data, status=503)
                     response['Content-Type'] = 'application/json'
-                    response['Retry-After'] = '3600'  # Suggest retry after 1 hour
                     return response
                     
             except Exception:
                 # If URL resolution fails, block access when API is disabled
                 response_data = {
-                    'error': 'Service Temporarily Limited',
-                    'message': 'Due to high traffic volume, this service is temporarily unavailable.',
-                    'code': 503,
-                    'status': 'Service Unavailable'
+                    "error": "service_temporarily_limited",
+                    "message": "Due to high traffic volume, this service is temporarily unavailable.",
+                    "code": 503,
+                    "status": "Service Unavailable",
+                    "blog": "https://ridwaanhall.com/blog/how-usage-monitoring-sustains-mlbb-stats-and-api-pddikti/",
+                    "support_contact": {
+                        "live_chat": "https://ridwaanhall.com/guestbook",
+                        "email": "hi@ridwaanhall.com",
+                        "form": "https://ridwaanhall.com/contact"
+                    }
                 }
                 
                 response = JsonResponse(response_data, status=503)
                 response['Content-Type'] = 'application/json'
-                response['Retry-After'] = '3600'
                 return response
 
         response = self.get_response(request)
