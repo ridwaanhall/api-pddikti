@@ -28,7 +28,8 @@ RIDWAANHALL_KEY=config('RIDWAANHALL_KEY')
 RIDWAANHALL_HASH_KEY=config('RIDWAANHALL_HASH_KEY')
 
 # API Status Control
-API_STATUS = config('API_STATUS', default=False, cast=bool)
+API_AVAILABILITY = config('API_AVAILABILITY', default=False, cast=bool) # false is limited access. true is full access
+API_VERSION = config('API_VERSION', default='3.0.2', cast=str)  # Default API version
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -45,7 +46,6 @@ if DEBUG:
 else:
     ALLOWED_HOSTS = [
         '.vercel.app',
-        '.ridwaanhall.me',
         '.ridwaanhall.com',
     ]
 

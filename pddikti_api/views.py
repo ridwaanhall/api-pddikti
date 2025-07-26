@@ -1,5 +1,4 @@
-import json
-from typing import Any, Dict, Optional, Union
+from typing import Any
 from urllib.parse import unquote
 
 import requests
@@ -9,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 BASE_URL = settings.RIDWAANHALL_MAIN_API
-API_STATUS = settings.API_STATUS
+API_AVAILABILITY = settings.API_AVAILABILITY
 
 
 class APIClient:
@@ -178,29 +177,71 @@ class BaseAPIView(APIView):
 # API Views
 class APIOverview(BaseAPIView):
     def get(self, _):
-        with open("api_overview.json", "r") as file:
-            data = json.load(file)
-        
-        # Add professional service status without exposing internal configuration
-        if API_STATUS:
-            data["service_status"] = {
+        meta = {
+            "base_url": "https://api-pddikti.ridwaanhall.com/",
+            "version": {
+                "current": settings.API_VERSION,
+                "minimum_supported": settings.API_VERSION,
+            },
+            "description": (
+                "Provides structured access to data from Pangkalan Data Pendidikan Tinggi (PDDikti), "
+                "Indonesia’s Higher Education Database"
+            ),
+            "last_updated": "2025-07-26T18:48:00+07:00",
+            "author": "ridwaanhall"
+        }
+        resources = {
+            "api_docs": "https://pddikti-docs.ridwaanhall.com/",
+            "api_root": "https://api-pddikti.ridwaanhall.com/",
+            "official_website": "https://pddikti.kemdiktisaintek.go.id/"
+        }
+        features = {
+            "documentation": "Comprehensive API guide with endpoints, examples, and usage instructions",
+            "status_monitoring": "Real-time performance and availability tracking",
+            "traffic_management": "Automated request balancing and throttling for high availability"
+        }
+        if API_AVAILABILITY:
+            status = {
                 "status": "Operational",
-                "message": "All API endpoints are fully operational and accessible.",
+                "code": "OK_200",
+                "severity": "normal",
+                "message": "All endpoints are functioning normally."
+            }
+            notice = {
+                "headline": "Service Operational",
+                "details": "Traffic levels have normalized and full services are restored.",
+                "estimated_resolution": None,
+                "support_contact": {
+                    "live_chat": "https://ridwaanhall.com/guestbook",
+                    "email": "hi@ridwaanhall.com",
+                    "form": "https://ridwaanhall.com/contact"
+                }
             }
         else:
-            data["service_status"] = {
+            status = {
                 "status": "Limited Service",
-                "message": "Due to high traffic volume, some endpoints are temporarily unavailable.",
+                "code": "TRAFFIC_LIMIT_001",
+                "severity": "warning",
+                "message": "Some endpoints are temporarily unavailable due to high traffic"
             }
-            data["service_notice"] = {
-                "notice": "We are experiencing high traffic volumes",
-                "action": "Some services are temporarily limited for stability",
-                "estimated_resolution": "Normal service will resume when traffic normalizes in a few days or weeks.",
-                "support": "Please try again later or contact support if urgent",
-                "contact": "Contact support if this issue persists",
-                "contact_site": "https://ridwaanhall.com/contact",
+            notice = {
+                "headline": "High Traffic Alert",
+                "details": "To maintain stability, some services are temporarily limited.",
+                "estimated_resolution": "Expected recovery as traffic normalizes within days or weeks",
+                "support_contact": {
+                    "live_chat": "https://ridwaanhall.com/guestbook",
+                    "email": "hi@ridwaanhall.com",
+                    "form": "https://ridwaanhall.com/contact"
+                }
             }
-        
+            meta["description"] += ", covering universities, study programs, lecturers, and students."
+        data = {
+            "meta": meta,
+            "resources": resources,
+            "features": features,
+            "status": status,
+            "notice": notice
+        }
         return self.handle_api_response(data)
 
 

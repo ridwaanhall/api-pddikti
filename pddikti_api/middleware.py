@@ -3,14 +3,14 @@ from django.urls import resolve
 from django.http import JsonResponse
 import json
 
-# Import API_STATUS directly from settings
-API_STATUS = settings.API_STATUS
+# Import API_AVAILABILITY directly from settings
+API_AVAILABILITY = settings.API_AVAILABILITY
 
 
 class APIStatusMiddleware:
     """
-    Middleware to control API access based on API_STATUS setting.
-    If API_STATUS is False, only the API overview endpoint is accessible.
+    Middleware to control API access based on API_AVAILABILITY setting.
+    If API_AVAILABILITY is False, only the API overview endpoint is accessible.
     
     Note: Django middleware must return HttpResponse-compatible objects,
     so we use JsonResponse with REST framework-style structure.
@@ -20,8 +20,8 @@ class APIStatusMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        # Check if API_STATUS is disabled
-        if not API_STATUS:
+        # Check if API_AVAILABILITY is disabled
+        if not API_AVAILABILITY:
             # Get the current URL name
             try:
                 current_url = resolve(request.path_info)
