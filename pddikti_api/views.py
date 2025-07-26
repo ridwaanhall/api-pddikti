@@ -228,6 +228,7 @@ class APIOverview(BaseAPIView):
                 "headline": "High Traffic Alert",
                 "details": "To maintain stability, some services are temporarily limited.",
                 "estimated_resolution": "Expected recovery as traffic normalizes within days or weeks",
+                "blog": "https://ridwaanhall.com/blog/how-usage-monitoring-sustains-mlbb-stats-and-api-pddikti/",
                 "support_contact": {
                     "live_chat": "https://ridwaanhall.com/guestbook",
                     "email": "hi@ridwaanhall.com",
