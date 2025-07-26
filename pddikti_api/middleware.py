@@ -40,8 +40,9 @@ class APIStatusMiddleware:
                             'description': 'API Overview - Current service status and available resources'
                         },
                         'support': {
-                            'retry_suggestion': 'Please try again in a few minutes',
-                            'contact': 'Contact support if this issue persists'
+                            'retry_suggestion': 'Please try again in a few days (or weeks) as we are currently experiencing high traffic.',
+                            'contact': 'Contact support if this issue persists',
+                            'contact_site': 'https://ridwaanhall.com/contact',
                         }
                     }
                     

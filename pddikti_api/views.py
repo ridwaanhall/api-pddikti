@@ -195,8 +195,10 @@ class APIOverview(BaseAPIView):
             data["service_notice"] = {
                 "notice": "We are experiencing high traffic volumes",
                 "action": "Some services are temporarily limited for stability",
-                "estimated_resolution": "Normal service will resume when traffic normalizes",
-                "support": "Please try again later or contact support if urgent"
+                "estimated_resolution": "Normal service will resume when traffic normalizes in a few days or weeks.",
+                "support": "Please try again later or contact support if urgent",
+                "contact": "Contact support if this issue persists",
+                "contact_site": "https://ridwaanhall.com/contact",
             }
         
         return self.handle_api_response(data)

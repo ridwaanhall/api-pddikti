@@ -28,7 +28,7 @@ RIDWAANHALL_KEY=config('RIDWAANHALL_KEY')
 RIDWAANHALL_HASH_KEY=config('RIDWAANHALL_HASH_KEY')
 
 # API Status Control
-API_STATUS = config('API_STATUS', default=True, cast=bool)
+API_STATUS = config('API_STATUS', default=False, cast=bool)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
