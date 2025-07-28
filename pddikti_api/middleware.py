@@ -41,8 +41,9 @@ class APIStatusMiddleware:
                         },
                         'support': {
                             'retry_suggestion': 'Please try again in a few days (or weeks) as we are currently experiencing high traffic.',
+                            'support_message': 'You can support us by donating from $1 USD (target: $500 USD) to help enhance API performance and handle high request volumes.',
                             'contact': 'Contact support if this issue persists',
-                            'contact_site': 'https://ridwaanhall.com/contact',
+                            'contact_site': 'https://ridwaanhall.com/guestbook',
                         }
                     }
                     
@@ -60,10 +61,12 @@ class APIStatusMiddleware:
                     "status": "Service Unavailable",
                     "blog": "https://ridwaanhall.com/blog/how-usage-monitoring-sustains-mlbb-stats-and-api-pddikti/",
                     "support_contact": {
+                        "donate": "https://github.com/sponsors/ridwaanhall",
                         "live_chat": "https://ridwaanhall.com/guestbook",
                         "email": "hi@ridwaanhall.com",
                         "form": "https://ridwaanhall.com/contact"
-                    }
+                    },
+                    "support_message": "You can support us by donating from $1 USD (target: $500 USD) to help enhance API performance and handle high request volumes."
                 }
                 
                 response = JsonResponse(response_data, status=503)

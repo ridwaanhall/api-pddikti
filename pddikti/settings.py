@@ -29,7 +29,7 @@ RIDWAANHALL_HASH_KEY=config('RIDWAANHALL_HASH_KEY')
 
 # API Status Control
 API_AVAILABILITY = config('API_AVAILABILITY', default=False, cast=bool) # false is limited access. true is full access
-API_VERSION = config('API_VERSION', default='3.0.2', cast=str)  # Default API version
+API_VERSION = config('API_VERSION', default='3.0.3', cast=str)  # Default API version
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
