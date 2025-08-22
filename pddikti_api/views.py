@@ -187,7 +187,7 @@ class APIOverview(BaseAPIView):
                 "Provides structured access to data from Pangkalan Data Pendidikan Tinggi (PDDikti), "
                 "Indonesia’s Higher Education Database"
             ),
-            "last_updated": "2025-07-26T18:48:00+07:00",
+            "last_updated": settings.LAST_UPDATE,
             "author": "ridwaanhall"
         }
         resources = {
