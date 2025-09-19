@@ -32,6 +32,9 @@ API_AVAILABILITY = config('API_AVAILABILITY', default=True, cast=bool) # false i
 API_VERSION = config('API_VERSION', default='3.0.4', cast=str)  # Default API version
 LAST_UPDATE = config('LAST_UPDATE', default='2025-08-22T15:04:00+07:00', cast=str)
 
+# API Timeout Configuration (optimized for Vercel serverless functions)
+API_TIMEOUT = config('API_TIMEOUT', default=8, cast=int)  # Seconds, optimized for Vercel limits
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 

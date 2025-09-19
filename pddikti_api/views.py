@@ -22,7 +22,9 @@ class APIClient:
             settings.RIDWAANHALL_X: settings.RIDWAANHALL_KEY,
             settings.RIDWAANHALL_HASH_X: settings.RIDWAANHALL_HASH_KEY,
         }
-        self.timeout = 30
+        # Use configurable timeout optimized for Vercel serverless functions
+        # Default 8s prevents timeouts on Hobby plan (10s limit) and Pro plan (60s limit)
+        self.timeout = settings.API_TIMEOUT
 
     def _handle_response(self, response: requests.Response) -> Any:
         """
@@ -53,9 +55,10 @@ class APIClient:
             }
         except requests.exceptions.Timeout as timeout_err:
             return {
-                "code": response.status_code,
+                "code": 408,
                 "error": "Request timed out",
-                "message": response.json(),
+                "message": "The external API did not respond within the allowed time limit. Please try again later.",
+                "timeout_seconds": self.timeout
             }
         except requests.exceptions.RequestException as req_err:
             return {
@@ -77,11 +80,22 @@ class APIClient:
         try:
             response = requests.get(url, headers=self.headers, timeout=self.timeout)
             return self._handle_response(response)
-        except Exception as e:
-            print(url)
-            print(self.headers)
-
+        except requests.exceptions.Timeout:
             return {
+                "code": 408,
+                "error": "Request timed out", 
+                "message": f"External API request timed out after {self.timeout} seconds. Please try again later.",
+                "timeout_seconds": self.timeout
+            }
+        except requests.exceptions.ConnectionError:
+            return {
+                "code": 503,
+                "error": "Connection error", 
+                "message": "Unable to connect to the external API. Please try again later.",
+            }
+        except Exception as e:
+            return {
+                "code": 500,
                 "error": "An unexpected error occurred", 
                 "message": "Please try again later or contact the administrator.",
             }
