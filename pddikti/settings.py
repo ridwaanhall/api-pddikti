@@ -28,7 +28,7 @@ RIDWAANHALL_KEY=config('RIDWAANHALL_KEY')
 RIDWAANHALL_HASH_KEY=config('RIDWAANHALL_HASH_KEY')
 
 # API Status Control
-API_AVAILABILITY = config('API_AVAILABILITY', default=True, cast=bool) # false is limited access. true is full access
+API_AVAILABILITY = config('API_AVAILABILITY', default=False, cast=bool) # false is limited access. true is full access
 API_VERSION = config('API_VERSION', default='3.0.4', cast=str)  # Default API version
 LAST_UPDATE = config('LAST_UPDATE', default='2025-08-22T15:04:00+07:00', cast=str)
 
