@@ -8,17 +8,17 @@
 
 ## Bagaimana cara menggunakan API?
 
-Baca dokumentasi berbahasa indonesia ini [PDDikti Docs](https://pddikti-docs.ridwaanhall.com). mudah dan gampang digunakan.
+Baca dokumentasi berbahasa indonesia ini [PDDikti Docs](https://pddikti-docs.rone.dev). mudah dan gampang digunakan.
 
 ## API Documentation
 
-[https://pddikti-docs.ridwaanhall.com](https://pddikti-docs.ridwaanhall.com)
+[https://pddikti-docs.rone.dev](https://pddikti-docs.rone.dev)
 
 ![API Documentation](https://github.com/user-attachments/assets/a30872f0-e3d5-45de-a7a1-86609a145fe4)
 
 ## Tampilan pada API Endpoint
 
-[https://api-pddikti.ridwaanhall.com](https://api-pddikti.ridwaanhall.com)
+[https://api-pddikti.rone.dev](https://api-pddikti.rone.dev)
 
 ![API Overview](images/api-overview.png)
 
@@ -41,7 +41,7 @@ During high traffic periods, some endpoints may return a professional service no
     "code": 503,
     "status": "Service Unavailable",
     "available_endpoint": {
-        "url": "https://api-pddikti.ridwaanhall.com",
+        "url": "https://api-pddikti.rone.dev",
         "method": "GET",
         "description": "API Overview - Current service status and available resources"
     },

@@ -192,7 +192,7 @@ class BaseAPIView(APIView):
 class APIOverview(BaseAPIView):
     def get(self, _):
         meta = {
-            "base_url": "https://api-pddikti.ridwaanhall.com/",
+            "base_url": "https://api-pddikti.rone.dev/",
             "version": {
                 "current": settings.API_VERSION,
                 "minimum_supported": settings.API_VERSION,
@@ -205,8 +205,8 @@ class APIOverview(BaseAPIView):
             "author": "ridwaanhall"
         }
         resources = {
-            "api_docs": "https://pddikti-docs.ridwaanhall.com/",
-            "api_root": "https://api-pddikti.ridwaanhall.com/",
+            "api_docs": "https://pddikti-docs.rone.dev/",
+            "api_root": "https://api-pddikti.rone.dev/",
             "official_website": "https://pddikti.kemdiktisaintek.go.id/"
         }
         features = {
