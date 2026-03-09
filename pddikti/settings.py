@@ -51,7 +51,6 @@ else:
     ALLOWED_HOSTS = [
         '.vercel.app',
         '.rone.dev',
-        '.rone.dev',
     ]
 
 # Application definition
