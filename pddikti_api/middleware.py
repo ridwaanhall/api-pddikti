@@ -75,3 +75,25 @@ class APIStatusMiddleware:
 
         response = self.get_response(request)
         return response
+
+
+class SEOHeadersMiddleware:
+    """
+    Middleware to add SEO-friendly HTTP response headers.
+    Explicitly sets X-Robots-Tag: index, follow to prevent any CDN or
+    framework defaults from blocking Google indexing.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+
+        # Explicitly allow indexing on all responses.
+        # This counteracts Vercel's default noindex behavior for vercel.app
+        # and ensures the custom domain is always indexable.
+        if 'X-Robots-Tag' not in response:
+            response['X-Robots-Tag'] = 'index, follow'
+
+        return response

@@ -17,8 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path, re_path
 from django.views.generic.base import RedirectView
+from pddikti_api.views import RobotsTxtView, SitemapXmlView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('robots.txt', RobotsTxtView.as_view(), name='robots-txt'),
+    path('sitemap.xml', SitemapXmlView.as_view(), name='sitemap-xml'),
     path('', include('pddikti_api.urls')),
 ]

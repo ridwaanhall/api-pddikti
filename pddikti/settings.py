@@ -70,6 +70,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    'pddikti_api.middleware.SEOHeadersMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -164,3 +165,13 @@ WHITENOISE_AUTOREFRESH = True
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# SEO & Security Headers
+# Prevents leaking the referrer to third-party sites (good for privacy + SEO signals)
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+# Tells browsers not to MIME-sniff the content type (security + SEO correctness)
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# X-Frame-Options: allow same-origin iframes only (prevents clickjacking)
+X_FRAME_OPTIONS = 'SAMEORIGIN'

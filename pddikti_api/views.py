@@ -4,6 +4,7 @@ from urllib.parse import unquote
 import requests
 from django.conf import settings
 from django.http import HttpResponse
+from django.views import View
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -603,3 +604,82 @@ class ProdiBidangIlmuTeknik(BaseAPIView):
     def get(self, _):
         data = self.api_client.get("prodi/bidang-ilmu/Teknik")
         return self.handle_api_response(data)
+
+
+# SEO: robots.txt
+class RobotsTxtView(View):
+    def get(self, request):
+        base_url = "https://api-pddikti.rone.dev"
+        lines = [
+            "User-agent: *",
+            "Allow: /",
+            "Disallow: /admin/",
+            "",
+            f"Sitemap: {base_url}/sitemap.xml",
+        ]
+        return HttpResponse("\n".join(lines), content_type="text/plain; charset=utf-8")
+
+
+# SEO: sitemap.xml
+class SitemapXmlView(View):
+    BASE_URL = "https://api-pddikti.rone.dev"
+
+    # Static API endpoints that return consistent, crawlable data
+    STATIC_URLS = [
+        ("/", "1.0", "daily"),
+        ("/stats/mhs-count/", "0.8", "weekly"),
+        ("/stats/mhs-count-active/", "0.8", "weekly"),
+        ("/stats/mhs-count-gender/", "0.8", "weekly"),
+        ("/stats/mhs-count-bidang-ilmu/", "0.8", "weekly"),
+        ("/stats/mhs-count-status/", "0.8", "weekly"),
+        ("/stats/mhs-count-jenjang/", "0.8", "weekly"),
+        ("/stats/mhs-count-kelompok-lembaga/", "0.8", "weekly"),
+        ("/stats/dosen-count/", "0.8", "weekly"),
+        ("/stats/dosen-count-active/", "0.8", "weekly"),
+        ("/stats/dosen-count-gender/", "0.8", "weekly"),
+        ("/stats/dosen-count-bidang/", "0.8", "weekly"),
+        ("/stats/dosen-count-keaktifan/", "0.8", "weekly"),
+        ("/stats/dosen-count-jenjang/", "0.8", "weekly"),
+        ("/stats/dosen-count-ikatan/", "0.8", "weekly"),
+        ("/stats/pt-count/", "0.8", "weekly"),
+        ("/stats/pt-count-province/", "0.8", "weekly"),
+        ("/stats/pt-count-kelompok-pembina/", "0.8", "weekly"),
+        ("/stats/pt-count-akreditasi/", "0.8", "weekly"),
+        ("/stats/pt-count-bentuk-pt/", "0.8", "weekly"),
+        ("/stats/prodi-count/", "0.8", "weekly"),
+        ("/stats/prodi-count-bidang-ilmu-terbanyak/", "0.8", "weekly"),
+        ("/stats/prodi-count-kelompok-pembina/", "0.8", "weekly"),
+        ("/stats/prodi-count-bidang-ilmu/", "0.8", "weekly"),
+        ("/stats/prodi-count-akreditasi/", "0.8", "weekly"),
+        ("/stats/prodi-count-jenjang/", "0.8", "weekly"),
+        ("/prodi-bidang-ilmu/agama/", "0.7", "monthly"),
+        ("/prodi-bidang-ilmu/ekonomi/", "0.7", "monthly"),
+        ("/prodi-bidang-ilmu/humaniora/", "0.7", "monthly"),
+        ("/prodi-bidang-ilmu/kesehatan/", "0.7", "monthly"),
+        ("/prodi-bidang-ilmu/mipa/", "0.7", "monthly"),
+        ("/prodi-bidang-ilmu/pendidikan/", "0.7", "monthly"),
+        ("/prodi-bidang-ilmu/pertanian/", "0.7", "monthly"),
+        ("/prodi-bidang-ilmu/seni/", "0.7", "monthly"),
+        ("/prodi-bidang-ilmu/sosial/", "0.7", "monthly"),
+        ("/prodi-bidang-ilmu/teknik/", "0.7", "monthly"),
+    ]
+
+    def get(self, request):
+        lastmod = settings.LAST_UPDATE.split("T")[0]
+        url_entries = []
+        for path, priority, changefreq in self.STATIC_URLS:
+            url_entries.append(
+                f"  <url>\n"
+                f"    <loc>{self.BASE_URL}{path}</loc>\n"
+                f"    <lastmod>{lastmod}</lastmod>\n"
+                f"    <changefreq>{changefreq}</changefreq>\n"
+                f"    <priority>{priority}</priority>\n"
+                f"  </url>"
+            )
+        xml = (
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+            + "\n".join(url_entries)
+            + "\n</urlset>"
+        )
+        return HttpResponse(xml, content_type="application/xml; charset=utf-8")
