@@ -12,8 +12,11 @@ router = APIRouter(tags=["overview"])
     description="Return API metadata, service status, and support information.",
 )
 def api_overview():
+    public_base_url = settings.public_base_url
+    api_base_url = f"{public_base_url}/api"
+
     meta = {
-        "base_url": "https://api-pddikti.rone.dev/api/",
+        "base_url": f"{api_base_url}/",
         "version": {
             "current": settings.api_version,
             "minimum_supported": settings.api_version,
@@ -26,8 +29,10 @@ def api_overview():
         "author": "ridwaanhall",
     }
     resources = {
-        "api_docs": "https://pddikti-docs.rone.dev/",
-        "api_root": "https://api-pddikti.rone.dev/api/",
+        "api_docs": f"{api_base_url}/docs",
+        "api_redoc": f"{api_base_url}/redoc",
+        "api_root": f"{api_base_url}/",
+        "web_explorer": f"{public_base_url}/web",
         "official_website": "https://pddikti.kemdiktisaintek.go.id/",
     }
     features = {

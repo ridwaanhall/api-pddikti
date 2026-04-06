@@ -124,16 +124,12 @@ def _collect_web_docs(request: Request) -> tuple[list[dict[str, Any]], dict[tupl
     return groups, lookup
 
 
-def _iter_static_api_paths() -> list[str]:
-    # Static API paths are generated from OpenAPI schema elsewhere when needed.
-    return []
-
-
 @router.get("/")
 def landing_page(request: Request):
     context = {
         "active_page": "landing",
         "project_name": "PDDIKTI API",
+        "public_base_url": settings.public_base_url,
         "api_version": settings.api_version,
         "api_available": settings.api_availability,
         "last_updated": settings.last_update,
@@ -148,6 +144,7 @@ def web_api_home(request: Request):
     context = {
         "active_page": "web",
         "project_name": "PDDIKTI API",
+        "public_base_url": settings.public_base_url,
         "groups": groups,
         "total_endpoints": sum(len(group["operations"]) for group in groups),
     }
@@ -164,6 +161,7 @@ def web_group_routes(request: Request, group_key: str):
     context = {
         "active_page": "web",
         "project_name": "PDDIKTI API",
+        "public_base_url": settings.public_base_url,
         "groups": groups,
         "group": group,
     }
@@ -182,6 +180,7 @@ def web_route_detail(request: Request, group_key: str, operation_id: str):
     context = {
         "active_page": "web",
         "project_name": "PDDIKTI API",
+        "public_base_url": settings.public_base_url,
         "groups": groups,
         "group": group,
         "operation": operation,
@@ -220,7 +219,7 @@ async def web_api_proxy(request: Request, forward_path: str):
 
 @router.get("/robots.txt")
 def robots_txt():
-    base_url = "https://api-pddikti.rone.dev"
+    base_url = settings.public_base_url
     lines = [
         "User-agent: *",
         "Allow: /",
@@ -233,7 +232,7 @@ def robots_txt():
 
 @router.get("/sitemap.xml")
 def sitemap_xml(request: Request):
-    base_url = "https://api-pddikti.rone.dev"
+    base_url = settings.public_base_url
     lastmod = settings.last_update.split("T")[0]
     groups, _ = _collect_web_docs(request)
 

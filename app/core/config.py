@@ -17,15 +17,33 @@ def _required_env(name: str) -> str:
     return value
 
 
-def _required_bool(name: str) -> bool:
-    value = _required_env(name).strip().lower()
-    if value in {"1", "true", "yes", "on"}:
+def _env(name: str, default: str) -> str:
+    value = os.getenv(name)
+    if value is None or value.strip() == "":
+        return default
+    return value
+
+
+def _parse_bool(name: str, value: str) -> bool:
+    normalized = value.strip().lower()
+    if normalized in {"1", "true", "yes", "on"}:
         return True
-    if value in {"0", "false", "no", "off"}:
+    if normalized in {"0", "false", "no", "off"}:
         return False
     raise RuntimeError(
         f"Invalid boolean value for {name}: {value!r}. Use true/false, 1/0, yes/no, or on/off."
     )
+
+
+def _required_bool(name: str) -> bool:
+    return _parse_bool(name, _required_env(name))
+
+
+def _env_bool(name: str, default: bool) -> bool:
+    value = os.getenv(name)
+    if value is None or value.strip() == "":
+        return default
+    return _parse_bool(name, value)
 
 
 def _required_int(name: str) -> int:
@@ -36,10 +54,20 @@ def _required_int(name: str) -> int:
         raise RuntimeError(f"Invalid integer value for {name}: {value!r}") from exc
 
 
+def _env_int(name: str, default: int) -> int:
+    value = os.getenv(name)
+    if value is None or value.strip() == "":
+        return default
+    try:
+        return int(value)
+    except ValueError as exc:
+        raise RuntimeError(f"Invalid integer value for {name}: {value!r}") from exc
+
+
 class Settings:
     def __init__(self) -> None:
         self.secret_key = _required_env("SECRET_KEY")
-        self.debug = _required_bool("DEBUG")
+        self.debug = _env_bool("DEBUG", False)
 
         self.ridwaanhall_main_api = _required_env("RIDWAANHALL_MAIN_API")
         self.api_key = _required_env("API_KEY")
@@ -52,10 +80,11 @@ class Settings:
         self.ridwaanhall_key = _required_env("RIDWAANHALL_KEY")
         self.ridwaanhall_hash_key = _required_env("RIDWAANHALL_HASH_KEY")
 
-        self.api_availability = _required_bool("API_AVAILABILITY")
-        self.api_version = _required_env("API_VERSION")
-        self.last_update = _required_env("LAST_UPDATE")
-        self.api_timeout = _required_int("API_TIMEOUT")
+        self.api_availability = _env_bool("API_AVAILABILITY", True)
+        self.api_version = _env("API_VERSION", "4.0.0")
+        self.last_update = _env("LAST_UPDATE", "2026-05-29T00:00:00+07:00")
+        self.api_timeout = _env_int("API_TIMEOUT", 8)
+        self.public_base_url = _env("PUBLIC_BASE_URL", "https://pddikti.rone.dev").rstrip("/")
 
 
 @lru_cache

@@ -1,84 +1,63 @@
 # PDDIKTI API
 
-[![wakatime](https://wakatime.com/badge/user/018b799e-de53-4f7a-bb65-edc2df9f26d8/project/e637f4e3-a75d-49c8-beb0-0f19f8eb52cd.svg)](https://wakatime.com/badge/user/018b799e-de53-4f7a-bb65-edc2df9f26d8/project/e637f4e3-a75d-49c8-beb0-0f19f8eb52cd)
+Production API service for structured access to Indonesia higher-education data (PDDIKTI), including universities, study programs, lecturers, and students.
 
-## INFO
+## Production Endpoint
 
-> API ini telah di-update berdasarkan data baru di <https://pddikti.kemdiktisaintek.go.id/>
+- Base URL: [https://pddikti.rone.dev](https://pddikti.rone.dev)
+- API Root: [https://pddikti.rone.dev/api/](https://pddikti.rone.dev/api/)
+- Swagger UI: [https://pddikti.rone.dev/api/docs](https://pddikti.rone.dev/api/docs)
+- ReDoc: [https://pddikti.rone.dev/api/redoc](https://pddikti.rone.dev/api/redoc)
+- Interactive Web Explorer: [https://pddikti.rone.dev/web](https://pddikti.rone.dev/web)
 
-## Stack
+## About This Project
 
-- FastAPI
-- Uvicorn
-- Requests
-- uv (dependency and lock management)
+PDDIKTI API is built to provide consistent, production-grade endpoint access over public higher-education datasets. It includes:
 
-## Menjalankan Secara Lokal
+- Modular FastAPI routing by domain (`search`, `pt`, `prodi`, `dosen`, `mhs`, `stats`, `prodi-bidang-ilmu`)
+- OpenAPI documentation with Swagger and ReDoc
+- Interactive `/web` explorer with route groups, endpoint details, and live request testing
+- Availability gating and service metadata for traffic management
+- SEO-ready landing and endpoint discovery pages
+
+## How to Use the API
+
+1. Open the API overview to inspect service metadata and status:
+    - GET [https://pddikti.rone.dev/api/](https://pddikti.rone.dev/api/)
+2. Browse endpoint documentation:
+    - Swagger: [https://pddikti.rone.dev/api/docs](https://pddikti.rone.dev/api/docs)
+    - ReDoc: [https://pddikti.rone.dev/api/redoc](https://pddikti.rone.dev/api/redoc)
+3. Call endpoints directly from your app or client.
+
+### Example Request
 
 ```bash
-uv sync --group dev
-uv run uvicorn app.main:app --reload
+curl "https://pddikti.rone.dev/api/search/all/informatika/"
 ```
 
-Lalu akses:
-
-- Landing page: <http://127.0.0.1:8000/>
-- API overview: <http://127.0.0.1:8000/api/>
-- Docs: <http://127.0.0.1:8000/api/docs>
-- ReDoc: <http://127.0.0.1:8000/api/redoc>
-- Web API demo: <http://127.0.0.1:8000/web>
-
-## Bagaimana cara menggunakan API?
-
-Baca dokumentasi berbahasa indonesia ini [PDDikti Docs](https://pddikti-docs.rone.dev). mudah dan gampang digunakan.
-
-## API Documentation
-
-[https://pddikti-docs.rone.dev](https://pddikti-docs.rone.dev)
-
-![API Documentation](https://github.com/user-attachments/assets/a30872f0-e3d5-45de-a7a1-86609a145fe4)
-
-## Tampilan pada API Endpoint
-
-[https://api-pddikti.rone.dev](https://api-pddikti.rone.dev)
-
-![API Overview](images/api-overview.png)
-
-## API Traffic Management
-
-This API includes intelligent traffic management to ensure optimal performance and system stability during high-traffic periods.
-
-### Service Status Monitoring
-
-The API automatically monitors traffic levels and may temporarily limit certain endpoints to maintain service quality for all users.
-
-### Response Format
-
-During high traffic periods, some endpoints may return a professional service notice:
+### Example Response Shape
 
 ```json
 {
-    "error": "Service Temporarily Limited",
-    "message": "Due to high traffic volume, this endpoint is temporarily unavailable to ensure system stability.",
-    "code": 503,
-    "status": "Service Unavailable",
-    "available_endpoint": {
-        "url": "https://api-pddikti.rone.dev",
-        "method": "GET",
-        "description": "API Overview - Current service status and available resources"
-    },
-    "support": {
-        "retry_suggestion": "Please try again in a few minutes",
-        "contact": "Contact support if this issue persists"
+    "code": 200,
+    "message": "ok",
+    "data": {
+        "pt": [],
+        "prodi": [],
+        "dosen": [],
+        "mahasiswa": []
     }
 }
 ```
 
-The response includes proper HTTP headers:
+## Service Availability Behavior
 
-- `Content-Type: application/json`
-- `Retry-After: 3600` (suggesting retry after 1 hour)
+When traffic protection is active, non-overview API endpoints may return a temporary limitation response (`HTTP 503`) with guidance to retry later. The API overview endpoint remains available as the primary status source.
 
-All API responses maintain consistent formatting and provide clear guidance for users during service limitations.
+## Stack
 
-The API overview endpoint will always remain accessible and will show the current service status and additional information about the traffic management state.
+- FastAPI
+- Starlette
+- Requests
+- httpx
+- uv (dependency and lock management)

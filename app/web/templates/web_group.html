@@ -1,45 +1,49 @@
 {% extends "base.html" %}
 
 {% block title %}{{ group.label }} \ PDDIKTI API{% endblock %}
+{% block meta_description %}Explore {{ group.label }} endpoints, parameter descriptions, and quick links to mirrored /web routes.{% endblock %}
+{% block canonical_url %}{{ public_base_url }}/web/routes/{{ group.key }}{% endblock %}
+{% block og_title %}{{ group.label }} \ PDDIKTI API{% endblock %}
+{% block twitter_title %}{{ group.label }} \ PDDIKTI API{% endblock %}
 
 {% block content %}
 <main class="mx-auto flex w-full max-w-6xl flex-col px-4 py-8 sm:px-8 lg:px-12">
-  <header class="mb-6 border border-zinc-800 p-6">
-    <p class="text-xs uppercase tracking-[0.18em] text-zinc-500">Route Group</p>
-    <h1 class="mt-2 text-2xl font-semibold sm:text-3xl">{{ group.label }}</h1>
-    <p class="mt-2 text-sm text-zinc-400">{{ group.description }}</p>
-  </header>
+    <header class="mb-6 border border-zinc-800 p-6">
+        <p class="text-xs uppercase tracking-[0.18em] text-zinc-500">Route Group</p>
+        <h1 class="mt-2 text-2xl font-semibold sm:text-3xl">{{ group.label }}</h1>
+        <p class="mt-2 text-sm text-zinc-400">{{ group.description }}</p>
+    </header>
 
-  <section class="grid gap-6 lg:grid-cols-[240px_1fr]">
-    <aside class="h-fit border border-zinc-800 p-4 lg:sticky lg:top-6">
-      <p class="mb-3 text-xs uppercase tracking-[0.18em] text-zinc-500">All Groups</p>
-      <ul class="space-y-2 text-sm text-zinc-300">
-        {% for nav_group in groups %}
-        <li>
-          <a href="/web/routes/{{ nav_group.key }}" class="{% if nav_group.key == group.key %}text-zinc-100{% else %}hover:text-zinc-100{% endif %}">{{ nav_group.label }}</a>
-        </li>
-        {% endfor %}
-      </ul>
-    </aside>
+    <section class="grid gap-6 lg:grid-cols-[240px_1fr]">
+        <aside class="h-fit border border-zinc-800 p-4 lg:sticky lg:top-6">
+            <p class="mb-3 text-xs uppercase tracking-[0.18em] text-zinc-500">All Groups</p>
+            <ul class="space-y-2 text-sm text-zinc-300">
+                {% for nav_group in groups %}
+                <li>
+                    <a href="/web/routes/{{ nav_group.key }}" class="{% if nav_group.key == group.key %}text-zinc-100{% else %}hover:text-zinc-100{% endif %}">{{ nav_group.label }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </aside>
 
-    <div class="space-y-4">
-      {% for operation in group.operations %}
-      <article class="border border-zinc-800 p-5">
-        <div class="flex flex-wrap items-center gap-3">
-          <span class="border border-zinc-700 px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-zinc-300">{{ operation.method }}</span>
-          <p class="text-sm text-zinc-300">{{ operation.web_path }}</p>
+        <div class="space-y-4">
+            {% for operation in group.operations %}
+            <article class="border border-zinc-800 p-5">
+                <div class="flex flex-wrap items-center gap-3">
+                    <span class="border border-zinc-700 px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-zinc-300">{{ operation.method }}</span>
+                    <p class="text-sm text-zinc-300">{{ operation.web_path }}</p>
+                </div>
+                <h2 class="mt-3 text-lg font-medium">{{ operation.summary }}</h2>
+                <p class="mt-2 text-sm text-zinc-400">{{ operation.description }}</p>
+                <div class="mt-4 flex flex-wrap gap-4 text-sm">
+                    <a href="/web/routes/{{ group.key }}/{{ operation.id }}" class="underline underline-offset-4">More Detail</a>
+                    {% if "{" not in operation.api_path %}
+                    <a href="{{ operation.web_path }}" class="underline underline-offset-4">Quick Try</a>
+                    {% endif %}
+                </div>
+            </article>
+            {% endfor %}
         </div>
-        <h2 class="mt-3 text-lg font-medium">{{ operation.summary }}</h2>
-        <p class="mt-2 text-sm text-zinc-400">{{ operation.description }}</p>
-        <div class="mt-4 flex flex-wrap gap-4 text-sm">
-          <a href="/web/routes/{{ group.key }}/{{ operation.id }}" class="underline underline-offset-4">More Detail</a>
-          {% if "{" not in operation.api_path %}
-          <a href="{{ operation.web_path }}" class="underline underline-offset-4">Quick Try</a>
-          {% endif %}
-        </div>
-      </article>
-      {% endfor %}
-    </div>
-  </section>
+    </section>
 </main>
 {% endblock %}

@@ -1,146 +1,150 @@
 {% extends "base.html" %}
 
 {% block title %}{{ operation.summary }} - {{ group.label }} \ PDDIKTI API{% endblock %}
+{% block meta_description %}{{ operation.summary }} endpoint details, parameter requirements, and live testing interface for {{ group.label }} routes.{% endblock %}
+{% block canonical_url %}{{ public_base_url }}/web/routes/{{ group.key }}/{{ operation.id }}{% endblock %}
+{% block og_title %}{{ operation.summary }} - {{ group.label }} \ PDDIKTI API{% endblock %}
+{% block twitter_title %}{{ operation.summary }} - {{ group.label }} \ PDDIKTI API{% endblock %}
 
 {% block content %}
 <main class="mx-auto flex w-full max-w-6xl flex-col px-4 py-8 sm:px-8 lg:px-12">
-  <header class="mb-6 border border-zinc-800 p-6">
-    <p class="text-xs uppercase tracking-[0.18em] text-zinc-500">Route Detail</p>
-    <h1 class="mt-2 text-2xl font-semibold sm:text-3xl">{{ operation.summary }}</h1>
-    <p class="mt-2 text-sm text-zinc-400">{{ operation.description }}</p>
-    <div class="mt-4 grid gap-2 text-xs text-zinc-500 sm:grid-cols-2">
-      <p>Group: {{ group.label }}</p>
-      <p>Method: {{ operation.method }}</p>
-      <p>API Path: {{ operation.api_path }}</p>
-      <p>Web Path: {{ operation.web_path }}</p>
-    </div>
-  </header>
-
-  <section class="grid gap-6 lg:grid-cols-[240px_1fr]">
-    <aside class="h-fit border border-zinc-800 p-4 lg:sticky lg:top-6">
-      <p class="mb-3 text-xs uppercase tracking-[0.18em] text-zinc-500">Navigation</p>
-      <ul class="space-y-2 text-sm text-zinc-300">
-        <li><a href="/web" class="hover:text-zinc-100">Web Home</a></li>
-        <li><a href="/web/routes/{{ group.key }}" class="hover:text-zinc-100">{{ group.label }}</a></li>
-      </ul>
-    </aside>
-
-    <div class="space-y-5">
-      <article class="border border-zinc-800 p-5">
-        <h2 class="text-lg font-medium">Parameters</h2>
-        {% if operation.parameters %}
-        <div class="mt-3 overflow-x-auto">
-          <table class="w-full min-w-[520px] border-collapse text-sm">
-            <thead>
-              <tr class="border-b border-zinc-800 text-zinc-400">
-                <th class="py-2 text-left font-normal">Name</th>
-                <th class="py-2 text-left font-normal">In</th>
-                <th class="py-2 text-left font-normal">Type</th>
-                <th class="py-2 text-left font-normal">Required</th>
-                <th class="py-2 text-left font-normal">Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for parameter in operation.parameters %}
-              <tr class="border-b border-zinc-900 align-top">
-                <td class="py-2 text-zinc-200">{{ parameter.name }}</td>
-                <td class="py-2 text-zinc-400">{{ parameter.in }}</td>
-                <td class="py-2 text-zinc-400">{{ parameter.type }}</td>
-                <td class="py-2 text-zinc-400">{{ "yes" if parameter.required else "no" }}</td>
-                <td class="py-2 text-zinc-400">{{ parameter.description }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+    <header class="mb-6 border border-zinc-800 p-6">
+        <p class="text-xs uppercase tracking-[0.18em] text-zinc-500">Route Detail</p>
+        <h1 class="mt-2 text-2xl font-semibold sm:text-3xl">{{ operation.summary }}</h1>
+        <p class="mt-2 text-sm text-zinc-400">{{ operation.description }}</p>
+        <div class="mt-4 grid gap-2 text-xs text-zinc-500 sm:grid-cols-2">
+            <p>Group: {{ group.label }}</p>
+            <p>Method: {{ operation.method }}</p>
+            <p>API Path: {{ operation.api_path }}</p>
+            <p>Web Path: {{ operation.web_path }}</p>
         </div>
-        {% else %}
-        <p class="mt-3 text-sm text-zinc-400">This endpoint does not require input parameters.</p>
-        {% endif %}
-      </article>
+    </header>
 
-      <article class="border border-zinc-800 p-5">
-        <h2 class="text-lg font-medium">Try Endpoint</h2>
-        <form id="try-form" class="mt-4 grid gap-4">
-          {% for parameter in operation.parameters %}
-          <label class="grid gap-1">
-            <span class="text-xs uppercase tracking-[0.12em] text-zinc-500">{{ parameter.title }}</span>
-            <input
-              id="param-{{ parameter.name }}"
-              name="{{ parameter.name }}"
-              class="border border-zinc-700 bg-transparent px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-500"
-              placeholder="{{ parameter.description }}"
-            />
-          </label>
-          {% endfor %}
+    <section class="grid gap-6 lg:grid-cols-[240px_1fr]">
+        <aside class="h-fit border border-zinc-800 p-4 lg:sticky lg:top-6">
+            <p class="mb-3 text-xs uppercase tracking-[0.18em] text-zinc-500">Navigation</p>
+            <ul class="space-y-2 text-sm text-zinc-300">
+                <li><a href="/web" class="hover:text-zinc-100">Web Home</a></li>
+                <li><a href="/web/routes/{{ group.key }}" class="hover:text-zinc-100">{{ group.label }}</a></li>
+            </ul>
+        </aside>
 
-          <div class="flex flex-wrap gap-3">
-            <button type="submit" class="border border-zinc-600 px-4 py-2 text-sm hover:border-zinc-400">Run Request</button>
-            <a href="{{ operation.web_path }}" class="border border-zinc-700 px-4 py-2 text-sm">Open Raw Endpoint</a>
-          </div>
-        </form>
+        <div class="space-y-5">
+            <article class="border border-zinc-800 p-5">
+                <h2 class="text-lg font-medium">Parameters</h2>
+                {% if operation.parameters %}
+                <div class="mt-3 overflow-x-auto">
+                    <table class="w-full min-w-[520px] border-collapse text-sm">
+                        <thead>
+                            <tr class="border-b border-zinc-800 text-zinc-400">
+                                <th class="py-2 text-left font-normal">Name</th>
+                                <th class="py-2 text-left font-normal">In</th>
+                                <th class="py-2 text-left font-normal">Type</th>
+                                <th class="py-2 text-left font-normal">Required</th>
+                                <th class="py-2 text-left font-normal">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for parameter in operation.parameters %}
+                            <tr class="border-b border-zinc-900 align-top">
+                                <td class="py-2 text-zinc-200">{{ parameter.name }}</td>
+                                <td class="py-2 text-zinc-400">{{ parameter.in }}</td>
+                                <td class="py-2 text-zinc-400">{{ parameter.type }}</td>
+                                <td class="py-2 text-zinc-400">{{ "yes" if parameter.required else "no" }}</td>
+                                <td class="py-2 text-zinc-400">{{ parameter.description }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="mt-3 text-sm text-zinc-400">This endpoint does not require input parameters.</p>
+                {% endif %}
+            </article>
 
-        <div class="mt-5">
-          <p class="mb-2 text-xs uppercase tracking-[0.14em] text-zinc-500">Response</p>
-          <pre id="response-box" class="max-h-[380px] overflow-auto border border-zinc-800 p-4 text-xs text-zinc-300">Run a request to see response output...</pre>
+            <article class="border border-zinc-800 p-5">
+                <h2 class="text-lg font-medium">Try Endpoint</h2>
+                <form id="try-form" class="mt-4 grid gap-4">
+                    {% for parameter in operation.parameters %}
+                    <label class="grid gap-1">
+                        <span class="text-xs uppercase tracking-[0.12em] text-zinc-500">{{ parameter.title }}</span>
+                        <input
+                            id="param-{{ parameter.name }}"
+                            name="{{ parameter.name }}"
+                            class="border border-zinc-700 bg-transparent px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-500"
+                            placeholder="{{ parameter.description }}"
+                        />
+                    </label>
+                    {% endfor %}
+
+                    <div class="flex flex-wrap gap-3">
+                        <button type="submit" class="border border-zinc-600 px-4 py-2 text-sm hover:border-zinc-400">Run Request</button>
+                        <a href="{{ operation.web_path }}" class="border border-zinc-700 px-4 py-2 text-sm">Open Raw Endpoint</a>
+                    </div>
+                </form>
+
+                <div class="mt-5">
+                    <p class="mb-2 text-xs uppercase tracking-[0.14em] text-zinc-500">Response</p>
+                    <pre id="response-box" class="max-h-[380px] overflow-auto border border-zinc-800 p-4 text-xs text-zinc-300">Run a request to see response output...</pre>
+                </div>
+            </article>
         </div>
-      </article>
-    </div>
-  </section>
+    </section>
 </main>
 
 <script>
-  const operation = {{ operation | tojson }};
-  const form = document.getElementById("try-form");
-  const responseBox = document.getElementById("response-box");
+    const operation = {{ operation | tojson }};
+    const form = document.getElementById("try-form");
+    const responseBox = document.getElementById("response-box");
 
-  function buildRequestPath() {
-    let path = operation.web_path;
-    const query = new URLSearchParams();
+    function buildRequestPath() {
+        let path = operation.web_path;
+        const query = new URLSearchParams();
 
-    for (const parameter of operation.parameters) {
-      const field = document.getElementById(`param-${parameter.name}`);
-      const value = (field?.value || "").trim();
+        for (const parameter of operation.parameters) {
+            const field = document.getElementById(`param-${parameter.name}`);
+            const value = (field?.value || "").trim();
 
-      if (parameter.in === "path") {
-        if (!value) {
-          throw new Error(`Missing required path parameter: ${parameter.name}`);
+            if (parameter.in === "path") {
+                if (!value) {
+                    throw new Error(`Missing required path parameter: ${parameter.name}`);
+                }
+                path = path.replace(`{${parameter.name}}`, encodeURIComponent(value));
+            } else if (parameter.in === "query" && value) {
+                query.append(parameter.name, value);
+            }
         }
-        path = path.replace(`{${parameter.name}}`, encodeURIComponent(value));
-      } else if (parameter.in === "query" && value) {
-        query.append(parameter.name, value);
-      }
+
+        if (path.includes("{")) {
+            throw new Error("Some path parameters are still unresolved.");
+        }
+
+        const qs = query.toString();
+        return qs ? `${path}?${qs}` : path;
     }
 
-    if (path.includes("{")) {
-      throw new Error("Some path parameters are still unresolved.");
-    }
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
 
-    const qs = query.toString();
-    return qs ? `${path}?${qs}` : path;
-  }
+        try {
+            const target = buildRequestPath();
+            responseBox.textContent = `Request: ${target}\n\nLoading...`;
 
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
+            const response = await fetch(target, {
+                method: "GET",
+                headers: { "Accept": "application/json, text/plain, */*" },
+            });
 
-    try {
-      const target = buildRequestPath();
-      responseBox.textContent = `Request: ${target}\n\nLoading...`;
+            const raw = await response.text();
+            let pretty = raw;
+            try {
+                pretty = JSON.stringify(JSON.parse(raw), null, 2);
+            } catch (_) {}
 
-      const response = await fetch(target, {
-        method: "GET",
-        headers: { "Accept": "application/json, text/plain, */*" },
-      });
-
-      const raw = await response.text();
-      let pretty = raw;
-      try {
-        pretty = JSON.stringify(JSON.parse(raw), null, 2);
-      } catch (_) {}
-
-      responseBox.textContent = `Status: ${response.status} ${response.statusText}\n\n${pretty}`;
-    } catch (error) {
-      responseBox.textContent = `Error: ${error.message}`;
-    }
-  });
+            responseBox.textContent = `Status: ${response.status} ${response.statusText}\n\n${pretty}`;
+        } catch (error) {
+            responseBox.textContent = `Error: ${error.message}`;
+        }
+    });
 </script>
 {% endblock %}
