@@ -67,10 +67,37 @@
             :root {
                 --font-sans: "Onest", "Segoe UI", sans-serif;
                 --font-mono: "Space Mono", "Cascadia Mono", monospace;
+                --scroll-thumb: #52525b;
+                --scroll-thumb-hover: #71717a;
+                --scroll-track: #09090b;
             }
 
             body {
                 font-family: var(--font-sans);
+            }
+
+            * {
+                scrollbar-width: thin;
+                scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+            }
+
+            *::-webkit-scrollbar {
+                width: 10px;
+                height: 10px;
+            }
+
+            *::-webkit-scrollbar-track {
+                background: var(--scroll-track);
+            }
+
+            *::-webkit-scrollbar-thumb {
+                background: var(--scroll-thumb);
+                border-radius: 999px;
+                border: 2px solid var(--scroll-track);
+            }
+
+            *::-webkit-scrollbar-thumb:hover {
+                background: var(--scroll-thumb-hover);
             }
 
             code,

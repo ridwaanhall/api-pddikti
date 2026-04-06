@@ -167,7 +167,7 @@
 
                     <div class="mt-5 rounded-lg border border-zinc-800 p-4">
                         <p class="text-xs uppercase tracking-[0.14em] text-zinc-500">Readable Response</p>
-                        <div id="readable-{{ operation.id }}" class="mt-3 overflow-auto border border-zinc-800 p-3 text-xs text-zinc-300">
+                        <div id="readable-{{ operation.id }}" class="mt-3 max-h-[320px] overflow-auto border border-zinc-800 p-3 text-xs text-zinc-300">
                             Run execute to render readable key-value response.
                         </div>
                     </div>
@@ -360,37 +360,28 @@
         return selected.join("\n");
     }
 
-    function flattenRows(value, prefix = "", rows = [], depth = 0) {
-        if (depth > 6 || rows.length > 300) {
+    function flattenRows(value, rows = [], level = 0, key = "root") {
+        if (rows.length > 500 || level > 8) {
             return rows;
         }
 
         if (Array.isArray(value)) {
-            if (value.length === 0) {
-                rows.push({ key: prefix || "array", value: "[]" });
-                return rows;
-            }
+            rows.push({ level, key, type: "array", value: `(${value.length})` });
             value.forEach((item, index) => {
-                const key = prefix ? `${prefix}[${index}]` : `[${index}]`;
-                flattenRows(item, key, rows, depth + 1);
+                flattenRows(item, rows, level + 1, `[${index}]`);
             });
             return rows;
         }
 
         if (value && typeof value === "object") {
-            const entries = Object.entries(value);
-            if (entries.length === 0) {
-                rows.push({ key: prefix || "object", value: "{}" });
-                return rows;
-            }
-            entries.forEach(([key, item]) => {
-                const next = prefix ? `${prefix}.${key}` : key;
-                flattenRows(item, next, rows, depth + 1);
+            rows.push({ level, key, type: "object", value: "" });
+            Object.entries(value).forEach(([childKey, item]) => {
+                flattenRows(item, rows, level + 1, childKey);
             });
             return rows;
         }
 
-        rows.push({ key: prefix || "value", value: String(value) });
+        rows.push({ level, key, type: typeof value, value: String(value) });
         return rows;
     }
 
@@ -401,15 +392,15 @@
             return;
         }
 
-        const rows = flattenRows(payload);
+        const rows = flattenRows(payload, [], 0, "root");
         const htmlRows = rows
             .map(
                 (row) =>
-                    `<tr class=\"border-b border-zinc-900\"><td class=\"px-2 py-1 align-top text-zinc-200\">${escapeHtml(row.key)}</td><td class=\"px-2 py-1 text-zinc-400 break-all\">${escapeHtml(row.value)}</td></tr>`
+                    `<tr class=\"border-b border-zinc-900\"><td class=\"px-2 py-1 align-top text-zinc-200\" style=\"padding-left:${8 + row.level * 16}px\">${escapeHtml(row.key)}</td><td class=\"px-2 py-1 align-top text-zinc-500\">${escapeHtml(row.type)}</td><td class=\"px-2 py-1 text-zinc-400 break-all\">${escapeHtml(row.value)}</td></tr>`
             )
             .join("");
 
-        target.innerHTML = `<table class=\"w-full text-xs\"><thead><tr class=\"border-b border-zinc-800\"><th class=\"px-2 py-1 text-left text-zinc-500 font-normal\">Key</th><th class=\"px-2 py-1 text-left text-zinc-500 font-normal\">Value</th></tr></thead><tbody>${htmlRows}</tbody></table>`;
+        target.innerHTML = `<table class=\"w-full min-w-[680px] text-xs\"><thead><tr class=\"border-b border-zinc-800\"><th class=\"px-2 py-1 text-left text-zinc-500 font-normal\">Key</th><th class=\"px-2 py-1 text-left text-zinc-500 font-normal\">Type</th><th class=\"px-2 py-1 text-left text-zinc-500 font-normal\">Value</th></tr></thead><tbody>${htmlRows}</tbody></table>`;
     }
 
     function refreshSnippet(operationId) {

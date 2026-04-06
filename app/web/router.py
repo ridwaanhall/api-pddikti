@@ -179,10 +179,11 @@ def _resolve_selected_operation(
 
 @router.get("/")
 def landing_page(request: Request):
+    current_base_url = str(request.base_url).rstrip("/")
     context = {
         "active_page": "landing",
         "project_name": "PDDIKTI API",
-        "public_base_url": settings.public_base_url,
+        "public_base_url": current_base_url,
         "api_version": settings.api_version,
         "api_available": settings.api_availability,
         "last_updated": settings.last_update,
@@ -198,6 +199,7 @@ def web_api_home(
     operation: str | None = None,
     view: str | None = None,
 ):
+    current_base_url = str(request.base_url).rstrip("/")
     groups, _ = _collect_web_docs(request)
     selected_group = _resolve_selected_group(groups, group)
     selected_operation = _resolve_selected_operation(selected_group, operation)
@@ -208,13 +210,13 @@ def web_api_home(
     context = {
         "active_page": "web",
         "project_name": "PDDIKTI API",
-        "public_base_url": settings.public_base_url,
+        "public_base_url": current_base_url,
         "groups": groups,
         "selected_group": selected_group,
         "selected_operation": selected_operation,
         "is_single_view": is_single_view,
         "rendered_operations": rendered_operations,
-        "public_api_base_url": f"{settings.public_base_url}/api",
+        "public_api_base_url": f"{current_base_url}/api",
         "total_endpoints": sum(len(group["operations"]) for group in groups),
     }
     return templates.TemplateResponse(request, "web_index.html", context)
