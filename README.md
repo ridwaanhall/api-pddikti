@@ -4,6 +4,12 @@ Production API service for structured access to Indonesia higher-education data 
 
 ## Production Endpoint
 
+alternative endpoint
+
+```txt
+https://pddikti.fastapicloud.dev
+```
+
 - Base URL: [https://pddikti.rone.dev](https://pddikti.rone.dev)
 - API Root: [https://pddikti.rone.dev/api/](https://pddikti.rone.dev/api/)
 - Swagger UI: [https://pddikti.rone.dev/api/docs](https://pddikti.rone.dev/api/docs)
