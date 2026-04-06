@@ -1,0 +1,103 @@
+from fastapi import APIRouter
+
+from app.api.common import settings
+
+
+router = APIRouter(tags=["overview"])
+
+
+@router.get("/", summary="API overview")
+def api_overview():
+    meta = {
+        "base_url": "https://api-pddikti.rone.dev/api/",
+        "version": {
+            "current": settings.api_version,
+            "minimum_supported": settings.api_version,
+        },
+        "description": (
+            "Provides structured access to data from Pangkalan Data Pendidikan Tinggi "
+            "(PDDikti), Indonesia's Higher Education Database"
+        ),
+        "last_updated": settings.last_update,
+        "author": "ridwaanhall",
+    }
+    resources = {
+        "api_docs": "https://pddikti-docs.rone.dev/",
+        "api_root": "https://api-pddikti.rone.dev/api/",
+        "official_website": "https://pddikti.kemdiktisaintek.go.id/",
+    }
+    features = {
+        "documentation": (
+            "Comprehensive API guide with endpoints, examples, and usage instructions"
+        ),
+        "status_monitoring": "Real-time performance and availability tracking",
+        "traffic_management": (
+            "Automated request balancing and throttling for high availability"
+        ),
+    }
+
+    if settings.api_availability:
+        status = {
+            "status": "Operational",
+            "code": "OK_200",
+            "severity": "normal",
+            "message": "All endpoints are functioning normally.",
+        }
+        notice = {
+            "headline": "Service Operational",
+            "details": "Traffic levels have normalized and full services are restored.",
+            "estimated_resolution": None,
+            "support_contact": {
+                "live_chat": "https://ridwaanhall.com/guestbook",
+                "email": "hi@ridwaanhall.com",
+                "form": "https://ridwaanhall.com/contact",
+            },
+        }
+    else:
+        status = {
+            "status": "Limited Service",
+            "code": "TRAFFIC_LIMIT_001",
+            "severity": "warning",
+            "message": "Some endpoints are temporarily unavailable due to high traffic",
+        }
+        notice = {
+            "headline": "High Traffic Alert",
+            "details": "To maintain stability, some services are temporarily limited.",
+            "estimated_resolution": (
+                "Expected recovery as traffic normalizes within days or weeks"
+            ),
+            "blog": (
+                "https://ridwaanhall.com/blog/how-usage-monitoring-sustains-"
+                "mlbb-stats-and-api-pddikti/"
+            ),
+            "support_contact": {
+                "live_chat": "https://ridwaanhall.com/guestbook",
+                "email": "hi@ridwaanhall.com",
+                "form": "https://ridwaanhall.com/contact",
+            },
+        }
+        meta[
+            "description"
+        ] += ", covering universities, study programs, lecturers, and students."
+
+    return {
+        "meta": meta,
+        "resources": resources,
+        "features": features,
+        "status": status,
+        "notice": notice,
+    }
+
+
+ENDPOINT_GROUP = {
+    "id": "overview",
+    "label": "Overview",
+    "description": "Service metadata and health context.",
+    "endpoints": [
+        {
+            "method": "GET",
+            "path": "/api/",
+            "summary": "API overview",
+        }
+    ],
+}

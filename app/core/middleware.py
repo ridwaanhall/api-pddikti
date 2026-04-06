@@ -1,0 +1,69 @@
+from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+
+from app.core.config import get_settings
+
+
+class APIStatusMiddleware(BaseHTTPMiddleware):
+    """Restrict non-overview API endpoints when API availability is disabled."""
+
+    async def dispatch(self, request: Request, call_next):
+        settings = get_settings()
+        path = request.url.path
+        allowed_paths = {"/api", "/api/"}
+        allowed_prefixes = (
+            "/api/docs",
+            "/api/openapi.json",
+            "/api/docs/oauth2-redirect",
+        )
+
+        if not settings.api_availability and path.startswith("/api"):
+            is_allowed = path in allowed_paths or any(
+                path.startswith(prefix) for prefix in allowed_prefixes
+            )
+            if not is_allowed:
+                payload = {
+                    "error": "Service Temporarily Limited",
+                    "message": (
+                        "Due to high traffic volume, this endpoint is temporarily "
+                        "unavailable to ensure system stability."
+                    ),
+                    "code": 503,
+                    "status": "Service Unavailable",
+                    "available_endpoint": {
+                        "url": str(request.base_url),
+                        "method": "GET",
+                        "description": (
+                            "API Overview - Current service status and available resources"
+                        ),
+                    },
+                    "support": {
+                        "retry_suggestion": (
+                            "Please try again in a few days (or weeks) as we are "
+                            "currently experiencing high traffic."
+                        ),
+                        "support_message": (
+                            "You can support us by donating from $1 USD (target: "
+                            "$500 USD) to help enhance API performance and handle "
+                            "high request volumes."
+                        ),
+                        "contact": "Contact support if this issue persists",
+                        "contact_site": "https://ridwaanhall.com/guestbook",
+                    },
+                }
+                return JSONResponse(payload, status_code=503, headers={"Retry-After": "3600"})
+
+        return await call_next(request)
+
+
+class SEOHeadersMiddleware(BaseHTTPMiddleware):
+    """Add SEO and security headers to every response."""
+
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        response.headers.setdefault("X-Robots-Tag", "index, follow")
+        response.headers.setdefault("X-Content-Type-Options", "nosniff")
+        response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+        response.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
+        return response

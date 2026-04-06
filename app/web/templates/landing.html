@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}PDDIKTI API | Landing{% endblock %}
+
+{% block content %}
+<main class="mx-auto flex w-full max-w-6xl flex-col px-6 py-10 sm:px-10 lg:px-12">
+  <header class="mb-10">
+    <p class="mb-4 inline-block rounded-full border border-zinc-700 px-3 py-1 text-xs uppercase tracking-[0.22em] text-zinc-300">
+      Indonesia Higher Education Data Gateway
+    </p>
+    <h1 class="max-w-4xl text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">
+      {{ project_name }}
+    </h1>
+    <p class="mt-4 max-w-2xl text-sm text-zinc-300 sm:text-base">
+      Fast, modular access to university, study program, lecturer, and student data from PDDIKTI.
+    </p>
+  </header>
+
+  <section class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+    <article class="rounded-2xl border border-zinc-800 p-6">
+      <h2 class="text-lg font-medium">API Root</h2>
+      <p class="mt-2 text-sm text-zinc-300">Use this endpoint for service status and API metadata.</p>
+      <a href="/api/" class="mt-4 inline-block text-sm underline underline-offset-4">Open /api/</a>
+    </article>
+
+    <article class="rounded-2xl border border-zinc-800 p-6">
+      <h2 class="text-lg font-medium">Interactive Docs</h2>
+      <p class="mt-2 text-sm text-zinc-300">Explore and test endpoint contracts from your browser.</p>
+      <a href="/api/docs" class="mt-4 inline-block text-sm underline underline-offset-4">Open /api/docs</a>
+    </article>
+
+    <article class="rounded-2xl border border-zinc-800 p-6">
+      <h2 class="text-lg font-medium">Current Status</h2>
+      <p class="mt-2 text-sm text-zinc-300">
+        {% if api_available %}
+          Operational
+        {% else %}
+          Limited Service
+        {% endif %}
+      </p>
+      <p class="mt-2 text-xs text-zinc-500">Version {{ api_version }} | Updated {{ last_updated }}</p>
+    </article>
+
+    <article class="rounded-2xl border border-zinc-800 p-6">
+      <h2 class="text-lg font-medium">Web API Explorer</h2>
+      <p class="mt-2 text-sm text-zinc-300">Open grouped API endpoint references with sidebar navigation.</p>
+      <a href="/web" class="mt-4 inline-block text-sm underline underline-offset-4">Open /web</a>
+    </article>
+  </section>
+</main>
+{% endblock %}

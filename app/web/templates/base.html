@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}PDDIKTI API{% endblock %}</title>
+    <link rel="icon" href="https://mlbb-card.rone.dev/static/favicon.ico" />
+    <link rel="shortcut icon" href="https://mlbb-card.rone.dev/static/favicon.ico" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    {% block head %}{% endblock %}
+  </head>
+  <body class="min-h-screen bg-black text-zinc-100 antialiased">
+    {% set active = active_page|default('landing') %}
+    <div class="min-h-screen bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.08),transparent_35%),radial-gradient(circle_at_80%_0%,rgba(255,255,255,0.05),transparent_35%)]">
+      <header class="border-b border-zinc-800">
+        <nav class="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4 sm:px-10 lg:px-12">
+          <a href="/" class="text-sm font-semibold tracking-[0.22em]">PDDIKTI API</a>
+          <div class="flex items-center gap-4 text-xs uppercase tracking-[0.16em] text-zinc-400">
+            <a href="/" class="{% if active == 'landing' %}text-zinc-100{% endif %}">Home</a>
+            <a href="/web" class="{% if active == 'web' %}text-zinc-100{% endif %}">Web API</a>
+            <a href="/api/" class="hover:text-zinc-100">API Root</a>
+            <a href="/api/docs" class="hover:text-zinc-100">Swagger</a>
+          </div>
+        </nav>
+      </header>
+      {% block content %}{% endblock %}
+    </div>
+  </body>
+</html>

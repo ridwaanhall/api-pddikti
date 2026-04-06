@@ -6,6 +6,26 @@
 
 > API ini telah di-update berdasarkan data baru di <https://pddikti.kemdiktisaintek.go.id/>
 
+## Stack
+
+- FastAPI
+- Uvicorn
+- Requests
+- uv (dependency and lock management)
+
+## Menjalankan Secara Lokal
+
+```bash
+uv sync --group dev
+uv run uvicorn app.main:app --reload
+```
+
+Lalu akses:
+
+- Landing page: <http://127.0.0.1:8000/>
+- API overview: <http://127.0.0.1:8000/api/>
+- Docs: <http://127.0.0.1:8000/api/docs>
+
 ## Bagaimana cara menggunakan API?
 
 Baca dokumentasi berbahasa indonesia ini [PDDikti Docs](https://pddikti-docs.rone.dev). mudah dan gampang digunakan.
