@@ -165,6 +165,18 @@ def _resolve_selected_group(
     )
 
 
+def _resolve_selected_operation(
+    selected_group: dict[str, Any],
+    requested_operation: str | None,
+) -> dict[str, Any] | None:
+    operations = selected_group.get("operations", [])
+    if not operations:
+        return None
+    if not requested_operation:
+        return None
+    return next((operation for operation in operations if operation["id"] == requested_operation), None)
+
+
 @router.get("/")
 def landing_page(request: Request):
     context = {
@@ -180,9 +192,18 @@ def landing_page(request: Request):
 
 @router.get("/web")
 @router.get("/web/")
-def web_api_home(request: Request, group: str | None = None):
+def web_api_home(
+    request: Request,
+    group: str | None = None,
+    operation: str | None = None,
+    view: str | None = None,
+):
     groups, _ = _collect_web_docs(request)
     selected_group = _resolve_selected_group(groups, group)
+    selected_operation = _resolve_selected_operation(selected_group, operation)
+
+    is_single_view = view == "single" and selected_operation is not None
+    rendered_operations = [selected_operation] if is_single_view else selected_group["operations"]
 
     context = {
         "active_page": "web",
@@ -190,6 +211,9 @@ def web_api_home(request: Request, group: str | None = None):
         "public_base_url": settings.public_base_url,
         "groups": groups,
         "selected_group": selected_group,
+        "selected_operation": selected_operation,
+        "is_single_view": is_single_view,
+        "rendered_operations": rendered_operations,
         "public_api_base_url": f"{settings.public_base_url}/api",
         "total_endpoints": sum(len(group["operations"]) for group in groups),
     }
@@ -216,7 +240,7 @@ def web_route_detail(request: Request, group_key: str, operation_id: str):
     if not lookup.get((group_key, operation_id)):
         raise HTTPException(status_code=404, detail="Route detail not found")
 
-    return RedirectResponse(url=f"/web?group={group_key}#endpoint-{operation_id}")
+    return RedirectResponse(url=f"/web?group={group_key}&operation={operation_id}&view=single")
 
 
 @router.get("/web/{forward_path:path}", include_in_schema=False)

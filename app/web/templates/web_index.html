@@ -9,7 +9,7 @@
 {% block content %}
 <main class="mx-auto w-full max-w-[1600px] px-4 py-8 sm:px-8 lg:px-12">
     <section class="grid gap-6 xl:grid-cols-[340px_1fr]">
-        <aside class="h-fit border border-zinc-800 p-4 xl:sticky xl:top-6">
+        <aside class="h-fit max-h-[calc(100vh-6.5rem)] overflow-y-auto rounded-xl border border-zinc-800 p-4 xl:sticky xl:top-6">
             <p class="text-xs uppercase tracking-[0.18em] text-zinc-500">Website Routes</p>
             <p class="mt-1 text-sm text-zinc-300">Select a group to render all endpoints in one view.</p>
 
@@ -17,7 +17,7 @@
                 {% for group in groups %}
                 <a
                     href="/web?group={{ group.key }}"
-                    class="rounded-sm border px-3 py-2 text-left transition {% if group.key == selected_group.key %}border-zinc-300 text-zinc-100{% else %}border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-zinc-100{% endif %}"
+                    class="rounded-lg border px-3 py-2 text-left transition {% if group.key == selected_group.key %}border-zinc-300 text-zinc-100{% else %}border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-zinc-100{% endif %}"
                 >
                     <p class="text-[10px] uppercase tracking-[0.14em] text-zinc-500">{{ group.id }}</p>
                     <p class="mt-1 text-sm font-medium">{{ group.label }}</p>
@@ -31,8 +31,8 @@
                 <div class="mt-3 grid gap-2">
                     {% for endpoint in selected_group.operations %}
                     <a
-                        href="#endpoint-{{ endpoint.id }}"
-                        class="rounded-sm border border-zinc-700 px-3 py-2 text-left text-zinc-300 transition hover:border-zinc-500 hover:text-zinc-100"
+                        href="/web?group={{ selected_group.key }}&operation={{ endpoint.id }}&view=single"
+                        class="rounded-lg border border-zinc-700 px-3 py-2 text-left text-zinc-300 transition hover:border-zinc-500 hover:text-zinc-100 {% if is_single_view and selected_operation and selected_operation.id == endpoint.id %}border-zinc-300 text-zinc-100{% endif %}"
                     >
                         <span class="inline-flex border px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] {% if endpoint.method == 'GET' %}border-emerald-500/60 text-emerald-300{% elif endpoint.method == 'POST' %}border-sky-500/60 text-sky-300{% elif endpoint.method == 'PUT' %}border-amber-500/60 text-amber-300{% elif endpoint.method == 'DELETE' %}border-rose-500/60 text-rose-300{% else %}border-zinc-500/60 text-zinc-300{% endif %}">
                             {{ endpoint.method }}
@@ -45,16 +45,27 @@
         </aside>
 
         <div>
-            <header class="border border-zinc-800 p-6">
+            <header class="rounded-xl border border-zinc-800 p-6">
                 <p class="text-xs uppercase tracking-[0.18em] text-zinc-500">Web Playground</p>
                 <h1 class="mt-2 text-3xl font-semibold sm:text-4xl">{{ selected_group.label }}</h1>
                 <p class="mt-2 text-sm text-zinc-300">Each card maps directly to one API endpoint and includes form inputs, code snippets, readable response, and raw JSON output.</p>
-                <p class="mt-2 text-xs text-zinc-500">Showing {{ selected_group.operations|length }} endpoints from this group · Total endpoints: {{ total_endpoints }}</p>
+                <p class="mt-2 text-xs text-zinc-500">{% if is_single_view %}Showing 1 endpoint{% else %}Showing {{ selected_group.operations|length }} endpoints{% endif %} from this group · Total endpoints: {{ total_endpoints }}</p>
+
+                <div class="mt-4 flex flex-wrap gap-3">
+                    <a href="/web?group={{ selected_group.key }}" class="inline-flex rounded-lg border border-zinc-600 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-200 transition hover:border-zinc-300 hover:text-zinc-100">
+                        Show All Endpoints
+                    </a>
+                    {% if is_single_view and selected_operation %}
+                    <a href="#endpoint-{{ selected_operation.id }}" class="inline-flex rounded-lg border border-emerald-500/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-emerald-300 transition hover:border-emerald-300 hover:text-emerald-100">
+                        Active: {{ selected_operation.method }}
+                    </a>
+                    {% endif %}
+                </div>
             </header>
 
             <div class="mt-6 space-y-6">
-                {% for operation in selected_group.operations %}
-                <article id="endpoint-{{ operation.id }}" class="border border-zinc-800 p-6 scroll-mt-20">
+                {% for operation in rendered_operations %}
+                <article id="endpoint-{{ operation.id }}" class="scroll-mt-20 rounded-xl border border-zinc-800 p-6">
                     <div class="flex flex-wrap items-center gap-3">
                         <span class="inline-flex border px-2 py-1 text-[10px] font-semibold tracking-[0.14em] {% if operation.method == 'GET' %}border-emerald-500/60 text-emerald-300{% elif operation.method == 'POST' %}border-sky-500/60 text-sky-300{% elif operation.method == 'PUT' %}border-amber-500/60 text-amber-300{% elif operation.method == 'DELETE' %}border-rose-500/60 text-rose-300{% else %}border-zinc-500/60 text-zinc-300{% endif %}">
                             {{ operation.method }}
@@ -64,6 +75,25 @@
 
                     <p class="mt-3 break-all text-sm text-zinc-300">{{ operation.web_path }}</p>
                     <p class="mt-3 text-sm text-zinc-400">{{ operation.description }}</p>
+
+                    <div class="mt-4 flex flex-wrap gap-3">
+                        {% if not is_single_view %}
+                        <a
+                            href="/web?group={{ selected_group.key }}&operation={{ operation.id }}&view=single"
+                            class="inline-flex rounded-lg border border-violet-500/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-violet-300 transition hover:border-violet-300 hover:text-violet-100"
+                        >
+                            Show Only This
+                        </a>
+                        {% endif %}
+                        {% if "{" not in operation.web_path %}
+                        <a
+                            href="{{ operation.web_path }}"
+                            class="inline-flex rounded-lg border border-zinc-600 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-300 transition hover:border-zinc-300 hover:text-zinc-100"
+                        >
+                            Open Raw Endpoint
+                        </a>
+                        {% endif %}
+                    </div>
 
                     <form id="form-{{ operation.id }}" class="mt-5 grid gap-4" data-operation-id="{{ operation.id }}">
                         {% for parameter in operation.parameters %}
@@ -104,22 +134,14 @@
                         <div class="flex flex-wrap gap-3">
                             <button
                                 type="submit"
-                                class="inline-flex border px-4 py-2 text-sm font-semibold transition {% if operation.method == 'GET' %}border-emerald-500/70 text-emerald-300 hover:border-emerald-300 hover:text-emerald-100{% elif operation.method == 'POST' %}border-sky-500/70 text-sky-300 hover:border-sky-300 hover:text-sky-100{% elif operation.method == 'PUT' %}border-amber-500/70 text-amber-300 hover:border-amber-300 hover:text-amber-100{% elif operation.method == 'DELETE' %}border-rose-500/70 text-rose-300 hover:border-rose-300 hover:text-rose-100{% else %}border-zinc-500/70 text-zinc-300 hover:border-zinc-300 hover:text-zinc-100{% endif %}"
+                                class="inline-flex rounded-lg border px-4 py-2 text-sm font-semibold transition {% if operation.method == 'GET' %}border-emerald-500/70 text-emerald-300 hover:border-emerald-300 hover:text-emerald-100{% elif operation.method == 'POST' %}border-sky-500/70 text-sky-300 hover:border-sky-300 hover:text-sky-100{% elif operation.method == 'PUT' %}border-amber-500/70 text-amber-300 hover:border-amber-300 hover:text-amber-100{% elif operation.method == 'DELETE' %}border-rose-500/70 text-rose-300 hover:border-rose-300 hover:text-rose-100{% else %}border-zinc-500/70 text-zinc-300 hover:border-zinc-300 hover:text-zinc-100{% endif %}"
                             >
                                 Execute
                             </button>
-                            {% if "{" not in operation.web_path %}
-                            <a
-                                href="{{ operation.web_path }}"
-                                class="inline-flex border border-zinc-600 px-4 py-2 text-sm text-zinc-300 transition hover:border-zinc-400 hover:text-zinc-100"
-                            >
-                                Open Raw Endpoint
-                            </a>
-                            {% endif %}
                         </div>
                     </form>
 
-                    <div class="mt-5 border border-zinc-800 p-4">
+                    <div class="mt-5 rounded-lg border border-zinc-800 p-4">
                         <div class="flex flex-wrap items-center gap-3">
                             <p class="text-xs uppercase tracking-[0.14em] text-zinc-500">Code Snippet</p>
                             <select id="lang-{{ operation.id }}" class="border border-zinc-700 bg-transparent px-2 py-1 text-xs text-zinc-100">
@@ -135,7 +157,7 @@
                             <button
                                 type="button"
                                 id="copy-snippet-{{ operation.id }}"
-                                class="inline-flex border border-zinc-600 px-3 py-1 text-xs text-zinc-300 transition hover:border-zinc-400 hover:text-zinc-100"
+                                class="inline-flex rounded-lg border border-zinc-600 px-3 py-1 text-xs text-zinc-300 transition hover:border-zinc-400 hover:text-zinc-100"
                             >
                                 Copy Snippet
                             </button>
@@ -143,20 +165,20 @@
                         <pre id="snippet-{{ operation.id }}" class="mt-3 max-h-[260px] overflow-auto border border-zinc-800 p-4 text-xs text-zinc-300"></pre>
                     </div>
 
-                    <div class="mt-5 border border-zinc-800 p-4">
+                    <div class="mt-5 rounded-lg border border-zinc-800 p-4">
                         <p class="text-xs uppercase tracking-[0.14em] text-zinc-500">Readable Response</p>
                         <div id="readable-{{ operation.id }}" class="mt-3 overflow-auto border border-zinc-800 p-3 text-xs text-zinc-300">
                             Run execute to render readable key-value response.
                         </div>
                     </div>
 
-                    <div class="mt-5 border border-zinc-800 p-4">
+                    <div class="mt-5 rounded-lg border border-zinc-800 p-4">
                         <div class="flex flex-wrap items-center justify-between gap-3">
                             <p class="text-xs uppercase tracking-[0.14em] text-zinc-500">Raw Response JSON</p>
                             <button
                                 type="button"
                                 id="copy-raw-{{ operation.id }}"
-                                class="inline-flex border border-zinc-600 px-3 py-1 text-xs text-zinc-300 transition hover:border-zinc-400 hover:text-zinc-100"
+                                class="inline-flex rounded-lg border border-zinc-600 px-3 py-1 text-xs text-zinc-300 transition hover:border-zinc-400 hover:text-zinc-100"
                             >
                                 Copy Response
                             </button>
