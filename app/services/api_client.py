@@ -1,5 +1,5 @@
 from typing import Any
-from urllib.parse import unquote
+from urllib.parse import quote, unquote
 import random
 
 import requests
@@ -55,7 +55,7 @@ class APIClient:
             "message": message,
         }
 
-    def _make_request(self, url: str) -> Any:
+    def _make_request(self, url: str, params: dict[str, str] | None = None) -> Any:
         try:
             request_headers = dict(self.headers)
             client_ip = get_request_client_ip()
@@ -69,7 +69,12 @@ class APIClient:
 
             request_headers["User-Agent"] = random.choice(RANDOM_USER_AGENTS)
 
-            response = requests.get(url, headers=request_headers, timeout=self.timeout)
+            response = requests.get(
+                url,
+                headers=request_headers,
+                timeout=self.timeout,
+                params=params,
+            )
             return self._handle_response(response)
         except requests.exceptions.Timeout:
             return {
@@ -96,25 +101,27 @@ class APIClient:
 
     def get(self, endpoint: str, **kwargs: str) -> Any:
         url = f"{self.base_url}/{endpoint}"
-        if kwargs:
-            params = "&".join([f"{k}={unquote(v)}" for k, v in kwargs.items()])
-            url = f"{url}?{params}"
+        params = {key: value for key, value in kwargs.items()} if kwargs else None
+        return self._make_request(url, params=params)
 
-        return self._make_request(url)
+    @staticmethod
+    def _quote_segment(value: str) -> str:
+        return quote(unquote(value), safe="")
 
     def get_with_keyword(self, endpoint: str, keyword: str) -> Any:
-        decoded_keyword = unquote(keyword)
-        url = f"{self.base_url}/{endpoint}/{decoded_keyword}"
+        encoded_keyword = self._quote_segment(keyword)
+        url = f"{self.base_url}/{endpoint}/{encoded_keyword}"
         return self._make_request(url)
 
     def get_with_id_and_semester(self, endpoint: str, item_id: str, id_thsmt: str) -> Any:
-        decoded_id = unquote(item_id)
-        url = f"{self.base_url}/{endpoint}/{decoded_id}/{id_thsmt}"
+        encoded_id = self._quote_segment(item_id)
+        encoded_semester = self._quote_segment(id_thsmt)
+        url = f"{self.base_url}/{endpoint}/{encoded_id}/{encoded_semester}"
         return self._make_request(url)
 
     def get_with_id_and_param_semester(
         self, endpoint: str, item_id: str, id_thsmt: str
     ) -> Any:
-        decoded_id = unquote(item_id)
-        url = f"{self.base_url}/{endpoint}/{decoded_id}?semester={id_thsmt}"
-        return self._make_request(url)
+        encoded_id = self._quote_segment(item_id)
+        url = f"{self.base_url}/{endpoint}/{encoded_id}"
+        return self._make_request(url, params={"semester": id_thsmt})

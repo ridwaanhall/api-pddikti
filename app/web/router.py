@@ -4,7 +4,7 @@ from typing import Any
 
 import httpx
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import PlainTextResponse, RedirectResponse, Response
+from fastapi.responses import PlainTextResponse, Response
 from fastapi.templating import Jinja2Templates
 
 from app.api.router import API_ENDPOINT_CATALOG
@@ -177,10 +177,40 @@ def _resolve_selected_operation(
     return next((operation for operation in operations if operation["id"] == requested_operation), None)
 
 
+def _build_web_context(
+    request: Request,
+    group: str | None = None,
+    operation: str | None = None,
+    view: str | None = None,
+) -> dict[str, Any]:
+    current_base_url = str(request.base_url).rstrip("/")
+    groups, _ = _collect_web_docs(request)
+    selected_group = _resolve_selected_group(groups, group)
+    selected_operation = _resolve_selected_operation(selected_group, operation)
+
+    is_single_view = view == "single" and selected_operation is not None
+    rendered_operations = [selected_operation] if is_single_view else selected_group["operations"]
+
+    return {
+        "request": request,
+        "active_page": "web",
+        "project_name": "PDDIKTI API",
+        "public_base_url": current_base_url,
+        "groups": groups,
+        "selected_group": selected_group,
+        "selected_operation": selected_operation,
+        "is_single_view": is_single_view,
+        "rendered_operations": rendered_operations,
+        "public_api_base_url": f"{current_base_url}/api",
+        "total_endpoints": sum(len(group_item["operations"]) for group_item in groups),
+    }
+
+
 @router.get("/")
 def landing_page(request: Request):
     current_base_url = str(request.base_url).rstrip("/")
     context = {
+        "request": request,
         "active_page": "landing",
         "project_name": "PDDIKTI API",
         "public_base_url": current_base_url,
@@ -199,26 +229,12 @@ def web_api_home(
     operation: str | None = None,
     view: str | None = None,
 ):
-    current_base_url = str(request.base_url).rstrip("/")
-    groups, _ = _collect_web_docs(request)
-    selected_group = _resolve_selected_group(groups, group)
-    selected_operation = _resolve_selected_operation(selected_group, operation)
-
-    is_single_view = view == "single" and selected_operation is not None
-    rendered_operations = [selected_operation] if is_single_view else selected_group["operations"]
-
-    context = {
-        "active_page": "web",
-        "project_name": "PDDIKTI API",
-        "public_base_url": current_base_url,
-        "groups": groups,
-        "selected_group": selected_group,
-        "selected_operation": selected_operation,
-        "is_single_view": is_single_view,
-        "rendered_operations": rendered_operations,
-        "public_api_base_url": f"{current_base_url}/api",
-        "total_endpoints": sum(len(group["operations"]) for group in groups),
-    }
+    context = _build_web_context(
+        request=request,
+        group=group,
+        operation=operation,
+        view=view,
+    )
     return templates.TemplateResponse(request, "web_index.html", context)
 
 
@@ -229,7 +245,8 @@ def web_group_routes(request: Request, group_key: str):
     if not selected_group:
         raise HTTPException(status_code=404, detail="Route group not found")
 
-    return RedirectResponse(url=f"/web?group={group_key}")
+    context = _build_web_context(request=request, group=selected_group["key"])
+    return templates.TemplateResponse(request, "web_index.html", context)
 
 
 @router.get("/web/routes/{group_key}/{operation_id}")
@@ -242,7 +259,13 @@ def web_route_detail(request: Request, group_key: str, operation_id: str):
     if not lookup.get((group_key, operation_id)):
         raise HTTPException(status_code=404, detail="Route detail not found")
 
-    return RedirectResponse(url=f"/web?group={group_key}&operation={operation_id}&view=single")
+    context = _build_web_context(
+        request=request,
+        group=selected_group["key"],
+        operation=operation_id,
+        view="single",
+    )
+    return templates.TemplateResponse(request, "web_index.html", context)
 
 
 @router.get("/web/{forward_path:path}", include_in_schema=False)

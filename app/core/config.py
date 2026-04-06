@@ -66,11 +66,11 @@ def _env_int(name: str, default: int) -> int:
 
 class Settings:
     def __init__(self) -> None:
-        self.secret_key = _required_env("SECRET_KEY")
+        self.secret_key = _env("SECRET_KEY", "")
         self.debug = _env_bool("DEBUG", False)
 
         self.ridwaanhall_main_api = _env("RIDWAANHALL_MAIN_API", "https://internal.invalid")
-        self.api_key = _required_env("API_KEY")
+        self.api_key = _env("API_KEY", "")
 
         self.ridwaanhall_api_x = _env("RIDWAANHALL_API_X", "X-Private-Api-Host")
         self.ridwaanhall_x = _env("RIDWAANHALL_X", "X-Private-Origin")
