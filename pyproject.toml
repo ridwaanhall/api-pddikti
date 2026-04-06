@@ -1,0 +1,18 @@
+[project]
+name = "api-pddikti"
+version = "0.1.0"
+description = "FastAPI wrapper for PDDIKTI endpoints"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]>=0.116.1",
+    "requests>=2.33.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.0",
+]
+
+[tool.uv]
+package = false

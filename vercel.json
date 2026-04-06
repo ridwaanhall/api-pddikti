@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "pddikti/wsgi.py",
+      "src": "app/main.py",
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "15mb",
@@ -36,7 +36,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "pddikti/wsgi.py"
+      "dest": "app/main.py"
     }
   ]
 }

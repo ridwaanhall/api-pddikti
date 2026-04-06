@@ -1,0 +1,496 @@
+{% extends "base.html" %}
+
+{% block title %}Web API \ PDDIKTI API{% endblock %}
+{% block meta_description %}Browse grouped PDDIKTI API endpoints in the interactive web explorer and access mirrored /web endpoint routes.{% endblock %}
+{% block canonical_url %}{{ public_base_url }}/web{% endblock %}
+{% block og_title %}Web API Explorer \ PDDIKTI API{% endblock %}
+{% block twitter_title %}Web API Explorer \ PDDIKTI API{% endblock %}
+
+{% block content %}
+<main class="mx-auto w-full max-w-[1600px] px-4 py-8 sm:px-8 lg:px-12">
+    <section class="grid gap-6 xl:grid-cols-[340px_1fr]">
+        <aside class="h-fit max-h-[calc(100vh-6.5rem)] overflow-y-auto rounded-xl border border-zinc-800 p-4 xl:sticky xl:top-6">
+            <p class="text-xs uppercase tracking-[0.18em] text-zinc-500">Website Routes</p>
+            <p class="mt-1 text-sm text-zinc-300">Select a group to render all endpoints in one view.</p>
+
+            <div class="mt-4 grid gap-2">
+                {% for group in groups %}
+                <a
+                    href="/web?group={{ group.key }}"
+                    class="rounded-lg border px-3 py-2 text-left transition {% if group.key == selected_group.key %}border-zinc-300 text-zinc-100{% else %}border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-zinc-100{% endif %}"
+                >
+                    <p class="text-[10px] uppercase tracking-[0.14em] text-zinc-500">{{ group.id }}</p>
+                    <p class="mt-1 text-sm font-medium">{{ group.label }}</p>
+                    <p class="mt-1 text-xs text-zinc-500">{{ group.operations|length }} endpoints</p>
+                </a>
+                {% endfor %}
+            </div>
+
+            <div class="mt-6 border-t border-zinc-800 pt-4">
+                <p class="text-xs uppercase tracking-[0.18em] text-zinc-500">Endpoints</p>
+                <div class="mt-3 grid gap-2">
+                    {% for endpoint in selected_group.operations %}
+                    <a
+                        href="/web?group={{ selected_group.key }}&operation={{ endpoint.id }}&view=single"
+                        class="rounded-lg border border-zinc-700 px-3 py-2 text-left text-zinc-300 transition hover:border-zinc-500 hover:text-zinc-100 {% if is_single_view and selected_operation and selected_operation.id == endpoint.id %}border-zinc-300 text-zinc-100{% endif %}"
+                    >
+                        <span class="inline-flex border px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] {% if endpoint.method == 'GET' %}border-emerald-500/60 text-emerald-300{% elif endpoint.method == 'POST' %}border-sky-500/60 text-sky-300{% elif endpoint.method == 'PUT' %}border-amber-500/60 text-amber-300{% elif endpoint.method == 'DELETE' %}border-rose-500/60 text-rose-300{% else %}border-zinc-500/60 text-zinc-300{% endif %}">
+                            {{ endpoint.method }}
+                        </span>
+                        <p class="mt-2 break-all text-xs">{{ endpoint.web_path }}</p>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </aside>
+
+        <div>
+            <header class="rounded-xl border border-zinc-800 p-6">
+                <p class="text-xs uppercase tracking-[0.18em] text-zinc-500">Web Playground</p>
+                <h1 class="mt-2 text-3xl font-semibold sm:text-4xl">{{ selected_group.label }}</h1>
+                <p class="mt-2 text-sm text-zinc-300">Each card maps directly to one API endpoint and includes form inputs, code snippets, readable response, and raw JSON output.</p>
+                <p class="mt-2 text-xs text-zinc-500">{% if is_single_view %}Showing 1 endpoint{% else %}Showing {{ selected_group.operations|length }} endpoints{% endif %} from this group · Total endpoints: {{ total_endpoints }}</p>
+
+                <div class="mt-4 flex flex-wrap gap-3">
+                    <a href="/web?group={{ selected_group.key }}" class="inline-flex rounded-lg border border-zinc-600 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-200 transition hover:border-zinc-300 hover:text-zinc-100">
+                        Show All Endpoints
+                    </a>
+                    {% if is_single_view and selected_operation %}
+                    <a href="#endpoint-{{ selected_operation.id }}" class="inline-flex rounded-lg border border-emerald-500/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-emerald-300 transition hover:border-emerald-300 hover:text-emerald-100">
+                        Active: {{ selected_operation.method }}
+                    </a>
+                    {% endif %}
+                </div>
+            </header>
+
+            <div class="mt-6 space-y-6">
+                {% for operation in rendered_operations %}
+                <article id="endpoint-{{ operation.id }}" class="scroll-mt-20 rounded-xl border border-zinc-800 p-6">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <span class="inline-flex border px-2 py-1 text-[10px] font-semibold tracking-[0.14em] {% if operation.method == 'GET' %}border-emerald-500/60 text-emerald-300{% elif operation.method == 'POST' %}border-sky-500/60 text-sky-300{% elif operation.method == 'PUT' %}border-amber-500/60 text-amber-300{% elif operation.method == 'DELETE' %}border-rose-500/60 text-rose-300{% else %}border-zinc-500/60 text-zinc-300{% endif %}">
+                            {{ operation.method }}
+                        </span>
+                        <h2 class="text-xl font-semibold">{{ operation.summary }}</h2>
+                    </div>
+
+                    <p class="mt-3 break-all text-sm text-zinc-300">{{ operation.web_path }}</p>
+                    <p class="mt-3 text-sm text-zinc-400">{{ operation.description }}</p>
+
+                    <div class="mt-4 flex flex-wrap gap-3">
+                        {% if not is_single_view %}
+                        <a
+                            href="/web?group={{ selected_group.key }}&operation={{ operation.id }}&view=single"
+                            class="inline-flex rounded-lg border border-violet-500/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-violet-300 transition hover:border-violet-300 hover:text-violet-100"
+                        >
+                            Show Only This
+                        </a>
+                        {% endif %}
+                        {% if "{" not in operation.web_path %}
+                        <a
+                            href="{{ operation.web_path }}"
+                            class="inline-flex rounded-lg border border-zinc-600 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-300 transition hover:border-zinc-300 hover:text-zinc-100"
+                        >
+                            Open Raw Endpoint
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    <form id="form-{{ operation.id }}" class="mt-5 grid gap-4" data-operation-id="{{ operation.id }}">
+                        {% for parameter in operation.parameters %}
+                        <label class="grid gap-1">
+                            <span class="text-xs uppercase tracking-[0.12em] text-zinc-500">{{ parameter.name }} <span class="text-zinc-600">{{ parameter.in }}</span></span>
+                            {% if parameter.enum %}
+                            <select
+                                name="{{ parameter.name }}"
+                                class="border border-zinc-700 bg-transparent px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-500"
+                            >
+                                {% for enum_value in parameter.enum %}
+                                <option value="{{ enum_value }}" {% if parameter.default == enum_value %}selected{% endif %}>{{ enum_value }}</option>
+                                {% endfor %}
+                            </select>
+                            {% else %}
+                            <input
+                                name="{{ parameter.name }}"
+                                value="{{ parameter.default }}"
+                                placeholder="{{ parameter.description }}"
+                                class="border border-zinc-700 bg-transparent px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-500"
+                            />
+                            {% endif %}
+                            <span class="text-xs text-zinc-500">{{ parameter.description }}</span>
+                        </label>
+                        {% endfor %}
+
+                        {% if operation.request_body %}
+                        <label class="grid gap-1">
+                            <span class="text-xs uppercase tracking-[0.12em] text-zinc-500">Request Body JSON</span>
+                            <textarea
+                                id="body-{{ operation.id }}"
+                                rows="8"
+                                class="border border-zinc-700 bg-transparent px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-500"
+                            >{{ operation.request_body.schema | tojson(indent=2) }}</textarea>
+                        </label>
+                        {% endif %}
+
+                        <div class="flex flex-wrap gap-3">
+                            <button
+                                type="submit"
+                                class="inline-flex rounded-lg border px-4 py-2 text-sm font-semibold transition {% if operation.method == 'GET' %}border-emerald-500/70 text-emerald-300 hover:border-emerald-300 hover:text-emerald-100{% elif operation.method == 'POST' %}border-sky-500/70 text-sky-300 hover:border-sky-300 hover:text-sky-100{% elif operation.method == 'PUT' %}border-amber-500/70 text-amber-300 hover:border-amber-300 hover:text-amber-100{% elif operation.method == 'DELETE' %}border-rose-500/70 text-rose-300 hover:border-rose-300 hover:text-rose-100{% else %}border-zinc-500/70 text-zinc-300 hover:border-zinc-300 hover:text-zinc-100{% endif %}"
+                            >
+                                Execute
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="mt-5 rounded-lg border border-zinc-800 p-4">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <p class="text-xs uppercase tracking-[0.14em] text-zinc-500">Code Snippet</p>
+                            <select id="lang-{{ operation.id }}" class="border border-zinc-700 bg-transparent px-2 py-1 text-xs text-zinc-100">
+                                <option value="curl">curl</option>
+                                <option value="python">python</option>
+                                <option value="javascript">javascript</option>
+                                <option value="go">go</option>
+                                <option value="node">node (axios)</option>
+                                <option value="php">php</option>
+                                <option value="java">java</option>
+                                <option value="csharp">csharp</option>
+                            </select>
+                            <button
+                                type="button"
+                                id="copy-snippet-{{ operation.id }}"
+                                class="inline-flex rounded-lg border border-zinc-600 px-3 py-1 text-xs text-zinc-300 transition hover:border-zinc-400 hover:text-zinc-100"
+                            >
+                                Copy Snippet
+                            </button>
+                        </div>
+                        <pre id="snippet-{{ operation.id }}" class="mt-3 max-h-[260px] overflow-auto border border-zinc-800 p-4 text-xs text-zinc-300"></pre>
+                    </div>
+
+                    <div class="mt-5 rounded-lg border border-zinc-800 p-4">
+                        <p class="text-xs uppercase tracking-[0.14em] text-zinc-500">Readable Response</p>
+                        <div id="readable-{{ operation.id }}" class="mt-3 max-h-[320px] overflow-auto border border-zinc-800 p-3 text-xs text-zinc-300">
+                            Run execute to render readable key-value response.
+                        </div>
+                    </div>
+
+                    <div class="mt-5 rounded-lg border border-zinc-800 p-4">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <p class="text-xs uppercase tracking-[0.14em] text-zinc-500">Raw Response JSON</p>
+                            <button
+                                type="button"
+                                id="copy-raw-{{ operation.id }}"
+                                class="inline-flex rounded-lg border border-zinc-600 px-3 py-1 text-xs text-zinc-300 transition hover:border-zinc-400 hover:text-zinc-100"
+                            >
+                                Copy Response
+                            </button>
+                        </div>
+                        <pre id="raw-{{ operation.id }}" class="mt-3 max-h-[320px] overflow-auto border border-zinc-800 p-4 text-xs text-zinc-300">Run execute to view raw response...</pre>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    const operations = {{ selected_group.operations | tojson }};
+    const publicApiBaseUrl = {{ public_api_base_url | tojson }};
+    const operationMap = new Map(operations.map((item) => [item.id, item]));
+
+    function escapeHtml(value) {
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#39;");
+    }
+
+    function buildRequestParts(operationId) {
+        const operation = operationMap.get(operationId);
+        const form = document.getElementById(`form-${operationId}`);
+        let webPath = operation.web_path;
+        let apiPath = operation.api_path;
+        const query = new URLSearchParams();
+
+        for (const parameter of operation.parameters) {
+            const field = form.elements.namedItem(parameter.name);
+            const value = (field?.value || "").trim();
+
+            if (parameter.in === "path") {
+                if (!value) {
+                    throw new Error(`Missing required path parameter: ${parameter.name}`);
+                }
+                webPath = webPath.replace(`{${parameter.name}}`, encodeURIComponent(value));
+                apiPath = apiPath.replace(`{${parameter.name}}`, encodeURIComponent(value));
+            } else if (parameter.in === "query" && value) {
+                query.append(parameter.name, value);
+            }
+        }
+
+        if (webPath.includes("{") || apiPath.includes("{")) {
+            throw new Error("Some path parameters are still unresolved.");
+        }
+
+        let requestBody = null;
+        const bodyField = document.getElementById(`body-${operationId}`);
+        if (bodyField) {
+            const rawBody = bodyField.value.trim();
+            if (rawBody) {
+                requestBody = JSON.parse(rawBody);
+            }
+        }
+
+        const queryString = query.toString();
+        return {
+            method: operation.method,
+            webTarget: queryString ? `${webPath}?${queryString}` : webPath,
+            apiTarget: queryString ? `${apiPath}?${queryString}` : apiPath,
+            requestBody,
+        };
+    }
+
+    function buildSnippets(language, request) {
+        const absoluteUrl = `${publicApiBaseUrl}${request.apiTarget.replace(/^\/api/, "")}`;
+        const bodyText = request.requestBody ? JSON.stringify(request.requestBody, null, 4) : null;
+
+        const snippets = {
+            curl: [
+                `curl -X '${request.method}' \\\\`,
+                `    '${absoluteUrl}' \\\\`,
+                "    -H 'accept: application/json'",
+            ],
+            python: [
+                "import requests",
+                "",
+                `url = \"${absoluteUrl}\"`,
+                "headers = {",
+                "    \"accept\": \"application/json\",",
+                "}",
+                `response = requests.request(\"${request.method}\", url, headers=headers${bodyText ? ", json=payload" : ""})`,
+                "print(response.text)",
+            ],
+            javascript: [
+                `const response = await fetch(\"${absoluteUrl}\", {`,
+                `    method: \"${request.method}\",`,
+                "    headers: {",
+                "        \"accept\": \"application/json\",",
+                ...(bodyText ? ["        \"content-type\": \"application/json\","] : []),
+                "    },",
+                ...(bodyText ? ["    body: JSON.stringify(payload),"] : []),
+                "});",
+                "const data = await response.json();",
+                "console.log(data);",
+            ],
+            go: [
+                "package main",
+                "",
+                "import (",
+                "    \"fmt\"",
+                "    \"io\"",
+                "    \"net/http\"",
+                ")",
+                "",
+                "func main() {",
+                `    req, _ := http.NewRequest(\"${request.method}\", \"${absoluteUrl}\", nil)`,
+                "    req.Header.Set(\"accept\", \"application/json\")",
+                "    res, _ := http.DefaultClient.Do(req)",
+                "    defer res.Body.Close()",
+                "    body, _ := io.ReadAll(res.Body)",
+                "    fmt.Println(string(body))",
+                "}",
+            ],
+            node: [
+                "const axios = require(\"axios\");",
+                "",
+                "async function run() {",
+                "    const response = await axios({",
+                `        method: \"${request.method.toLowerCase()}\",`,
+                `        url: \"${absoluteUrl}\",`,
+                "        headers: {",
+                "            accept: \"application/json\",",
+                "        },",
+                ...(bodyText ? ["        data: payload,"] : []),
+                "    });",
+                "    console.log(response.data);",
+                "}",
+                "",
+                "run();",
+            ],
+            php: [
+                "<?php",
+                `$ch = curl_init(\"${absoluteUrl}\");`,
+                "curl_setopt($ch, CURLOPT_CUSTOMREQUEST, \"" + request.method + "\");",
+                "curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);",
+                "curl_setopt($ch, CURLOPT_HTTPHEADER, [",
+                "    \"accept: application/json\",",
+                "]);",
+                "$response = curl_exec($ch);",
+                "curl_close($ch);",
+                "echo $response;",
+            ],
+            java: [
+                "HttpClient client = HttpClient.newHttpClient();",
+                "HttpRequest request = HttpRequest.newBuilder()",
+                `    .uri(URI.create(\"${absoluteUrl}\"))`,
+                `    .method(\"${request.method}\", HttpRequest.BodyPublishers.noBody())`,
+                "    .header(\"accept\", \"application/json\")",
+                "    .build();",
+                "HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());",
+                "System.out.println(response.body());",
+            ],
+            csharp: [
+                "using var client = new HttpClient();",
+                "using var request = new HttpRequestMessage();",
+                `request.Method = HttpMethod.${request.method === "GET" ? "Get" : request.method === "POST" ? "Post" : request.method === "PUT" ? "Put" : request.method === "DELETE" ? "Delete" : "Get"};`,
+                `request.RequestUri = new Uri(\"${absoluteUrl}\");`,
+                "request.Headers.Add(\"accept\", \"application/json\");",
+                "var response = await client.SendAsync(request);",
+                "var content = await response.Content.ReadAsStringAsync();",
+                "Console.WriteLine(content);",
+            ],
+        };
+
+        const selected = snippets[language] || snippets.curl;
+
+        if (bodyText && ["python", "javascript", "node"].includes(language)) {
+            return [...selected.slice(0, 2), "payload = " + bodyText, ...selected.slice(2)].join("\n");
+        }
+
+        return selected.join("\n");
+    }
+
+    function flattenRows(value, rows = [], level = 0, key = "root") {
+        if (rows.length > 500 || level > 8) {
+            return rows;
+        }
+
+        if (Array.isArray(value)) {
+            rows.push({ level, key, type: "array", value: `(${value.length})` });
+            value.forEach((item, index) => {
+                flattenRows(item, rows, level + 1, `[${index}]`);
+            });
+            return rows;
+        }
+
+        if (value && typeof value === "object") {
+            rows.push({ level, key, type: "object", value: "" });
+            Object.entries(value).forEach(([childKey, item]) => {
+                flattenRows(item, rows, level + 1, childKey);
+            });
+            return rows;
+        }
+
+        rows.push({ level, key, type: typeof value, value: String(value) });
+        return rows;
+    }
+
+    function renderReadable(operationId, payload) {
+        const target = document.getElementById(`readable-${operationId}`);
+        if (!payload || typeof payload !== "object") {
+            target.innerHTML = `<p class=\"text-xs text-zinc-400\">${escapeHtml(String(payload))}</p>`;
+            return;
+        }
+
+        const rows = flattenRows(payload, [], 0, "root");
+        const htmlRows = rows
+            .map(
+                (row) =>
+                    `<tr class=\"border-b border-zinc-900\"><td class=\"px-2 py-1 align-top text-zinc-200\" style=\"padding-left:${8 + row.level * 16}px\">${escapeHtml(row.key)}</td><td class=\"px-2 py-1 align-top text-zinc-500\">${escapeHtml(row.type)}</td><td class=\"px-2 py-1 text-zinc-400 break-all\">${escapeHtml(row.value)}</td></tr>`
+            )
+            .join("");
+
+        target.innerHTML = `<table class=\"w-full min-w-[680px] text-xs\"><thead><tr class=\"border-b border-zinc-800\"><th class=\"px-2 py-1 text-left text-zinc-500 font-normal\">Key</th><th class=\"px-2 py-1 text-left text-zinc-500 font-normal\">Type</th><th class=\"px-2 py-1 text-left text-zinc-500 font-normal\">Value</th></tr></thead><tbody>${htmlRows}</tbody></table>`;
+    }
+
+    function refreshSnippet(operationId) {
+        const language = document.getElementById(`lang-${operationId}`).value;
+        const snippetBox = document.getElementById(`snippet-${operationId}`);
+
+        try {
+            const request = buildRequestParts(operationId);
+            snippetBox.textContent = buildSnippets(language, request);
+        } catch (error) {
+            snippetBox.textContent = `Error: ${error.message}`;
+        }
+    }
+
+    operations.forEach((operation) => {
+        const operationId = operation.id;
+        const form = document.getElementById(`form-${operationId}`);
+        const langSelect = document.getElementById(`lang-${operationId}`);
+        const copySnippetButton = document.getElementById(`copy-snippet-${operationId}`);
+        const rawBox = document.getElementById(`raw-${operationId}`);
+        const copyRawButton = document.getElementById(`copy-raw-${operationId}`);
+
+        langSelect.addEventListener("change", () => refreshSnippet(operationId));
+        form.addEventListener("input", () => refreshSnippet(operationId));
+
+        copySnippetButton.addEventListener("click", async () => {
+            try {
+                await navigator.clipboard.writeText(document.getElementById(`snippet-${operationId}`).textContent || "");
+                copySnippetButton.textContent = "Copied";
+                setTimeout(() => {
+                    copySnippetButton.textContent = "Copy Snippet";
+                }, 1200);
+            } catch (_) {
+                copySnippetButton.textContent = "Copy Failed";
+                setTimeout(() => {
+                    copySnippetButton.textContent = "Copy Snippet";
+                }, 1200);
+            }
+        });
+
+        copyRawButton.addEventListener("click", async () => {
+            try {
+                await navigator.clipboard.writeText(rawBox.textContent || "");
+                copyRawButton.textContent = "Copied";
+                setTimeout(() => {
+                    copyRawButton.textContent = "Copy Response";
+                }, 1200);
+            } catch (_) {
+                copyRawButton.textContent = "Copy Failed";
+                setTimeout(() => {
+                    copyRawButton.textContent = "Copy Response";
+                }, 1200);
+            }
+        });
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            try {
+                const request = buildRequestParts(operationId);
+                const fetchOptions = {
+                    method: request.method,
+                    headers: {
+                        Accept: "application/json, text/plain, */*",
+                    },
+                };
+
+                if (request.requestBody) {
+                    fetchOptions.headers["Content-Type"] = "application/json";
+                    fetchOptions.body = JSON.stringify(request.requestBody);
+                }
+
+                const response = await fetch(request.webTarget, fetchOptions);
+                const rawText = await response.text();
+
+                let parsed = rawText;
+                let pretty = rawText;
+                try {
+                    parsed = JSON.parse(rawText);
+                    pretty = JSON.stringify(parsed, null, 2);
+                } catch (_) {}
+
+                rawBox.textContent = `Status: ${response.status} ${response.statusText}\n\n${pretty}`;
+                renderReadable(operationId, parsed);
+            } catch (error) {
+                rawBox.textContent = `Error: ${error.message}`;
+                renderReadable(operationId, `Error: ${error.message}`);
+            }
+        });
+
+        refreshSnippet(operationId);
+    });
+</script>
+{% endblock %}
