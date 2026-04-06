@@ -52,9 +52,18 @@ class APIStatusMiddleware(BaseHTTPMiddleware):
                     "message": (
                         "Due to high traffic volume, this endpoint is temporarily "
                         "unavailable to ensure system stability."
+                        "use alternative endpoint or check back later."
                     ),
                     "code": 503,
                     "status": "Service Unavailable",
+                    "alternative_endpoint": {
+                        "always_online": "https://pddikti.fastapicloud.dev",
+                        "description": (
+                            "This alternative API endpoint is designed to remain "
+                            "operational even during high traffic periods, providing "
+                            "access to essential data with optimized performance."
+                        ),
+                    },
                     "available_endpoint": {
                         "url": str(request.base_url),
                         "method": "GET",
