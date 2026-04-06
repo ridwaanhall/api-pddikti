@@ -1,7 +1,11 @@
 from fastapi import FastAPI
 
 from app.api.router import router as api_router
-from app.core.middleware import APIStatusMiddleware, SEOHeadersMiddleware
+from app.core.middleware import (
+    APIStatusMiddleware,
+    RequestIdentityMiddleware,
+    SEOHeadersMiddleware,
+)
 from app.web.router import router as web_router
 
 
@@ -14,11 +18,12 @@ app = FastAPI(
     version="4.0.0",
     docs_url="/api/docs",
     openapi_url="/api/openapi.json",
-    redoc_url=None,
+    redoc_url="/api/redoc",
 )
 
 app.add_middleware(SEOHeadersMiddleware)
 app.add_middleware(APIStatusMiddleware)
+app.add_middleware(RequestIdentityMiddleware)
 
 app.include_router(api_router)
 app.include_router(web_router)

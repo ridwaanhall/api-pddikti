@@ -3,6 +3,29 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 
 from app.core.config import get_settings
+from app.core.request_context import reset_request_identity, set_request_identity
+
+
+def _extract_client_ip(request: Request) -> str | None:
+    forwarded_for = request.headers.get("x-forwarded-for", "")
+    if forwarded_for:
+        return forwarded_for.split(",")[0].strip()
+    if request.client:
+        return request.client.host
+    return None
+
+
+class RequestIdentityMiddleware(BaseHTTPMiddleware):
+    """Store request identity context for outbound API forwarding headers."""
+
+    async def dispatch(self, request: Request, call_next):
+        client_ip = _extract_client_ip(request)
+        user_agent = request.headers.get("user-agent")
+        tokens = set_request_identity(client_ip=client_ip, user_agent=user_agent)
+        try:
+            return await call_next(request)
+        finally:
+            reset_request_identity(tokens)
 
 
 class APIStatusMiddleware(BaseHTTPMiddleware):
@@ -15,6 +38,7 @@ class APIStatusMiddleware(BaseHTTPMiddleware):
         allowed_prefixes = (
             "/api/docs",
             "/api/openapi.json",
+            "/api/redoc",
             "/api/docs/oauth2-redirect",
         )
 

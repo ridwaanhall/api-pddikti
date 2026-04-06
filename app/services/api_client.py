@@ -1,9 +1,19 @@
 from typing import Any
 from urllib.parse import unquote
+import random
 
 import requests
 
 from app.core.config import get_settings
+from app.core.request_context import get_request_client_ip, get_request_user_agent
+
+
+RANDOM_USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_5) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15",
+    "Mozilla/5.0 (X11; Linux x86_64; rv:137.0) Gecko/20100101 Firefox/137.0",
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 18_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3 Mobile/15E148 Safari/604.1",
+]
 
 
 class APIClient:
@@ -47,7 +57,19 @@ class APIClient:
 
     def _make_request(self, url: str) -> Any:
         try:
-            response = requests.get(url, headers=self.headers, timeout=self.timeout)
+            request_headers = dict(self.headers)
+            client_ip = get_request_client_ip()
+            if client_ip:
+                request_headers["X-Forwarded-For"] = client_ip
+                request_headers["X-Real-IP"] = client_ip
+
+            incoming_user_agent = get_request_user_agent()
+            if incoming_user_agent:
+                request_headers["X-Original-User-Agent"] = incoming_user_agent
+
+            request_headers["User-Agent"] = random.choice(RANDOM_USER_AGENTS)
+
+            response = requests.get(url, headers=request_headers, timeout=self.timeout)
             return self._handle_response(response)
         except requests.exceptions.Timeout:
             return {

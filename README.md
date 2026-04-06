@@ -25,6 +25,8 @@ Lalu akses:
 - Landing page: <http://127.0.0.1:8000/>
 - API overview: <http://127.0.0.1:8000/api/>
 - Docs: <http://127.0.0.1:8000/api/docs>
+- ReDoc: <http://127.0.0.1:8000/api/redoc>
+- Web API demo: <http://127.0.0.1:8000/web>
 
 ## Bagaimana cara menggunakan API?
 

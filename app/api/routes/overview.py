@@ -6,7 +6,11 @@ from app.api.common import settings
 router = APIRouter(tags=["overview"])
 
 
-@router.get("/", summary="API overview")
+@router.get(
+    "/",
+    summary="API overview",
+    description="Return API metadata, service status, and support information.",
+)
 def api_overview():
     meta = {
         "base_url": "https://api-pddikti.rone.dev/api/",
