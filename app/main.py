@@ -14,6 +14,7 @@ settings = get_settings()
 
 
 app = FastAPI(
+    debug=settings.debug,
     title="PDDIKTI API",
     description=(
         "Provides structured access to data from Pangkalan Data Pendidikan Tinggi "
