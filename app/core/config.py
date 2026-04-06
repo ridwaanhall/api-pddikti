@@ -69,16 +69,16 @@ class Settings:
         self.secret_key = _required_env("SECRET_KEY")
         self.debug = _env_bool("DEBUG", False)
 
-        self.ridwaanhall_main_api = _required_env("RIDWAANHALL_MAIN_API")
+        self.ridwaanhall_main_api = _env("RIDWAANHALL_MAIN_API", "https://internal.invalid")
         self.api_key = _required_env("API_KEY")
 
-        self.ridwaanhall_api_x = _required_env("RIDWAANHALL_API_X")
-        self.ridwaanhall_x = _required_env("RIDWAANHALL_X")
-        self.ridwaanhall_hash_x = _required_env("RIDWAANHALL_HASH_X")
+        self.ridwaanhall_api_x = _env("RIDWAANHALL_API_X", "X-Private-Api-Host")
+        self.ridwaanhall_x = _env("RIDWAANHALL_X", "X-Private-Origin")
+        self.ridwaanhall_hash_x = _env("RIDWAANHALL_HASH_X", "X-Private-Referer")
 
-        self.ridwaanhall_api_key = _required_env("RIDWAANHALL_API_KEY")
-        self.ridwaanhall_key = _required_env("RIDWAANHALL_KEY")
-        self.ridwaanhall_hash_key = _required_env("RIDWAANHALL_HASH_KEY")
+        self.ridwaanhall_api_key = _env("RIDWAANHALL_API_KEY", "private-api-key")
+        self.ridwaanhall_key = _env("RIDWAANHALL_KEY", "private-origin")
+        self.ridwaanhall_hash_key = _env("RIDWAANHALL_HASH_KEY", "private-referer")
 
         self.api_availability = _env_bool("API_AVAILABILITY", True)
         self.api_version = _env("API_VERSION", "4.0.0")

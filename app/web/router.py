@@ -4,9 +4,10 @@ from typing import Any
 
 import httpx
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import PlainTextResponse, Response
+from fastapi.responses import PlainTextResponse, RedirectResponse, Response
 from fastapi.templating import Jinja2Templates
 
+from app.api.router import API_ENDPOINT_CATALOG
 from app.core.config import get_settings
 
 
@@ -58,7 +59,7 @@ def _web_path_from_api_path(api_path: str) -> str:
 
 def _collect_web_docs(request: Request) -> tuple[list[dict[str, Any]], dict[tuple[str, str], dict[str, Any]]]:
     schema = request.app.openapi()
-    grouped: dict[str, dict[str, Any]] = {}
+    path_lookup: dict[tuple[str, str], dict[str, Any]] = {}
     lookup: dict[tuple[str, str], dict[str, Any]] = {}
 
     for api_path, methods in schema.get("paths", {}).items():
@@ -68,19 +69,24 @@ def _collect_web_docs(request: Request) -> tuple[list[dict[str, Any]], dict[tupl
             continue
 
         for http_method, operation in methods.items():
-            if http_method.lower() not in {"get"}:
-                continue
+            path_lookup[(http_method.upper(), api_path)] = operation
 
-            path_suffix = api_path.removeprefix("/api/").strip("/")
-            group_key = path_suffix.split("/")[0] if path_suffix else "overview"
+    groups: list[dict[str, Any]] = []
+    for catalog_group in API_ENDPOINT_CATALOG:
+        if catalog_group.get("id") == "overview":
+            continue
 
-            if group_key not in grouped:
-                grouped[group_key] = {
-                    "key": group_key,
-                    "label": _group_label(group_key),
-                    "description": _group_description(group_key),
-                    "operations": [],
-                }
+        endpoints = catalog_group.get("endpoints", [])
+        route_key = "overview"
+        if endpoints:
+            first_path = endpoints[0]["path"].removeprefix("/api/").strip("/")
+            route_key = first_path.split("/")[0] if first_path else "overview"
+
+        operations: list[dict[str, Any]] = []
+        for endpoint in endpoints:
+            method = endpoint["method"].upper()
+            api_path = endpoint["path"]
+            operation = path_lookup.get((method, api_path), {})
 
             parameters = []
             for parameter in operation.get("parameters", []):
@@ -95,33 +101,68 @@ def _collect_web_docs(request: Request) -> tuple[list[dict[str, Any]], dict[tupl
                             "title",
                             parameter.get("name", "parameter").replace("_", " ").title(),
                         ),
+                        "default": schema_info.get("default", ""),
+                        "enum": schema_info.get("enum", []),
                         "description": parameter.get("description", "No description provided."),
                     }
                 )
 
-            operation_id = _make_operation_id(
-                api_path,
-                http_method,
-                operation.get("operationId"),
+            request_body = None
+            body_schema = (
+                operation.get("requestBody", {})
+                .get("content", {})
+                .get("application/json", {})
+                .get("schema")
             )
+            if body_schema:
+                request_body = {
+                    "required": operation.get("requestBody", {}).get("required", False),
+                    "schema": body_schema,
+                }
+
+            operation_id = _make_operation_id(api_path, method, operation.get("operationId"))
             operation_detail = {
                 "id": operation_id,
-                "method": http_method.upper(),
-                "summary": operation.get("summary") or "Unnamed endpoint",
+                "method": method,
+                "summary": operation.get("summary") or endpoint.get("summary") or "Unnamed endpoint",
                 "description": operation.get("description") or "No description provided.",
                 "api_path": api_path,
                 "web_path": _web_path_from_api_path(api_path),
                 "parameters": parameters,
+                "request_body": request_body,
             }
 
-            grouped[group_key]["operations"].append(operation_detail)
-            lookup[(group_key, operation_id)] = operation_detail
+            operations.append(operation_detail)
+            lookup[(route_key, operation_id)] = operation_detail
 
-    groups = sorted(grouped.values(), key=lambda item: item["label"])
-    for group in groups:
-        group["operations"] = sorted(group["operations"], key=lambda op: op["api_path"])
+        groups.append(
+            {
+                "id": catalog_group.get("id", route_key),
+                "key": route_key,
+                "label": catalog_group.get("label") or _group_label(route_key),
+                "description": catalog_group.get("description") or _group_description(route_key),
+                "operations": operations,
+            }
+        )
 
     return groups, lookup
+
+
+def _resolve_selected_group(
+    groups: list[dict[str, Any]],
+    requested_group: str | None,
+) -> dict[str, Any]:
+    available_groups = [group for group in groups if group["operations"]]
+    if not available_groups:
+        raise HTTPException(status_code=500, detail="No web operations found")
+
+    default_group = next((group for group in available_groups if group["key"] == "search"), available_groups[0])
+    if not requested_group:
+        return default_group
+    return next(
+        (group for group in available_groups if group["key"] == requested_group),
+        default_group,
+    )
 
 
 @router.get("/")
@@ -139,13 +180,17 @@ def landing_page(request: Request):
 
 @router.get("/web")
 @router.get("/web/")
-def web_api_home(request: Request):
+def web_api_home(request: Request, group: str | None = None):
     groups, _ = _collect_web_docs(request)
+    selected_group = _resolve_selected_group(groups, group)
+
     context = {
         "active_page": "web",
         "project_name": "PDDIKTI API",
         "public_base_url": settings.public_base_url,
         "groups": groups,
+        "selected_group": selected_group,
+        "public_api_base_url": f"{settings.public_base_url}/api",
         "total_endpoints": sum(len(group["operations"]) for group in groups),
     }
     return templates.TemplateResponse(request, "web_index.html", context)
@@ -154,38 +199,24 @@ def web_api_home(request: Request):
 @router.get("/web/routes/{group_key}")
 def web_group_routes(request: Request, group_key: str):
     groups, _ = _collect_web_docs(request)
-    group = next((item for item in groups if item["key"] == group_key), None)
-    if not group:
+    selected_group = next((item for item in groups if item["key"] == group_key and item["operations"]), None)
+    if not selected_group:
         raise HTTPException(status_code=404, detail="Route group not found")
 
-    context = {
-        "active_page": "web",
-        "project_name": "PDDIKTI API",
-        "public_base_url": settings.public_base_url,
-        "groups": groups,
-        "group": group,
-    }
-    return templates.TemplateResponse(request, "web_group.html", context)
+    return RedirectResponse(url=f"/web?group={group_key}")
 
 
 @router.get("/web/routes/{group_key}/{operation_id}")
 def web_route_detail(request: Request, group_key: str, operation_id: str):
     groups, lookup = _collect_web_docs(request)
-    group = next((item for item in groups if item["key"] == group_key), None)
-    operation = lookup.get((group_key, operation_id))
-
-    if not group or not operation:
+    selected_group = next((item for item in groups if item["key"] == group_key and item["operations"]), None)
+    if not selected_group:
         raise HTTPException(status_code=404, detail="Route detail not found")
 
-    context = {
-        "active_page": "web",
-        "project_name": "PDDIKTI API",
-        "public_base_url": settings.public_base_url,
-        "groups": groups,
-        "group": group,
-        "operation": operation,
-    }
-    return templates.TemplateResponse(request, "web_detail.html", context)
+    if not lookup.get((group_key, operation_id)):
+        raise HTTPException(status_code=404, detail="Route detail not found")
+
+    return RedirectResponse(url=f"/web?group={group_key}#endpoint-{operation_id}")
 
 
 @router.get("/web/{forward_path:path}", include_in_schema=False)

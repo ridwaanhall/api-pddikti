@@ -61,25 +61,39 @@
     <body class="min-h-screen bg-black text-zinc-100 antialiased">
         {% set active = active_page|default('landing') %}
         <div class="min-h-screen bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.08),transparent_35%),radial-gradient(circle_at_80%_0%,rgba(255,255,255,0.05),transparent_35%)]">
-            <header class="border-b border-zinc-800">
-                <nav class="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-8 lg:px-12">
-                    <a href="/" class="text-sm font-semibold tracking-[0.22em]">PDDIKTI API</a>
-                    <div class="flex flex-wrap items-center gap-3 text-[10px] uppercase tracking-[0.16em] text-zinc-400 sm:text-xs">
-                        <a href="/" class="{% if active == 'landing' %}text-zinc-100{% endif %}">Home</a>
-                        <a href="/web" class="{% if active == 'web' %}text-zinc-100{% endif %}">Web API</a>
-                        <a href="/api/" class="hover:text-zinc-100">API Root</a>
-                        <a href="/api/docs" class="hover:text-zinc-100">Swagger</a>
-                        <a href="/api/redoc" class="hover:text-zinc-100">ReDoc</a>
+            <header class="border-b border-zinc-800/90 bg-black/80 backdrop-blur">
+                <nav class="mx-auto flex w-full max-w-[1600px] flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-8 lg:px-12">
+                    <a href="/" class="inline-flex items-center gap-2 text-sm font-semibold tracking-[0.2em]">
+                        <span class="inline-block h-2 w-2 rounded-full bg-emerald-400"></span>
+                        PDDIKTI API
+                    </a>
+                    <div class="flex flex-wrap items-center gap-2 text-[10px] uppercase tracking-[0.16em] text-zinc-400 sm:text-xs">
+                        <a href="/" class="border px-3 py-1 transition {% if active == 'landing' %}border-zinc-300 text-zinc-100{% else %}border-zinc-700 hover:border-zinc-500 hover:text-zinc-100{% endif %}">Home</a>
+                        <a href="/web" class="border px-3 py-1 transition {% if active == 'web' %}border-zinc-300 text-zinc-100{% else %}border-zinc-700 hover:border-zinc-500 hover:text-zinc-100{% endif %}">Web API</a>
+                        <a href="/api/" class="border border-zinc-700 px-3 py-1 transition hover:border-zinc-500 hover:text-zinc-100">API Root</a>
+                        <a href="/api/docs" class="border border-zinc-700 px-3 py-1 transition hover:border-zinc-500 hover:text-zinc-100">Swagger</a>
+                        <a href="/api/redoc" class="border border-zinc-700 px-3 py-1 transition hover:border-zinc-500 hover:text-zinc-100">ReDoc</a>
                     </div>
                 </nav>
             </header>
             <div class="min-h-[calc(100vh-170px)]">
                 {% block content %}{% endblock %}
             </div>
-            <footer class="border-t border-zinc-800">
-                <div class="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 py-6 text-xs text-zinc-500 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-12">
-                    <p>PDDIKTI API platform for universities, programs, lecturers, and students.</p>
-                    <p>Built with FastAPI and Tailwind for responsive multi-device usage.</p>
+            <footer class="border-t border-zinc-800/90 bg-black/40">
+                <div class="mx-auto flex w-full max-w-[1600px] flex-col gap-4 px-4 py-6 text-xs text-zinc-500 sm:px-8 lg:px-12">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <p>PDDIKTI API platform for universities, study programs, lecturers, and students.</p>
+                        <p>Version {{ api_version|default('4.0.0') }}</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3 text-zinc-600">
+                        <a href="/web" class="hover:text-zinc-300">Web Playground</a>
+                        <span>•</span>
+                        <a href="/api/docs" class="hover:text-zinc-300">Swagger</a>
+                        <span>•</span>
+                        <a href="/api/redoc" class="hover:text-zinc-300">ReDoc</a>
+                        <span>•</span>
+                        <a href="/api/" class="hover:text-zinc-300">API Root</a>
+                    </div>
                 </div>
             </footer>
         </div>
