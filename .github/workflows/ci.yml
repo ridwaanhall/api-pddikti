@@ -1,0 +1,40 @@
+name: CI
+
+on:
+    pull_request:
+    push:
+        branches:
+            - main
+            - fastapi
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        env:
+            RIDWAANHALL_MAIN_API: ${{ secrets.RIDWAANHALL_MAIN_API }}
+            API_KEY: ${{ secrets.API_KEY }}
+            RIDWAANHALL_API_X: ${{ secrets.RIDWAANHALL_API_X }}
+            RIDWAANHALL_X: ${{ secrets.RIDWAANHALL_X }}
+            RIDWAANHALL_HASH_X: ${{ secrets.RIDWAANHALL_HASH_X }}
+            RIDWAANHALL_API_KEY: ${{ secrets.RIDWAANHALL_API_KEY }}
+            RIDWAANHALL_KEY: ${{ secrets.RIDWAANHALL_KEY }}
+            RIDWAANHALL_HASH_KEY: ${{ secrets.RIDWAANHALL_HASH_KEY }}
+            SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.12"
+
+            - name: Set up uv
+              uses: astral-sh/setup-uv@v5
+
+            - name: Install dependencies
+              run: uv sync --group dev
+
+            - name: Run tests
+              run: uv run pytest
