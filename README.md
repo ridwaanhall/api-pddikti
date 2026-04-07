@@ -1,6 +1,6 @@
-# PDDIKTI API
+# PDDikti API
 
-Production API service for structured access to Indonesia higher-education data (PDDIKTI), including universities, study programs, lecturers, and students.
+Production API service for structured access to Indonesia higher-education data (PDDikti), including universities, study programs, lecturers, and students.
 
 ## Production Endpoint
 
@@ -18,7 +18,7 @@ https://pddikti.fastapicloud.dev
 
 ## About This Project
 
-PDDIKTI API is built to provide consistent, production-grade endpoint access over public higher-education datasets. It includes:
+PDDikti API is built to provide consistent, production-grade endpoint access over public higher-education datasets. It includes:
 
 - Modular FastAPI routing by domain (`search`, `pt`, `prodi`, `dosen`, `mhs`, `stats`, `prodi-bidang-ilmu`)
 - OpenAPI documentation with Swagger and ReDoc
@@ -67,3 +67,12 @@ When traffic protection is active, non-overview API endpoints may return a tempo
 - Requests
 - httpx
 - uv (dependency and lock management)
+
+## How to Use This Project (License Compliance)
+
+- This project uses GNU Affero General Public License v3.0 with Section 7 Additional Terms in `LICENSE`.
+- If you use, copy, or modify this source code, your entire project must be public open source and must include the exact credit line below.
+- If you only call the official hosted API (without copying/running this source code), your project may remain private, but you must still show the exact credit line.
+- No monetization is allowed: do not sell, charge money for, or make commercial profit from this code or services based on it.
+- Required exact credit line:
+    Powered by PDDikti Public Data API Web, Data © PDDikti, API maintained by ridwaanhall / RoneAI
