@@ -68,11 +68,14 @@ When traffic protection is active, non-overview API endpoints may return a tempo
 - httpx
 - uv (dependency and lock management)
 
-## How to Use This Project (License Compliance)
+## Source Code License
 
-- This project uses GNU Affero General Public License v3.0 with Section 7 Additional Terms in `LICENSE`.
-- If you use, copy, or modify this source code, your entire project must be public open source and must include the exact credit line below.
-- If you only call the official hosted API (without copying/running this source code), your project may remain private, but you must still show the exact credit line.
-- No monetization is allowed: do not sell, charge money for, or make commercial profit from this code or services based on it.
-- Required exact credit line:
-    Powered by PDDikti Public Data API Web, Data © PDDikti, API maintained by ridwaanhall / RoneAI
+- This project uses GNU Affero General Public License v3.0 (`LICENSE`) with unmodified upstream license text.
+- If you use, copy, modify, or redistribute this source code, follow the requirements stated in `LICENSE`.
+- Any project-specific hosted-service rules are documented separately in `HOSTED_API_TERMS.md`.
+
+## Hosted API Usage
+
+- Calling the official hosted API does not by itself mean you are using, copying, or redistributing this source code.
+- Rules for use of the hosted API are described separately as service terms in `HOSTED_API_TERMS.md`, not as source-code license obligations.
+- If you need attribution, commercial-use, or other usage guidance for the hosted service, consult the API operator's terms or contact the maintainer.

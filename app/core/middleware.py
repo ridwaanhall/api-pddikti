@@ -33,6 +33,7 @@ class APIStatusMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
         settings = get_settings()
+        header_credit = settings.required_credit_line.replace("©", "(C)")
         path = request.url.path
         allowed_paths = {"/api", "/api/"}
         allowed_prefixes = (
@@ -86,7 +87,14 @@ class APIStatusMiddleware(BaseHTTPMiddleware):
                         "contact_site": "https://ridwaanhall.com/guestbook",
                     },
                 }
-                return JSONResponse(payload, status_code=503, headers={"Retry-After": "3600"})
+                return JSONResponse(
+                    payload,
+                    status_code=503,
+                    headers={
+                        "Retry-After": "3600",
+                        "X-Project-Credit": header_credit,
+                    },
+                )
 
         return await call_next(request)
 
@@ -96,11 +104,12 @@ class SEOHeadersMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
         settings = get_settings()
+        header_credit = settings.required_credit_line.replace("©", "(C)")
         response = await call_next(request)
         response.headers.setdefault("X-Robots-Tag", "index, follow")
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
         response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
         response.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
         if request.url.path.startswith("/api"):
-            response.headers.setdefault("X-Project-Credit", settings.required_credit_line)
+            response.headers.setdefault("X-Project-Credit", header_credit)
         return response

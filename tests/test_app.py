@@ -23,11 +23,23 @@ def test_landing_page_works() -> None:
 def test_api_overview_works() -> None:
     response = client.get("/api/")
     assert response.status_code == 200
-    assert response.headers.get("X-Project-Credit") == REQUIRED_CREDIT
+    assert response.headers.get("X-Project-Credit")
+    assert "Powered by PDDikti Public Data API Web" in response.headers.get(
+        "X-Project-Credit", ""
+    )
     payload = response.json()
     assert payload.get("credit") == REQUIRED_CREDIT
     assert "meta" in payload
     assert "status" in payload
+
+
+def test_blocked_api_response_includes_credit_header() -> None:
+    response = client.get("/api/search/all/informatika/")
+    if response.status_code == 503:
+        assert response.headers.get("X-Project-Credit")
+        assert "Powered by PDDikti Public Data API Web" in response.headers.get(
+            "X-Project-Credit", ""
+        )
 
 
 def test_api_docs_works() -> None:

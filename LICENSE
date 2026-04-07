@@ -629,8 +629,8 @@ to attach them to the start of each source file to most effectively
 state the exclusion of warranty; and each file should have at least
 the "copyright" line and a pointer to where the full notice is found.
 
-    PDDikti Public Data API Web
-    Copyright (C) 2026 ridwaanhall / RoneAI
+    <one line to give the program's name and a brief idea of what it does.>
+    Copyright (C) <year>  <name of author>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
@@ -644,33 +644,6 @@ the "copyright" line and a pointer to where the full notice is found.
 
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-                       ADDITIONAL TERMS (Section 7)
-
-  In addition to the terms of the GNU AGPL v3.0, the following conditions apply:
-
-  1. Credit Requirement
-     Every copy, modified version, and every API response must prominently
-     display the following notice:
-    "Powered by PDDikti Public Data API Web, Data © PDDikti, API maintained by ridwaanhall / RoneAI"
-
-  2. Code Usage
-     If you use, modify, or run any part of this code (including running it
-     as a service or API), your entire project MUST be made public (open source)
-     under the same AGPL v3.0 license and must include the credit above.
-
-  3. API-Only Usage
-     If you only call the official hosted API (without copying or running the
-     source code), your project may remain private, but you MUST still show
-     the full credit notice in your application or documentation.
-
-  4. No Monetization
-     You are not allowed to sell, charge money for, or make any commercial
-     profit from this code, any modified version of it, or any service that
-     is based on this code.
-
-  These additional terms are permitted under Section 7 of the GNU AGPL v3.0
-  and form part of the license for this program.
 
 Also add information on how to contact you by electronic and paper mail.
 
