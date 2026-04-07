@@ -48,6 +48,7 @@ class APIStatusMiddleware(BaseHTTPMiddleware):
             )
             if not is_allowed:
                 payload = {
+                    "credit": settings.required_credit_line,
                     "error": "Service Temporarily Limited",
                     "message": (
                         "Due to high traffic volume, this endpoint is temporarily "
@@ -94,9 +95,12 @@ class SEOHeadersMiddleware(BaseHTTPMiddleware):
     """Add SEO and security headers to every response."""
 
     async def dispatch(self, request: Request, call_next):
+        settings = get_settings()
         response = await call_next(request)
         response.headers.setdefault("X-Robots-Tag", "index, follow")
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
         response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
         response.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
+        if request.url.path.startswith("/api"):
+            response.headers.setdefault("X-Project-Credit", settings.required_credit_line)
         return response

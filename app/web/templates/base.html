@@ -3,10 +3,10 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>{% block title %}Home \ PDDIKTI API{% endblock %}</title>
+        <title>{% block title %}Home \ PDDikti API{% endblock %}</title>
         <meta
             name="description"
-            content="{% block meta_description %}PDDIKTI API provides structured access to Indonesian higher education data including universities, study programs, lecturers, and students.{% endblock %}"
+            content="{% block meta_description %}PDDikti API provides structured access to Indonesian higher education data including universities, study programs, lecturers, and students.{% endblock %}"
         />
         <meta
             name="keywords"
@@ -21,8 +21,8 @@
         />
 
         <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="PDDIKTI API" />
-        <meta property="og:title" content="{% block og_title %}PDDIKTI API{% endblock %}" />
+        <meta property="og:site_name" content="PDDikti API" />
+        <meta property="og:title" content="{% block og_title %}PDDikti API{% endblock %}" />
         <meta
             property="og:description"
             content="{% block og_description %}Reliable API gateway for Indonesian higher education public data.{% endblock %}"
@@ -33,19 +33,19 @@
         />
 
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="{% block twitter_title %}PDDIKTI API{% endblock %}" />
+        <meta name="twitter:title" content="{% block twitter_title %}PDDikti API{% endblock %}" />
         <meta
             name="twitter:description"
-            content="{% block twitter_description %}Production API service for PDDIKTI university, program, lecturer, and student data.{% endblock %}"
+            content="{% block twitter_description %}Production API service for PDDikti university, program, lecturer, and student data.{% endblock %}"
         />
 
         <script type="application/ld+json">
             {
                 "@context": "https://schema.org",
                 "@type": "WebSite",
-                "name": "PDDIKTI API",
+                "name": "PDDikti API",
                 "url": "{{ public_base_url|default('https://pddikti.rone.dev') }}/",
-                "description": "Production API gateway for PDDIKTI higher education data.",
+                "description": "Production API gateway for PDDikti higher education data.",
                 "publisher": {
                     "@type": "Organization",
                     "name": "ridwaanhall"
@@ -116,7 +116,7 @@
                 <nav class="mx-auto flex w-full max-w-[1600px] flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-8 lg:px-12">
                     <a href="/" class="inline-flex items-center gap-2 text-sm font-semibold tracking-[0.2em]">
                         <span class="inline-block h-2 w-2 rounded-full bg-emerald-400"></span>
-                        PDDIKTI API
+                        PDDikti API
                     </a>
                     <div class="flex flex-wrap items-center gap-2 text-[10px] uppercase tracking-[0.16em] text-zinc-400 sm:text-xs">
                         <a href="/" class="border px-3 py-1 transition {% if active == 'landing' %}border-zinc-300 text-zinc-100{% else %}border-zinc-700 hover:border-zinc-500 hover:text-zinc-100{% endif %}">Home</a>
@@ -133,7 +133,7 @@
             <footer class="border-t border-zinc-800/90 bg-black/40">
                 <div class="mx-auto flex w-full max-w-[1600px] flex-col gap-4 px-4 py-6 text-xs text-zinc-500 sm:px-8 lg:px-12">
                     <div class="flex flex-wrap items-center justify-between gap-3">
-                        <p>PDDIKTI API platform for universities, study programs, lecturers, and students.</p>
+                        <p>PDDikti API platform for universities, study programs, lecturers, and students.</p>
                         <p>Version {{ api_version|default('4.0.0') }}</p>
                     </div>
                     <div class="flex flex-wrap items-center gap-3 text-zinc-600">
@@ -145,6 +145,9 @@
                         <span>•</span>
                         <a href="/api/" class="hover:text-zinc-300">API Root</a>
                     </div>
+                    <p class="text-[11px] leading-relaxed text-zinc-400">
+                        Powered by PDDikti Public Data API Web, Data © PDDikti, API maintained by ridwaanhall / RoneAI
+                    </p>
                 </div>
             </footer>
         </div>

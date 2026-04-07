@@ -6,17 +6,26 @@ from app.main import app
 client = TestClient(app)
 
 
+REQUIRED_CREDIT = (
+    "Powered by PDDikti Public Data API Web, Data © PDDikti, "
+    "API maintained by ridwaanhall / RoneAI"
+)
+
+
 def test_landing_page_works() -> None:
     response = client.get("/")
     assert response.status_code == 200
     assert "Open Web Playground" in response.text
     assert "Open Swagger Docs" in response.text
+    assert REQUIRED_CREDIT in response.text
 
 
 def test_api_overview_works() -> None:
     response = client.get("/api/")
     assert response.status_code == 200
+    assert response.headers.get("X-Project-Credit") == REQUIRED_CREDIT
     payload = response.json()
+    assert payload.get("credit") == REQUIRED_CREDIT
     assert "meta" in payload
     assert "status" in payload
 

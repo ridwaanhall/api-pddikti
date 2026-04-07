@@ -90,6 +90,7 @@ def api_overview():
         ] += ", covering universities, study programs, lecturers, and students."
 
     return {
+        "credit": settings.required_credit_line,
         "meta": meta,
         "resources": resources,
         "features": features,

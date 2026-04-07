@@ -66,6 +66,10 @@ def _env_int(name: str, default: int) -> int:
 
 class Settings:
     def __init__(self) -> None:
+        self.required_credit_line = (
+            "Powered by PDDikti Public Data API Web, Data © PDDikti, "
+            "API maintained by ridwaanhall / RoneAI"
+        )
         self.secret_key = _env("SECRET_KEY", "")
         self.debug = _env_bool("DEBUG", False)
 
@@ -80,9 +84,9 @@ class Settings:
         self.ridwaanhall_key = _env("RIDWAANHALL_KEY", "private-origin")
         self.ridwaanhall_hash_key = _env("RIDWAANHALL_HASH_KEY", "private-referer")
 
-        self.api_availability = _env_bool("API_AVAILABILITY", False)
+        self.api_availability = _env_bool("API_AVAILABILITY", True)
         self.api_version = _env("API_VERSION", "4.1.0")
-        self.last_update = _env("LAST_UPDATE", "2026-05-29T00:00:00+07:00")
+        self.last_update = _env("LAST_UPDATE", "2026-04-07T00:00:00+07:00")
         self.api_timeout = _env_int("API_TIMEOUT", 8)
         self.public_base_url = _env("PUBLIC_BASE_URL", "https://pddikti.rone.dev").rstrip("/")
 

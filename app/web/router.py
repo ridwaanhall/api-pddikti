@@ -194,7 +194,7 @@ def _build_web_context(
     return {
         "request": request,
         "active_page": "web",
-        "project_name": "PDDIKTI API",
+        "project_name": "PDDikti API",
         "public_base_url": current_base_url,
         "groups": groups,
         "selected_group": selected_group,
@@ -212,7 +212,7 @@ def landing_page(request: Request):
     context = {
         "request": request,
         "active_page": "landing",
-        "project_name": "PDDIKTI API",
+        "project_name": "PDDikti API",
         "public_base_url": current_base_url,
         "api_version": settings.api_version,
         "api_available": settings.api_availability,

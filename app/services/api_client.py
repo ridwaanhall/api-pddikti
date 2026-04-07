@@ -17,7 +17,7 @@ RANDOM_USER_AGENTS = [
 
 
 class APIClient:
-    """HTTP client for forwarding requests to the upstream PDDIKTI API."""
+    """HTTP client for forwarding requests to the upstream PDDikti API."""
 
     def __init__(self) -> None:
         settings = get_settings()
