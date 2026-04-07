@@ -1,4 +1,5 @@
 from fastapi.responses import JSONResponse
+from datetime import datetime, timezone
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 
@@ -48,44 +49,50 @@ class APIStatusMiddleware(BaseHTTPMiddleware):
                 path.startswith(prefix) for prefix in allowed_prefixes
             )
             if not is_allowed:
+                now_iso = datetime.now(timezone.utc).isoformat()
+                base_url = str(request.base_url).rstrip("/")
                 payload = {
+                    "success": False,
+                    "status": {
+                        "http_code": 503,
+                        "code": "API_TEMPORARILY_UNAVAILABLE",
+                        "message": (
+                            "This endpoint is temporarily unavailable due to high "
+                            "traffic and protection limits."
+                        ),
+                    },
                     "credit": settings.required_credit_line,
-                    "error": "Service Temporarily Limited",
-                    "message": (
-                        "Due to high traffic volume, this endpoint is temporarily "
-                        "unavailable to ensure system stability."
-                        "use alternative endpoint or check back later."
-                    ),
-                    "code": 503,
-                    "status": "Service Unavailable",
-                    "alternative_endpoint": {
-                        "always_online": "https://pddikti.fastapicloud.dev",
-                        "description": (
-                            "This alternative API endpoint is designed to remain "
-                            "operational even during high traffic periods, providing "
-                            "access to essential data with optimized performance."
-                        ),
+                    "request": {
+                        "method": request.method,
+                        "path": path,
+                        "timestamp": now_iso,
                     },
-                    "available_endpoint": {
-                        "url": str(request.base_url),
-                        "method": "GET",
-                        "description": (
-                            "API Overview - Current service status and available resources"
-                        ),
+                    "documentation": {
+                        "overview": f"{base_url}/api/",
+                        "swagger": f"{base_url}/api/docs",
+                        "redoc": f"{base_url}/api/redoc",
+                        "openapi": f"{base_url}/api/openapi.json",
                     },
+                    "alternative_endpoints": [
+                        {
+                            "name": "High Availability Endpoint",
+                            "url": "https://pddikti.fastapicloud.dev",
+                            "description": (
+                                "Alternative endpoint designed to remain available "
+                                "during high traffic periods."
+                            ),
+                        }
+                    ],
                     "support": {
-                        "retry_suggestion": (
-                            "Please try again in a few days (or weeks) as we are "
-                            "currently experiencing high traffic."
+                        "message": (
+                            "If this issue persists, please check service status on "
+                            "the overview endpoint and contact support."
                         ),
-                        "support_message": (
-                            "You can support us by donating from $1 USD (target: "
-                            "$500 USD) to help enhance API performance and handle "
-                            "high request volumes."
-                        ),
-                        "contact": "Contact support if this issue persists",
-                        "contact_site": "https://ridwaanhall.com/guestbook",
+                        "live_chat": "https://ridwaanhall.com/guestbook",
+                        "email": "hi@ridwaanhall.com",
+                        "contact_form": "https://ridwaanhall.com/contact",
                     },
+                    "retry_after_seconds": 3600,
                 }
                 return JSONResponse(
                     payload,
