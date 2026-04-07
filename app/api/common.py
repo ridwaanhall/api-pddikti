@@ -11,6 +11,9 @@ api_client = APIClient()
 
 
 def as_json(data: Any) -> Any:
+    if isinstance(data, dict):
+        data.setdefault("credit", settings.required_credit_line)
+
     if isinstance(data, dict) and isinstance(data.get("code"), int) and data["code"] >= 400:
         return JSONResponse(content=data, status_code=data["code"])
     return data

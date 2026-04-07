@@ -1,7 +1,11 @@
 [project]
 name = "api-pddikti"
-version = "0.1.0"
-description = "FastAPI wrapper for PDDIKTI endpoints"
+version = "4.1.0"
+description = "Production API service for structured access to Indonesia higher-education data (PDDikti), including universities, study programs, lecturers, and students."
+license = { file = "LICENSE" }
+authors = [
+    { name = "RoneAI", email = "founder@rone.dev" },
+]
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

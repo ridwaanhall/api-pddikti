@@ -6,19 +6,50 @@ from app.main import app
 client = TestClient(app)
 
 
+REQUIRED_CREDIT = (
+    "Powered by PDDikti Public Data API Web, Data © PDDikti, "
+    "API maintained by ridwaanhall / RoneAI"
+)
+
+
 def test_landing_page_works() -> None:
     response = client.get("/")
     assert response.status_code == 200
     assert "Open Web Playground" in response.text
     assert "Open Swagger Docs" in response.text
+    assert REQUIRED_CREDIT in response.text
 
 
 def test_api_overview_works() -> None:
     response = client.get("/api/")
     assert response.status_code == 200
+    assert response.headers.get("X-Project-Credit")
+    assert "Powered by PDDikti Public Data API Web" in response.headers.get(
+        "X-Project-Credit", ""
+    )
     payload = response.json()
-    assert "meta" in payload
-    assert "status" in payload
+    assert payload.get("success") is True
+    assert payload.get("credit") == REQUIRED_CREDIT
+    assert "service" in payload
+    assert "availability" in payload
+    assert "documentation" in payload
+    assert "support" in payload
+    assert "alternative_endpoints" in payload
+
+
+def test_blocked_api_response_includes_credit_header() -> None:
+    response = client.get("/api/search/all/informatika/")
+    if response.status_code == 503:
+        assert response.headers.get("X-Project-Credit")
+        assert "Powered by PDDikti Public Data API Web" in response.headers.get(
+            "X-Project-Credit", ""
+        )
+        payload = response.json()
+        assert payload.get("success") is False
+        assert payload.get("status", {}).get("code") == "API_TEMPORARILY_UNAVAILABLE"
+        assert "documentation" in payload
+        assert "support" in payload
+        assert "alternative_endpoints" in payload
 
 
 def test_api_docs_works() -> None:
@@ -53,4 +84,4 @@ def test_web_proxy_overview_works() -> None:
     response = client.get("/web/api-overview/")
     assert response.status_code == 200
     payload = response.json()
-    assert "meta" in payload
+    assert "service" in payload

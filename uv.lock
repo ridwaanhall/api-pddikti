@@ -40,7 +40,7 @@ wheels = [
 
 [[package]]
 name = "api-pddikti"
-version = "0.1.0"
+version = "4.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "fastapi", extra = ["standard"] },
