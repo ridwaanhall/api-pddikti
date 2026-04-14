@@ -15,7 +15,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "pytest>=8.4.0",
+    "pytest>=9.0.3",
 ]
 
 [tool.uv]
