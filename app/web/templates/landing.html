@@ -26,11 +26,13 @@
                 {% if api_available %}
                     <span class="h-1.5 w-1.5 rounded-full bg-gold-500 shadow-[0_0_8px_rgba(200,169,126,0.6)]"></span> Operational
                 {% else %}
-                    <span class="h-1.5 w-1.5 rounded-full bg-red-900"></span> Limited Service
+                    <span class="h-1.5 w-1.5 rounded-full bg-red-800 shadow-[0_0_8px_rgba(153,27,27,0.6)]"></span> Limited Service
                 {% endif %}
             </span>
         </div>
 
+        <!-- Conditional UI based on API availability -->
+        {% if api_available %}
         <div class="mt-14 flex flex-wrap items-center gap-5">
             <a href="/web" class="group relative inline-flex items-center justify-center bg-gold-500 px-8 py-3.5 text-sm font-medium tracking-wide text-[#09090b] transition-all hover:bg-gold-400">
                 Open Web Playground
@@ -42,6 +44,24 @@
                 ReDoc
             </a>
         </div>
+        {% else %}
+        <div class="mt-12 flex w-full max-w-3xl flex-col items-start gap-6 border-l-2 border-red-900/50 bg-[#0c0c0e] py-6 pl-6 sm:pl-8">
+            <div class="flex flex-col gap-2">
+                <h3 class="font-serif text-2xl font-medium text-red-400/90">Primary Service Unavailable</h3>
+                <p class="max-w-xl text-sm font-light leading-relaxed text-zinc-400">
+                    Our primary PDDikti connection is currently experiencing limited service. Please route your active requests through our high-availability fallback endpoint to maintain access.
+                </p>
+            </div>
+            <div class="mt-2 flex flex-wrap items-center gap-4">
+                <a href="https://openmlbb.fastapicloud.dev" target="_blank" rel="noopener noreferrer" class="group relative inline-flex items-center justify-center border border-red-900/50 bg-red-950/30 px-8 py-3 text-sm font-medium tracking-wide text-red-300 transition-all hover:border-red-500/50 hover:bg-red-900/20">
+                    Open Alternative Gateway <span class="ml-2 opacity-70 transition-transform group-hover:translate-x-1">&rarr;</span>
+                </a>
+                <a href="/api/docs" class="inline-flex items-center justify-center px-6 py-3 text-sm font-medium tracking-wide text-zinc-500 transition-colors hover:text-zinc-300">
+                    View Local Docs
+                </a>
+            </div>
+        </div>
+        {% endif %}
     </header>
 
     <div class="my-8 h-px w-full bg-gradient-to-r from-transparent via-zinc-800 to-transparent"></div>
