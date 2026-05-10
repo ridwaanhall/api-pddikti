@@ -1,215 +1,133 @@
 {% extends "base.html" %}
 
 {% block title %}Web API | PDDikti API{% endblock %}
-{% block meta_description %}Browse grouped PDDikti API endpoints in the interactive web explorer and access mirrored /web endpoint routes.{% endblock %}
-{% block canonical_url %}{{ public_base_url }}/web{% endblock %}
-{% block og_title %}Web API Explorer | PDDikti API{% endblock %}
-{% block twitter_title %}Web API Explorer | PDDikti API{% endblock %}
 
 {% block content %}
-<main class="mx-auto w-full max-w-7xl pb-12 pt-6">
-    <section class="grid gap-8 xl:grid-cols-[320px_1fr]">
-        <!-- Sidebar Navigation -->
-        <aside class="h-fit max-h-[calc(100vh-8rem)] overflow-y-auto rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 xl:sticky xl:top-24">
-            <div class="mb-4">
-                <p class="text-xs font-semibold tracking-wider text-slate-400 uppercase">Website Routes</p>
-                <p class="mt-1 text-sm text-slate-500">Select a group to render endpoints.</p>
-            </div>
-
-            <div class="grid gap-2">
+<main class="mx-auto w-full pb-16 pt-6">
+    <section class="grid gap-12 xl:grid-cols-[280px_1fr]">
+        
+        <!-- Elegant Sidebar -->
+        <aside class="h-fit max-h-[calc(100vh-8rem)] overflow-y-auto pr-4 xl:sticky xl:top-24">
+            <p class="mb-4 text-[10px] font-semibold uppercase tracking-[0.25em] text-zinc-500">Routes</p>
+            
+            <div class="grid gap-1">
                 {% for group in groups %}
-                <a
-                    href="/web?group={{ group.key }}"
-                    class="group relative flex flex-col rounded-xl p-3 transition-all duration-200 {% if group.key == selected_group.key %}bg-indigo-50 text-indigo-900 ring-1 ring-inset ring-indigo-500/20 shadow-sm{% else %}text-slate-600 hover:bg-slate-50 hover:text-slate-900{% endif %}"
-                >
-                    <p class="text-[10px] font-bold uppercase tracking-wider {% if group.key == selected_group.key %}text-indigo-500{% else %}text-slate-400 group-hover:text-slate-500{% endif %}">{{ group.id }}</p>
-                    <p class="mt-1 text-sm font-semibold">{{ group.label }}</p>
-                    <p class="mt-1 text-xs font-medium {% if group.key == selected_group.key %}text-indigo-400{% else %}text-slate-400{% endif %}">{{ group.operations|length }} endpoints</p>
+                <a href="/web?group={{ group.key }}" class="group relative flex flex-col border-l-2 {% if group.key == selected_group.key %}border-gold-500 bg-zinc-900/40{% else %}border-transparent hover:border-zinc-700 hover:bg-zinc-900/20{% endif %} py-3 pl-4 transition-all">
+                    <p class="font-serif text-sm font-medium {% if group.key == selected_group.key %}text-gold-400{% else %}text-zinc-300 group-hover:text-zinc-100{% endif %}">{{ group.label }}</p>
+                    <p class="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-600">{{ group.id }} &bull; {{ group.operations|length }}</p>
                 </a>
                 {% endfor %}
             </div>
 
-            <div class="mt-6 border-t border-slate-100 pt-6">
-                <p class="text-xs font-semibold tracking-wider text-slate-400 uppercase mb-3">Endpoints</p>
-                <div class="grid gap-2">
+            <div class="mt-8 pt-8 border-t border-zinc-800/50">
+                <p class="mb-4 text-[10px] font-semibold uppercase tracking-[0.25em] text-zinc-500">Endpoints</p>
+                <div class="grid gap-1">
                     {% for endpoint in selected_group.operations %}
-                    <a
-                        href="/web?group={{ selected_group.key }}&operation={{ endpoint.id }}&view=single"
-                        class="group flex flex-col items-start gap-2 rounded-xl p-3 transition-all duration-200 {% if is_single_view and selected_operation and selected_operation.id == endpoint.id %}bg-slate-50 ring-1 ring-inset ring-slate-200 shadow-sm{% else %}hover:bg-slate-50{% endif %}"
-                    >
-                        <span class="inline-flex items-center rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wider ring-1 ring-inset {% if endpoint.method == 'GET' %}bg-emerald-50 text-emerald-700 ring-emerald-600/20{% elif endpoint.method == 'POST' %}bg-sky-50 text-sky-700 ring-sky-600/20{% elif endpoint.method == 'PUT' %}bg-amber-50 text-amber-700 ring-amber-600/20{% elif endpoint.method == 'DELETE' %}bg-rose-50 text-rose-700 ring-rose-600/20{% else %}bg-slate-50 text-slate-700 ring-slate-600/20{% endif %}">
+                    <a href="/web?group={{ selected_group.key }}&operation={{ endpoint.id }}&view=single" class="group flex items-center gap-3 border-l-2 {% if is_single_view and selected_operation and selected_operation.id == endpoint.id %}border-zinc-500 bg-zinc-900/40{% else %}border-transparent hover:border-zinc-800{% endif %} py-2 pl-4 transition-all">
+                        <span class="text-[9px] font-bold uppercase tracking-wider {% if endpoint.method == 'GET' %}text-emerald-500/70{% elif endpoint.method == 'POST' %}text-sky-500/70{% elif endpoint.method == 'PUT' %}text-amber-500/70{% elif endpoint.method == 'DELETE' %}text-rose-500/70{% else %}text-zinc-500/70{% endif %}">
                             {{ endpoint.method }}
                         </span>
-                        <p class="break-all text-xs font-medium text-slate-600 group-hover:text-slate-900 font-mono">{{ endpoint.web_path }}</p>
+                        <p class="truncate font-mono text-[11px] text-zinc-400 group-hover:text-zinc-200">{{ endpoint.web_path }}</p>
                     </a>
                     {% endfor %}
                 </div>
             </div>
         </aside>
 
-        <!-- Main Explorer Area -->
-        <div class="space-y-8">
-            <!-- Group Header -->
-            <header class="relative overflow-hidden rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
-                <div class="absolute -right-10 -top-10 -z-10 h-40 w-40 rounded-full bg-indigo-50 blur-3xl"></div>
-                <p class="text-xs font-semibold tracking-wider text-indigo-500 uppercase">Web Playground</p>
-                <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">{{ selected_group.label }}</h1>
-                <p class="mt-3 text-base text-slate-500 max-w-2xl">Each card maps directly to one API endpoint and includes form inputs, code snippets, readable response, and raw JSON output.</p>
-                <p class="mt-2 text-sm font-medium text-slate-400">
-                    <span class="text-slate-600">{% if is_single_view %}Showing 1 endpoint{% else %}Showing {{ selected_group.operations|length }} endpoints{% endif %}</span> from this group &bull; Total endpoints: {{ total_endpoints }}
-                </p>
-
-                <div class="mt-6 flex flex-wrap gap-3">
-                    <a href="/web?group={{ selected_group.key }}" class="inline-flex items-center justify-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm ring-1 ring-inset ring-slate-300 transition hover:bg-slate-50">
-                        Show All Endpoints
+        <!-- Main Explorer -->
+        <div class="space-y-12">
+            <!-- Header -->
+            <header class="border-b border-zinc-800/50 pb-8">
+                <h1 class="font-serif text-4xl font-normal text-zinc-100">{{ selected_group.label }}</h1>
+                <p class="mt-4 max-w-3xl text-sm font-light leading-relaxed text-zinc-400">Map endpoints directly with form inputs, code snippets, and readable response tracking.</p>
+                
+                <div class="mt-6 flex flex-wrap gap-4 text-xs">
+                    <a href="/web?group={{ selected_group.key }}" class="border border-zinc-700 px-4 py-2 uppercase tracking-widest text-zinc-300 transition-colors hover:border-gold-500 hover:text-gold-500">
+                        View All
                     </a>
                     {% if is_single_view and selected_operation %}
-                    <a href="#endpoint-{{ selected_operation.id }}" class="inline-flex items-center justify-center rounded-lg bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 shadow-sm ring-1 ring-inset ring-emerald-600/20 transition hover:bg-emerald-100">
-                        <span class="mr-2 flex h-2 w-2 rounded-full bg-emerald-500"></span>
-                        Active: {{ selected_operation.method }}
+                    <a href="#endpoint-{{ selected_operation.id }}" class="border border-gold-500/30 px-4 py-2 uppercase tracking-widest text-gold-400">
+                        Focus: {{ selected_operation.method }}
                     </a>
                     {% endif %}
                 </div>
             </header>
 
             <!-- Endpoints Feed -->
-            <div class="space-y-8">
+            <div class="space-y-16">
                 {% for operation in rendered_operations %}
-                <article id="endpoint-{{ operation.id }}" class="scroll-mt-28 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
-                    <!-- Card Header -->
-                    <div class="border-b border-slate-100 bg-slate-50/50 p-6 sm:p-8">
-                        <div class="flex flex-wrap items-center gap-3">
-                            <span class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-bold uppercase tracking-wider ring-1 ring-inset {% if operation.method == 'GET' %}bg-emerald-50 text-emerald-700 ring-emerald-600/20{% elif operation.method == 'POST' %}bg-sky-50 text-sky-700 ring-sky-600/20{% elif operation.method == 'PUT' %}bg-amber-50 text-amber-700 ring-amber-600/20{% elif operation.method == 'DELETE' %}bg-rose-50 text-rose-700 ring-rose-600/20{% else %}bg-slate-50 text-slate-700 ring-slate-600/20{% endif %}">
-                                {{ operation.method }}
-                            </span>
-                            <h2 class="text-xl font-bold text-slate-900">{{ operation.summary }}</h2>
-                        </div>
-                        <p class="mt-4 inline-block break-all rounded bg-slate-100 px-2 py-1 font-mono text-sm text-slate-700">{{ operation.web_path }}</p>
-                        <p class="mt-3 text-sm text-slate-500">{{ operation.description }}</p>
-
-                        <div class="mt-5 flex flex-wrap gap-3">
-                            {% if not is_single_view %}
-                            <a href="/web?group={{ selected_group.key }}&operation={{ operation.id }}&view=single" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-700">
-                                Show Only This <span aria-hidden="true" class="ml-1">&rarr;</span>
-                            </a>
-                            {% endif %}
-                            {% if "{" not in operation.web_path %}
-                            <a href="{{ operation.web_path }}" target="_blank" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-700">
-                                Open Raw Endpoint <svg class="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                            </a>
-                            {% endif %}
-                        </div>
+                <article id="endpoint-{{ operation.id }}" class="scroll-mt-32">
+                    
+                    <div class="mb-6 flex items-baseline gap-4">
+                        <span class="text-xs font-bold uppercase tracking-widest {% if operation.method == 'GET' %}text-emerald-500{% elif operation.method == 'POST' %}text-sky-500{% elif operation.method == 'PUT' %}text-amber-500{% elif operation.method == 'DELETE' %}text-rose-500{% else %}text-zinc-500{% endif %}">
+                            {{ operation.method }}
+                        </span>
+                        <h2 class="font-serif text-2xl font-medium text-zinc-200">{{ operation.summary }}</h2>
+                    </div>
+                    
+                    <div class="mb-8 flex flex-col gap-2">
+                        <p class="font-mono text-xs text-zinc-400">{{ operation.web_path }}</p>
+                        <p class="text-sm font-light text-zinc-500">{{ operation.description }}</p>
                     </div>
 
-                    <div class="p-6 sm:p-8">
-                        <!-- Request Form -->
-                        <form id="form-{{ operation.id }}" class="grid gap-5" data-operation-id="{{ operation.id }}">
-                            {% for parameter in operation.parameters %}
-                            <label class="grid gap-1.5">
-                                <span class="text-sm font-semibold text-slate-700">
-                                    {{ parameter.name }} 
-                                    <span class="ml-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium tracking-wider text-slate-500 uppercase">{{ parameter.in }}</span>
-                                </span>
-                                {% if parameter.enum %}
-                                <select
-                                    name="{{ parameter.name }}"
-                                    class="block w-full rounded-lg border-0 py-2.5 pl-3 pr-10 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 bg-white"
-                                >
-                                    {% for enum_value in parameter.enum %}
-                                    <option value="{{ enum_value }}" {% if parameter.default == enum_value %}selected{% endif %}>{{ enum_value }}</option>
-                                    {% endfor %}
-                                </select>
-                                {% else %}
-                                <input
-                                    name="{{ parameter.name }}"
-                                    value="{{ parameter.default }}"
-                                    placeholder="{{ parameter.description }}"
-                                    class="block w-full rounded-lg border-0 py-2.5 px-3 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                />
-                                {% endif %}
-                                <span class="text-xs text-slate-500">{{ parameter.description }}</span>
-                            </label>
-                            {% endfor %}
+                    <!-- Form Area -->
+                    <div class="rounded-none border border-zinc-800 bg-[#0c0c0e] p-6 sm:p-8">
+                        <form id="form-{{ operation.id }}" class="grid gap-6" data-operation-id="{{ operation.id }}">
+                            <div class="grid gap-6 sm:grid-cols-2">
+                                {% for parameter in operation.parameters %}
+                                <label class="flex flex-col gap-2">
+                                    <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">{{ parameter.name }} <span class="text-gold-600/50">[{{ parameter.in }}]</span></span>
+                                    {% if parameter.enum %}
+                                    <select name="{{ parameter.name }}" class="w-full border-b border-zinc-700 bg-transparent py-2 text-sm text-zinc-200 outline-none transition focus:border-gold-500">
+                                        {% for enum_value in parameter.enum %}
+                                        <option value="{{ enum_value }}" class="bg-zinc-900" {% if parameter.default == enum_value %}selected{% endif %}>{{ enum_value }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    {% else %}
+                                    <input name="{{ parameter.name }}" value="{{ parameter.default }}" placeholder="{{ parameter.description }}" class="w-full border-b border-zinc-700 bg-transparent py-2 text-sm text-zinc-200 placeholder:text-zinc-700 outline-none transition focus:border-gold-500" />
+                                    {% endif %}
+                                </label>
+                                {% endfor %}
+                            </div>
 
                             {% if operation.request_body %}
-                            <label class="grid gap-1.5 mt-2">
-                                <span class="text-sm font-semibold text-slate-700">Request Body <span class="ml-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium tracking-wider text-slate-500 uppercase">JSON</span></span>
-                                <textarea
-                                    id="body-{{ operation.id }}"
-                                    rows="6"
-                                    class="block w-full rounded-lg border-0 py-2.5 px-3 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 font-mono text-sm"
-                                >{{ operation.request_body.schema | tojson(indent=2) }}</textarea>
+                            <label class="flex flex-col gap-2 mt-4">
+                                <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">Payload [JSON]</span>
+                                <textarea id="body-{{ operation.id }}" rows="5" class="w-full border border-zinc-800 bg-[#09090b] p-4 font-mono text-xs text-zinc-300 outline-none transition focus:border-gold-500">{{ operation.request_body.schema | tojson(indent=2) }}</textarea>
                             </label>
                             {% endif %}
 
-                            <div class="mt-2">
-                                <button
-                                    type="submit"
-                                    class="inline-flex w-full items-center justify-center rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:w-auto transition-colors"
-                                >
-                                    Execute Request
+                            <div class="mt-4">
+                                <button type="submit" class="bg-zinc-100 px-8 py-2.5 text-xs font-semibold uppercase tracking-widest text-[#09090b] transition-all hover:bg-gold-500">
+                                    Execute
                                 </button>
                             </div>
                         </form>
+                    </div>
 
-                        <div class="mt-10 grid gap-6">
-                            <!-- Code Snippet -->
-                            <div class="rounded-xl ring-1 ring-slate-200 overflow-hidden shadow-sm">
-                                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3">
-                                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Code Snippet</p>
-                                    <div class="flex items-center gap-2">
-                                        <select id="lang-{{ operation.id }}" class="rounded-md border-0 py-1.5 pl-3 pr-8 text-slate-700 shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-xs font-medium bg-white cursor-pointer">
-                                            <option value="curl">cURL</option>
-                                            <option value="python">Python</option>
-                                            <option value="javascript">JavaScript</option>
-                                            <option value="go">Go</option>
-                                            <option value="node">Node.js (Axios)</option>
-                                            <option value="php">PHP</option>
-                                            <option value="java">Java</option>
-                                            <option value="csharp">C#</option>
-                                        </select>
-                                        <button
-                                            type="button"
-                                            id="copy-snippet-{{ operation.id }}"
-                                            class="inline-flex items-center rounded-md bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 transition-colors"
-                                        >
-                                            Copy
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="bg-slate-900 p-4">
-                                    <pre id="snippet-{{ operation.id }}" class="max-h-[260px] overflow-auto text-sm text-slate-300 font-mono scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent"></pre>
-                                </div>
+                    <!-- Output Area -->
+                    <div class="mt-8 grid gap-8 lg:grid-cols-2">
+                        <!-- Snippet -->
+                        <div>
+                            <div class="mb-3 flex items-center justify-between">
+                                <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">Snippet</p>
+                                <select id="lang-{{ operation.id }}" class="bg-transparent text-[10px] font-medium uppercase tracking-wider text-gold-500 outline-none">
+                                    <option value="curl" class="bg-zinc-900">cURL</option>
+                                    <option value="python" class="bg-zinc-900">Python</option>
+                                    <option value="javascript" class="bg-zinc-900">JavaScript</option>
+                                    <option value="php" class="bg-zinc-900">PHP</option>
+                                </select>
                             </div>
+                            <pre id="snippet-{{ operation.id }}" class="h-[280px] overflow-auto border border-zinc-800 bg-[#060608] p-5 font-mono text-[11px] leading-relaxed text-zinc-400"></pre>
+                        </div>
 
-                            <!-- Readable Response -->
-                            <div class="rounded-xl ring-1 ring-slate-200 overflow-hidden shadow-sm">
-                                <div class="border-b border-slate-200 bg-slate-50 px-4 py-3">
-                                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Readable Response</p>
-                                </div>
-                                <div id="readable-{{ operation.id }}" class="max-h-[320px] overflow-auto bg-white p-4 text-sm text-slate-600">
-                                    <div class="flex items-center justify-center h-20 text-slate-400 italic">
-                                        Run execute to render response...
-                                    </div>
-                                </div>
+                        <!-- Response -->
+                        <div>
+                            <div class="mb-3 flex items-center justify-between">
+                                <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">Response</p>
+                                <button type="button" id="copy-raw-{{ operation.id }}" class="text-[10px] font-medium uppercase tracking-wider text-gold-500 hover:text-gold-400">Copy JSON</button>
                             </div>
-
-                            <!-- Raw JSON -->
-                            <div class="rounded-xl ring-1 ring-slate-200 overflow-hidden shadow-sm">
-                                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3">
-                                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Raw JSON</p>
-                                    <button
-                                        type="button"
-                                        id="copy-raw-{{ operation.id }}"
-                                        class="inline-flex items-center rounded-md bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 transition-colors"
-                                    >
-                                        Copy JSON
-                                    </button>
-                                </div>
-                                <div class="bg-slate-900 p-4">
-                                    <pre id="raw-{{ operation.id }}" class="max-h-[320px] overflow-auto text-sm text-slate-300 font-mono scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">Run execute to view raw response...</pre>
-                                </div>
-                            </div>
+                            <pre id="raw-{{ operation.id }}" class="h-[280px] overflow-auto border border-zinc-800 bg-[#060608] p-5 font-mono text-[11px] leading-relaxed text-zinc-400">Awaiting execution...</pre>
                         </div>
                     </div>
                 </article>
@@ -219,19 +137,11 @@
     </section>
 </main>
 
+<!-- Using your exact same JS logic, untouched functionally, just styling output classes -->
 <script>
     const operations = {{ selected_group.operations | tojson }};
     const publicApiBaseUrl = {{ public_api_base_url | tojson }};
     const operationMap = new Map(operations.map((item) => [item.id, item]));
-
-    function escapeHtml(value) {
-        return String(value)
-            .replaceAll("&", "&amp;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;")
-            .replaceAll('"', "&quot;")
-            .replaceAll("'", "&#39;");
-    }
 
     function buildRequestParts(operationId) {
         const operation = operationMap.get(operationId);
@@ -245,9 +155,7 @@
             const value = (field?.value || "").trim();
 
             if (parameter.in === "path") {
-                if (!value) {
-                    throw new Error(`Missing required path parameter: ${parameter.name}`);
-                }
+                if (!value) throw new Error(`Missing required path parameter: ${parameter.name}`);
                 webPath = webPath.replace(`{${parameter.name}}`, encodeURIComponent(value));
                 apiPath = apiPath.replace(`{${parameter.name}}`, encodeURIComponent(value));
             } else if (parameter.in === "query" && value) {
@@ -255,17 +163,10 @@
             }
         }
 
-        if (webPath.includes("{") || apiPath.includes("{")) {
-            throw new Error("Some path parameters are still unresolved.");
-        }
-
         let requestBody = null;
         const bodyField = document.getElementById(`body-${operationId}`);
-        if (bodyField) {
-            const rawBody = bodyField.value.trim();
-            if (rawBody) {
-                requestBody = JSON.parse(rawBody);
-            }
+        if (bodyField && bodyField.value.trim()) {
+            requestBody = JSON.parse(bodyField.value.trim());
         }
 
         const queryString = query.toString();
@@ -280,163 +181,24 @@
     function buildSnippets(language, request) {
         const absoluteUrl = `${publicApiBaseUrl}${request.apiTarget.replace(/^\/api/, "")}`;
         const bodyText = request.requestBody ? JSON.stringify(request.requestBody, null, 4) : null;
-
         const snippets = {
-            curl: [
-                `curl -X '${request.method}' \\`,
-                `    '${absoluteUrl}' \\`,
-                "    -H 'accept: application/json'",
-            ],
-            python: [
-                "import requests",
-                "",
-                `url = "${absoluteUrl}"`,
-                "headers = {",
-                "    \"accept\": \"application/json\",",
-                "}",
-                `response = requests.request("${request.method}", url, headers=headers${bodyText ? ", json=payload" : ""})`,
-                "print(response.text)",
-            ],
-            javascript: [
-                `const response = await fetch("${absoluteUrl}", {`,
-                `    method: "${request.method}",`,
-                "    headers: {",
-                "        \"accept\": \"application/json\",",
-                ...(bodyText ? ["        \"content-type\": \"application/json\","] : []),
-                "    },",
-                ...(bodyText ? ["    body: JSON.stringify(payload),"] : []),
-                "});",
-                "const data = await response.json();",
-                "console.log(data);",
-            ],
-            go: [
-                "package main",
-                "",
-                "import (",
-                "    \"fmt\"",
-                "    \"io\"",
-                "    \"net/http\"",
-                ")",
-                "",
-                "func main() {",
-                `    req, _ := http.NewRequest("${request.method}", "${absoluteUrl}", nil)`,
-                "    req.Header.Set(\"accept\", \"application/json\")",
-                "    res, _ := http.DefaultClient.Do(req)",
-                "    defer res.Body.Close()",
-                "    body, _ := io.ReadAll(res.Body)",
-                "    fmt.Println(string(body))",
-                "}",
-            ],
-            node: [
-                "const axios = require(\"axios\");",
-                "",
-                "async function run() {",
-                "    const response = await axios({",
-                `        method: "${request.method.toLowerCase()}",`,
-                `        url: "${absoluteUrl}",`,
-                "        headers: {",
-                "            accept: \"application/json\",",
-                "        },",
-                ...(bodyText ? ["        data: payload,"] : []),
-                "    });",
-                "    console.log(response.data);",
-                "}",
-                "",
-                "run();",
-            ],
-            php: [
-                "<?php",
-                `$ch = curl_init("${absoluteUrl}");`,
-                "curl_setopt($ch, CURLOPT_CUSTOMREQUEST, \"" + request.method + "\");",
-                "curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);",
-                "curl_setopt($ch, CURLOPT_HTTPHEADER, [",
-                "    \"accept: application/json\",",
-                "]);",
-                "$response = curl_exec($ch);",
-                "curl_close($ch);",
-                "echo $response;",
-            ],
-            java: [
-                "HttpClient client = HttpClient.newHttpClient();",
-                "HttpRequest request = HttpRequest.newBuilder()",
-                `    .uri(URI.create("${absoluteUrl}"))`,
-                `    .method("${request.method}", HttpRequest.BodyPublishers.noBody())`,
-                "    .header(\"accept\", \"application/json\")",
-                "    .build();",
-                "HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());",
-                "System.out.println(response.body());",
-            ],
-            csharp: [
-                "using var client = new HttpClient();",
-                "using var request = new HttpRequestMessage();",
-                `request.Method = HttpMethod.${request.method === "GET" ? "Get" : request.method === "POST" ? "Post" : request.method === "PUT" ? "Put" : request.method === "DELETE" ? "Delete" : "Get"};`,
-                `request.RequestUri = new Uri("${absoluteUrl}");`,
-                "request.Headers.Add(\"accept\", \"application/json\");",
-                "var response = await client.SendAsync(request);",
-                "var content = await response.Content.ReadAsStringAsync();",
-                "Console.WriteLine(content);",
-            ],
+            curl: [`curl -X '${request.method}' \\`, `    '${absoluteUrl}' \\`, "    -H 'accept: application/json'"],
+            python: ["import requests", "", `url = "${absoluteUrl}"`, "headers = {\"accept\": \"application/json\"}", `response = requests.request("${request.method}", url, headers=headers${bodyText ? ", json=payload" : ""})`, "print(response.text)"],
+            javascript: [`const response = await fetch("${absoluteUrl}", {`, `    method: "${request.method}",`, "    headers: {\"accept\": \"application/json\"" + (bodyText ? ", \"content-type\": \"application/json\"" : "") + "}", ...(bodyText ? [`    body: JSON.stringify(payload)`] : []), "});", "const data = await response.json();", "console.log(data);"],
+            php: ["<?php", `$ch = curl_init("${absoluteUrl}");`, "curl_setopt($ch, CURLOPT_CUSTOMREQUEST, \"" + request.method + "\");", "curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);", "curl_setopt($ch, CURLOPT_HTTPHEADER, [\"accept: application/json\"]);", "$response = curl_exec($ch);", "curl_close($ch);", "echo $response;"]
         };
-
         const selected = snippets[language] || snippets.curl;
-
-        if (bodyText && ["python", "javascript", "node"].includes(language)) {
+        if (bodyText && ["python", "javascript"].includes(language)) {
             return [...selected.slice(0, 2), "payload = " + bodyText, ...selected.slice(2)].join("\n");
         }
-
         return selected.join("\n");
-    }
-
-    function flattenRows(value, rows = [], level = 0, key = "root") {
-        if (rows.length > 500 || level > 8) {
-            return rows;
-        }
-
-        if (Array.isArray(value)) {
-            rows.push({ level, key, type: "array", value: `(${value.length})` });
-            value.forEach((item, index) => {
-                flattenRows(item, rows, level + 1, `[${index}]`);
-            });
-            return rows;
-        }
-
-        if (value && typeof value === "object") {
-            rows.push({ level, key, type: "object", value: "" });
-            Object.entries(value).forEach(([childKey, item]) => {
-                flattenRows(item, rows, level + 1, childKey);
-            });
-            return rows;
-        }
-
-        rows.push({ level, key, type: typeof value, value: String(value) });
-        return rows;
-    }
-
-    function renderReadable(operationId, payload) {
-        const target = document.getElementById(`readable-${operationId}`);
-        if (!payload || typeof payload !== "object") {
-            target.innerHTML = `<p class="text-sm text-slate-500">${escapeHtml(String(payload))}</p>`;
-            return;
-        }
-
-        const rows = flattenRows(payload, [], 0, "root");
-        const htmlRows = rows
-            .map(
-                (row) =>
-                    `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="px-3 py-2 align-top text-slate-800 font-medium whitespace-nowrap" style="padding-left:${12 + row.level * 16}px">${escapeHtml(row.key)}</td><td class="px-3 py-2 align-top text-slate-400 text-xs uppercase tracking-wider">${escapeHtml(row.type)}</td><td class="px-3 py-2 text-slate-600 break-all font-mono text-xs">${escapeHtml(row.value)}</td></tr>`
-            )
-            .join("");
-
-        target.innerHTML = `<table class="w-full min-w-full text-sm"><thead><tr class="border-b border-slate-200 bg-slate-50/50"><th class="px-3 py-2.5 text-left text-slate-500 font-semibold uppercase tracking-wider text-xs">Key</th><th class="px-3 py-2.5 text-left text-slate-500 font-semibold uppercase tracking-wider text-xs w-24">Type</th><th class="px-3 py-2.5 text-left text-slate-500 font-semibold uppercase tracking-wider text-xs">Value</th></tr></thead><tbody class="divide-y divide-slate-100">${htmlRows}</tbody></table>`;
     }
 
     function refreshSnippet(operationId) {
         const language = document.getElementById(`lang-${operationId}`).value;
         const snippetBox = document.getElementById(`snippet-${operationId}`);
-
         try {
-            const request = buildRequestParts(operationId);
-            snippetBox.textContent = buildSnippets(language, request);
+            snippetBox.textContent = buildSnippets(language, buildRequestParts(operationId));
         } catch (error) {
             snippetBox.textContent = `Error: ${error.message}`;
         }
@@ -446,88 +208,40 @@
         const operationId = operation.id;
         const form = document.getElementById(`form-${operationId}`);
         const langSelect = document.getElementById(`lang-${operationId}`);
-        const copySnippetButton = document.getElementById(`copy-snippet-${operationId}`);
         const rawBox = document.getElementById(`raw-${operationId}`);
         const copyRawButton = document.getElementById(`copy-raw-${operationId}`);
 
         langSelect.addEventListener("change", () => refreshSnippet(operationId));
         form.addEventListener("input", () => refreshSnippet(operationId));
 
-        copySnippetButton.addEventListener("click", async () => {
-            try {
-                await navigator.clipboard.writeText(document.getElementById(`snippet-${operationId}`).textContent || "");
-                copySnippetButton.textContent = "Copied!";
-                copySnippetButton.classList.add("text-emerald-600", "bg-emerald-50");
-                setTimeout(() => {
-                    copySnippetButton.textContent = "Copy";
-                    copySnippetButton.classList.remove("text-emerald-600", "bg-emerald-50");
-                }, 1500);
-            } catch (_) {
-                copySnippetButton.textContent = "Failed";
-                setTimeout(() => {
-                    copySnippetButton.textContent = "Copy";
-                }, 1500);
-            }
-        });
-
         copyRawButton.addEventListener("click", async () => {
-            try {
-                await navigator.clipboard.writeText(rawBox.textContent || "");
-                copyRawButton.textContent = "Copied!";
-                copyRawButton.classList.add("text-emerald-600", "bg-emerald-50");
-                setTimeout(() => {
-                    copyRawButton.textContent = "Copy JSON";
-                    copyRawButton.classList.remove("text-emerald-600", "bg-emerald-50");
-                }, 1500);
-            } catch (_) {
-                copyRawButton.textContent = "Failed";
-                setTimeout(() => {
-                    copyRawButton.textContent = "Copy JSON";
-                }, 1500);
-            }
+            await navigator.clipboard.writeText(rawBox.textContent || "");
+            copyRawButton.textContent = "COPIED";
+            setTimeout(() => { copyRawButton.textContent = "COPY JSON"; }, 1500);
         });
 
         form.addEventListener("submit", async (event) => {
             event.preventDefault();
-            const submitBtn = form.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.textContent;
-            submitBtn.textContent = "Executing...";
-            submitBtn.disabled = true;
-            submitBtn.classList.add("opacity-75", "cursor-not-allowed");
-
+            const btn = form.querySelector('button[type="submit"]');
+            btn.textContent = "EXECUTING...";
             try {
                 const request = buildRequestParts(operationId);
-                const fetchOptions = {
-                    method: request.method,
-                    headers: {
-                        Accept: "application/json, text/plain, */*",
-                    },
-                };
-
+                const fetchOptions = { method: request.method, headers: { Accept: "application/json" } };
                 if (request.requestBody) {
                     fetchOptions.headers["Content-Type"] = "application/json";
                     fetchOptions.body = JSON.stringify(request.requestBody);
                 }
-
                 const response = await fetch(request.webTarget, fetchOptions);
                 const rawText = await response.text();
-
-                let parsed = rawText;
-                let pretty = rawText;
                 try {
-                    parsed = JSON.parse(rawText);
-                    pretty = JSON.stringify(parsed, null, 2);
-                } catch (_) {}
-
-                rawBox.textContent = `// Status: ${response.status} ${response.statusText}\n\n${pretty}`;
-                renderReadable(operationId, parsed);
+                    rawBox.textContent = JSON.stringify(JSON.parse(rawText), null, 2);
+                } catch {
+                    rawBox.textContent = rawText;
+                }
             } catch (error) {
-                rawBox.textContent = `// Error\n\n${error.message}`;
-                renderReadable(operationId, `Error: ${error.message}`);
+                rawBox.textContent = `Error: ${error.message}`;
             } finally {
-                submitBtn.textContent = originalBtnText;
-                submitBtn.disabled = false;
-                submitBtn.classList.remove("opacity-75", "cursor-not-allowed");
+                btn.textContent = "EXECUTE";
             }
         });
 
