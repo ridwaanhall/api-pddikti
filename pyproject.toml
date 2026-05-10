@@ -1,6 +1,6 @@
 [project]
 name = "api-pddikti"
-version = "4.1.0"
+version = "4.2.0"
 description = "Production API service for structured access to Indonesia higher-education data (PDDikti), including universities, study programs, lecturers, and students."
 license = { file = "LICENSE" }
 authors = [
