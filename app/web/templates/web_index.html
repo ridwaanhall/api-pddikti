@@ -1,189 +1,216 @@
 {% extends "base.html" %}
 
-{% block title %}Web API \ PDDikti API{% endblock %}
+{% block title %}Web API | PDDikti API{% endblock %}
 {% block meta_description %}Browse grouped PDDikti API endpoints in the interactive web explorer and access mirrored /web endpoint routes.{% endblock %}
 {% block canonical_url %}{{ public_base_url }}/web{% endblock %}
-{% block og_title %}Web API Explorer \ PDDikti API{% endblock %}
-{% block twitter_title %}Web API Explorer \ PDDikti API{% endblock %}
+{% block og_title %}Web API Explorer | PDDikti API{% endblock %}
+{% block twitter_title %}Web API Explorer | PDDikti API{% endblock %}
 
 {% block content %}
-<main class="mx-auto w-full max-w-[1600px] px-4 py-8 sm:px-8 lg:px-12">
-    <section class="grid gap-6 xl:grid-cols-[340px_1fr]">
-        <aside class="h-fit max-h-[calc(100vh-6.5rem)] overflow-y-auto rounded-xl border border-zinc-800 p-4 xl:sticky xl:top-6">
-            <p class="text-xs uppercase tracking-[0.18em] text-zinc-500">Website Routes</p>
-            <p class="mt-1 text-sm text-zinc-300">Select a group to render all endpoints in one view.</p>
+<main class="mx-auto w-full max-w-7xl pb-12 pt-6">
+    <section class="grid gap-8 xl:grid-cols-[320px_1fr]">
+        <!-- Sidebar Navigation -->
+        <aside class="h-fit max-h-[calc(100vh-8rem)] overflow-y-auto rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 xl:sticky xl:top-24">
+            <div class="mb-4">
+                <p class="text-xs font-semibold tracking-wider text-slate-400 uppercase">Website Routes</p>
+                <p class="mt-1 text-sm text-slate-500">Select a group to render endpoints.</p>
+            </div>
 
-            <div class="mt-4 grid gap-2">
+            <div class="grid gap-2">
                 {% for group in groups %}
                 <a
                     href="/web?group={{ group.key }}"
-                    class="rounded-lg border px-3 py-2 text-left transition {% if group.key == selected_group.key %}border-zinc-300 text-zinc-100{% else %}border-zinc-700 text-zinc-300 hover:border-zinc-500 hover:text-zinc-100{% endif %}"
+                    class="group relative flex flex-col rounded-xl p-3 transition-all duration-200 {% if group.key == selected_group.key %}bg-indigo-50 text-indigo-900 ring-1 ring-inset ring-indigo-500/20 shadow-sm{% else %}text-slate-600 hover:bg-slate-50 hover:text-slate-900{% endif %}"
                 >
-                    <p class="text-[10px] uppercase tracking-[0.14em] text-zinc-500">{{ group.id }}</p>
-                    <p class="mt-1 text-sm font-medium">{{ group.label }}</p>
-                    <p class="mt-1 text-xs text-zinc-500">{{ group.operations|length }} endpoints</p>
+                    <p class="text-[10px] font-bold uppercase tracking-wider {% if group.key == selected_group.key %}text-indigo-500{% else %}text-slate-400 group-hover:text-slate-500{% endif %}">{{ group.id }}</p>
+                    <p class="mt-1 text-sm font-semibold">{{ group.label }}</p>
+                    <p class="mt-1 text-xs font-medium {% if group.key == selected_group.key %}text-indigo-400{% else %}text-slate-400{% endif %}">{{ group.operations|length }} endpoints</p>
                 </a>
                 {% endfor %}
             </div>
 
-            <div class="mt-6 border-t border-zinc-800 pt-4">
-                <p class="text-xs uppercase tracking-[0.18em] text-zinc-500">Endpoints</p>
-                <div class="mt-3 grid gap-2">
+            <div class="mt-6 border-t border-slate-100 pt-6">
+                <p class="text-xs font-semibold tracking-wider text-slate-400 uppercase mb-3">Endpoints</p>
+                <div class="grid gap-2">
                     {% for endpoint in selected_group.operations %}
                     <a
                         href="/web?group={{ selected_group.key }}&operation={{ endpoint.id }}&view=single"
-                        class="rounded-lg border border-zinc-700 px-3 py-2 text-left text-zinc-300 transition hover:border-zinc-500 hover:text-zinc-100 {% if is_single_view and selected_operation and selected_operation.id == endpoint.id %}border-zinc-300 text-zinc-100{% endif %}"
+                        class="group flex flex-col items-start gap-2 rounded-xl p-3 transition-all duration-200 {% if is_single_view and selected_operation and selected_operation.id == endpoint.id %}bg-slate-50 ring-1 ring-inset ring-slate-200 shadow-sm{% else %}hover:bg-slate-50{% endif %}"
                     >
-                        <span class="inline-flex border px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] {% if endpoint.method == 'GET' %}border-emerald-500/60 text-emerald-300{% elif endpoint.method == 'POST' %}border-sky-500/60 text-sky-300{% elif endpoint.method == 'PUT' %}border-amber-500/60 text-amber-300{% elif endpoint.method == 'DELETE' %}border-rose-500/60 text-rose-300{% else %}border-zinc-500/60 text-zinc-300{% endif %}">
+                        <span class="inline-flex items-center rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wider ring-1 ring-inset {% if endpoint.method == 'GET' %}bg-emerald-50 text-emerald-700 ring-emerald-600/20{% elif endpoint.method == 'POST' %}bg-sky-50 text-sky-700 ring-sky-600/20{% elif endpoint.method == 'PUT' %}bg-amber-50 text-amber-700 ring-amber-600/20{% elif endpoint.method == 'DELETE' %}bg-rose-50 text-rose-700 ring-rose-600/20{% else %}bg-slate-50 text-slate-700 ring-slate-600/20{% endif %}">
                             {{ endpoint.method }}
                         </span>
-                        <p class="mt-2 break-all text-xs">{{ endpoint.web_path }}</p>
+                        <p class="break-all text-xs font-medium text-slate-600 group-hover:text-slate-900 font-mono">{{ endpoint.web_path }}</p>
                     </a>
                     {% endfor %}
                 </div>
             </div>
         </aside>
 
-        <div>
-            <header class="rounded-xl border border-zinc-800 p-6">
-                <p class="text-xs uppercase tracking-[0.18em] text-zinc-500">Web Playground</p>
-                <h1 class="mt-2 text-3xl font-semibold sm:text-4xl">{{ selected_group.label }}</h1>
-                <p class="mt-2 text-sm text-zinc-300">Each card maps directly to one API endpoint and includes form inputs, code snippets, readable response, and raw JSON output.</p>
-                <p class="mt-2 text-xs text-zinc-500">{% if is_single_view %}Showing 1 endpoint{% else %}Showing {{ selected_group.operations|length }} endpoints{% endif %} from this group · Total endpoints: {{ total_endpoints }}</p>
+        <!-- Main Explorer Area -->
+        <div class="space-y-8">
+            <!-- Group Header -->
+            <header class="relative overflow-hidden rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+                <div class="absolute -right-10 -top-10 -z-10 h-40 w-40 rounded-full bg-indigo-50 blur-3xl"></div>
+                <p class="text-xs font-semibold tracking-wider text-indigo-500 uppercase">Web Playground</p>
+                <h1 class="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">{{ selected_group.label }}</h1>
+                <p class="mt-3 text-base text-slate-500 max-w-2xl">Each card maps directly to one API endpoint and includes form inputs, code snippets, readable response, and raw JSON output.</p>
+                <p class="mt-2 text-sm font-medium text-slate-400">
+                    <span class="text-slate-600">{% if is_single_view %}Showing 1 endpoint{% else %}Showing {{ selected_group.operations|length }} endpoints{% endif %}</span> from this group &bull; Total endpoints: {{ total_endpoints }}
+                </p>
 
-                <div class="mt-4 flex flex-wrap gap-3">
-                    <a href="/web?group={{ selected_group.key }}" class="inline-flex rounded-lg border border-zinc-600 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-200 transition hover:border-zinc-300 hover:text-zinc-100">
+                <div class="mt-6 flex flex-wrap gap-3">
+                    <a href="/web?group={{ selected_group.key }}" class="inline-flex items-center justify-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm ring-1 ring-inset ring-slate-300 transition hover:bg-slate-50">
                         Show All Endpoints
                     </a>
                     {% if is_single_view and selected_operation %}
-                    <a href="#endpoint-{{ selected_operation.id }}" class="inline-flex rounded-lg border border-emerald-500/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-emerald-300 transition hover:border-emerald-300 hover:text-emerald-100">
+                    <a href="#endpoint-{{ selected_operation.id }}" class="inline-flex items-center justify-center rounded-lg bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 shadow-sm ring-1 ring-inset ring-emerald-600/20 transition hover:bg-emerald-100">
+                        <span class="mr-2 flex h-2 w-2 rounded-full bg-emerald-500"></span>
                         Active: {{ selected_operation.method }}
                     </a>
                     {% endif %}
                 </div>
             </header>
 
-            <div class="mt-6 space-y-6">
+            <!-- Endpoints Feed -->
+            <div class="space-y-8">
                 {% for operation in rendered_operations %}
-                <article id="endpoint-{{ operation.id }}" class="scroll-mt-20 rounded-xl border border-zinc-800 p-6">
-                    <div class="flex flex-wrap items-center gap-3">
-                        <span class="inline-flex border px-2 py-1 text-[10px] font-semibold tracking-[0.14em] {% if operation.method == 'GET' %}border-emerald-500/60 text-emerald-300{% elif operation.method == 'POST' %}border-sky-500/60 text-sky-300{% elif operation.method == 'PUT' %}border-amber-500/60 text-amber-300{% elif operation.method == 'DELETE' %}border-rose-500/60 text-rose-300{% else %}border-zinc-500/60 text-zinc-300{% endif %}">
-                            {{ operation.method }}
-                        </span>
-                        <h2 class="text-xl font-semibold">{{ operation.summary }}</h2>
-                    </div>
-
-                    <p class="mt-3 break-all text-sm text-zinc-300">{{ operation.web_path }}</p>
-                    <p class="mt-3 text-sm text-zinc-400">{{ operation.description }}</p>
-
-                    <div class="mt-4 flex flex-wrap gap-3">
-                        {% if not is_single_view %}
-                        <a
-                            href="/web?group={{ selected_group.key }}&operation={{ operation.id }}&view=single"
-                            class="inline-flex rounded-lg border border-violet-500/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-violet-300 transition hover:border-violet-300 hover:text-violet-100"
-                        >
-                            Show Only This
-                        </a>
-                        {% endif %}
-                        {% if "{" not in operation.web_path %}
-                        <a
-                            href="{{ operation.web_path }}"
-                            class="inline-flex rounded-lg border border-zinc-600 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-300 transition hover:border-zinc-300 hover:text-zinc-100"
-                        >
-                            Open Raw Endpoint
-                        </a>
-                        {% endif %}
-                    </div>
-
-                    <form id="form-{{ operation.id }}" class="mt-5 grid gap-4" data-operation-id="{{ operation.id }}">
-                        {% for parameter in operation.parameters %}
-                        <label class="grid gap-1">
-                            <span class="text-xs uppercase tracking-[0.12em] text-zinc-500">{{ parameter.name }} <span class="text-zinc-600">{{ parameter.in }}</span></span>
-                            {% if parameter.enum %}
-                            <select
-                                name="{{ parameter.name }}"
-                                class="border border-zinc-700 bg-transparent px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-500"
-                            >
-                                {% for enum_value in parameter.enum %}
-                                <option value="{{ enum_value }}" {% if parameter.default == enum_value %}selected{% endif %}>{{ enum_value }}</option>
-                                {% endfor %}
-                            </select>
-                            {% else %}
-                            <input
-                                name="{{ parameter.name }}"
-                                value="{{ parameter.default }}"
-                                placeholder="{{ parameter.description }}"
-                                class="border border-zinc-700 bg-transparent px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-500"
-                            />
-                            {% endif %}
-                            <span class="text-xs text-zinc-500">{{ parameter.description }}</span>
-                        </label>
-                        {% endfor %}
-
-                        {% if operation.request_body %}
-                        <label class="grid gap-1">
-                            <span class="text-xs uppercase tracking-[0.12em] text-zinc-500">Request Body JSON</span>
-                            <textarea
-                                id="body-{{ operation.id }}"
-                                rows="8"
-                                class="border border-zinc-700 bg-transparent px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-500"
-                            >{{ operation.request_body.schema | tojson(indent=2) }}</textarea>
-                        </label>
-                        {% endif %}
-
-                        <div class="flex flex-wrap gap-3">
-                            <button
-                                type="submit"
-                                class="inline-flex rounded-lg border px-4 py-2 text-sm font-semibold transition {% if operation.method == 'GET' %}border-emerald-500/70 text-emerald-300 hover:border-emerald-300 hover:text-emerald-100{% elif operation.method == 'POST' %}border-sky-500/70 text-sky-300 hover:border-sky-300 hover:text-sky-100{% elif operation.method == 'PUT' %}border-amber-500/70 text-amber-300 hover:border-amber-300 hover:text-amber-100{% elif operation.method == 'DELETE' %}border-rose-500/70 text-rose-300 hover:border-rose-300 hover:text-rose-100{% else %}border-zinc-500/70 text-zinc-300 hover:border-zinc-300 hover:text-zinc-100{% endif %}"
-                            >
-                                Execute
-                            </button>
-                        </div>
-                    </form>
-
-                    <div class="mt-5 rounded-lg border border-zinc-800 p-4">
+                <article id="endpoint-{{ operation.id }}" class="scroll-mt-28 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+                    <!-- Card Header -->
+                    <div class="border-b border-slate-100 bg-slate-50/50 p-6 sm:p-8">
                         <div class="flex flex-wrap items-center gap-3">
-                            <p class="text-xs uppercase tracking-[0.14em] text-zinc-500">Code Snippet</p>
-                            <select id="lang-{{ operation.id }}" class="border border-zinc-700 bg-transparent px-2 py-1 text-xs text-zinc-100">
-                                <option value="curl">curl</option>
-                                <option value="python">python</option>
-                                <option value="javascript">javascript</option>
-                                <option value="go">go</option>
-                                <option value="node">node (axios)</option>
-                                <option value="php">php</option>
-                                <option value="java">java</option>
-                                <option value="csharp">csharp</option>
-                            </select>
-                            <button
-                                type="button"
-                                id="copy-snippet-{{ operation.id }}"
-                                class="inline-flex rounded-lg border border-zinc-600 px-3 py-1 text-xs text-zinc-300 transition hover:border-zinc-400 hover:text-zinc-100"
-                            >
-                                Copy Snippet
-                            </button>
+                            <span class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-bold uppercase tracking-wider ring-1 ring-inset {% if operation.method == 'GET' %}bg-emerald-50 text-emerald-700 ring-emerald-600/20{% elif operation.method == 'POST' %}bg-sky-50 text-sky-700 ring-sky-600/20{% elif operation.method == 'PUT' %}bg-amber-50 text-amber-700 ring-amber-600/20{% elif operation.method == 'DELETE' %}bg-rose-50 text-rose-700 ring-rose-600/20{% else %}bg-slate-50 text-slate-700 ring-slate-600/20{% endif %}">
+                                {{ operation.method }}
+                            </span>
+                            <h2 class="text-xl font-bold text-slate-900">{{ operation.summary }}</h2>
                         </div>
-                        <pre id="snippet-{{ operation.id }}" class="mt-3 max-h-[260px] overflow-auto border border-zinc-800 p-4 text-xs text-zinc-300"></pre>
-                    </div>
+                        <p class="mt-4 inline-block break-all rounded bg-slate-100 px-2 py-1 font-mono text-sm text-slate-700">{{ operation.web_path }}</p>
+                        <p class="mt-3 text-sm text-slate-500">{{ operation.description }}</p>
 
-                    <div class="mt-5 rounded-lg border border-zinc-800 p-4">
-                        <p class="text-xs uppercase tracking-[0.14em] text-zinc-500">Readable Response</p>
-                        <div id="readable-{{ operation.id }}" class="mt-3 max-h-[320px] overflow-auto border border-zinc-800 p-3 text-xs text-zinc-300">
-                            Run execute to render readable key-value response.
+                        <div class="mt-5 flex flex-wrap gap-3">
+                            {% if not is_single_view %}
+                            <a href="/web?group={{ selected_group.key }}&operation={{ operation.id }}&view=single" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-700">
+                                Show Only This <span aria-hidden="true" class="ml-1">&rarr;</span>
+                            </a>
+                            {% endif %}
+                            {% if "{" not in operation.web_path %}
+                            <a href="{{ operation.web_path }}" target="_blank" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-700">
+                                Open Raw Endpoint <svg class="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                            </a>
+                            {% endif %}
                         </div>
                     </div>
 
-                    <div class="mt-5 rounded-lg border border-zinc-800 p-4">
-                        <div class="flex flex-wrap items-center justify-between gap-3">
-                            <p class="text-xs uppercase tracking-[0.14em] text-zinc-500">Raw Response JSON</p>
-                            <button
-                                type="button"
-                                id="copy-raw-{{ operation.id }}"
-                                class="inline-flex rounded-lg border border-zinc-600 px-3 py-1 text-xs text-zinc-300 transition hover:border-zinc-400 hover:text-zinc-100"
-                            >
-                                Copy Response
-                            </button>
+                    <div class="p-6 sm:p-8">
+                        <!-- Request Form -->
+                        <form id="form-{{ operation.id }}" class="grid gap-5" data-operation-id="{{ operation.id }}">
+                            {% for parameter in operation.parameters %}
+                            <label class="grid gap-1.5">
+                                <span class="text-sm font-semibold text-slate-700">
+                                    {{ parameter.name }} 
+                                    <span class="ml-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium tracking-wider text-slate-500 uppercase">{{ parameter.in }}</span>
+                                </span>
+                                {% if parameter.enum %}
+                                <select
+                                    name="{{ parameter.name }}"
+                                    class="block w-full rounded-lg border-0 py-2.5 pl-3 pr-10 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 bg-white"
+                                >
+                                    {% for enum_value in parameter.enum %}
+                                    <option value="{{ enum_value }}" {% if parameter.default == enum_value %}selected{% endif %}>{{ enum_value }}</option>
+                                    {% endfor %}
+                                </select>
+                                {% else %}
+                                <input
+                                    name="{{ parameter.name }}"
+                                    value="{{ parameter.default }}"
+                                    placeholder="{{ parameter.description }}"
+                                    class="block w-full rounded-lg border-0 py-2.5 px-3 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                />
+                                {% endif %}
+                                <span class="text-xs text-slate-500">{{ parameter.description }}</span>
+                            </label>
+                            {% endfor %}
+
+                            {% if operation.request_body %}
+                            <label class="grid gap-1.5 mt-2">
+                                <span class="text-sm font-semibold text-slate-700">Request Body <span class="ml-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium tracking-wider text-slate-500 uppercase">JSON</span></span>
+                                <textarea
+                                    id="body-{{ operation.id }}"
+                                    rows="6"
+                                    class="block w-full rounded-lg border-0 py-2.5 px-3 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 font-mono text-sm"
+                                >{{ operation.request_body.schema | tojson(indent=2) }}</textarea>
+                            </label>
+                            {% endif %}
+
+                            <div class="mt-2">
+                                <button
+                                    type="submit"
+                                    class="inline-flex w-full items-center justify-center rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:w-auto transition-colors"
+                                >
+                                    Execute Request
+                                </button>
+                            </div>
+                        </form>
+
+                        <div class="mt-10 grid gap-6">
+                            <!-- Code Snippet -->
+                            <div class="rounded-xl ring-1 ring-slate-200 overflow-hidden shadow-sm">
+                                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3">
+                                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Code Snippet</p>
+                                    <div class="flex items-center gap-2">
+                                        <select id="lang-{{ operation.id }}" class="rounded-md border-0 py-1.5 pl-3 pr-8 text-slate-700 shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-xs font-medium bg-white cursor-pointer">
+                                            <option value="curl">cURL</option>
+                                            <option value="python">Python</option>
+                                            <option value="javascript">JavaScript</option>
+                                            <option value="go">Go</option>
+                                            <option value="node">Node.js (Axios)</option>
+                                            <option value="php">PHP</option>
+                                            <option value="java">Java</option>
+                                            <option value="csharp">C#</option>
+                                        </select>
+                                        <button
+                                            type="button"
+                                            id="copy-snippet-{{ operation.id }}"
+                                            class="inline-flex items-center rounded-md bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 transition-colors"
+                                        >
+                                            Copy
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-900 p-4">
+                                    <pre id="snippet-{{ operation.id }}" class="max-h-[260px] overflow-auto text-sm text-slate-300 font-mono scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent"></pre>
+                                </div>
+                            </div>
+
+                            <!-- Readable Response -->
+                            <div class="rounded-xl ring-1 ring-slate-200 overflow-hidden shadow-sm">
+                                <div class="border-b border-slate-200 bg-slate-50 px-4 py-3">
+                                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Readable Response</p>
+                                </div>
+                                <div id="readable-{{ operation.id }}" class="max-h-[320px] overflow-auto bg-white p-4 text-sm text-slate-600">
+                                    <div class="flex items-center justify-center h-20 text-slate-400 italic">
+                                        Run execute to render response...
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Raw JSON -->
+                            <div class="rounded-xl ring-1 ring-slate-200 overflow-hidden shadow-sm">
+                                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-slate-50 px-4 py-3">
+                                    <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Raw JSON</p>
+                                    <button
+                                        type="button"
+                                        id="copy-raw-{{ operation.id }}"
+                                        class="inline-flex items-center rounded-md bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 shadow-sm ring-1 ring-inset ring-slate-300 hover:bg-slate-50 transition-colors"
+                                    >
+                                        Copy JSON
+                                    </button>
+                                </div>
+                                <div class="bg-slate-900 p-4">
+                                    <pre id="raw-{{ operation.id }}" class="max-h-[320px] overflow-auto text-sm text-slate-300 font-mono scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">Run execute to view raw response...</pre>
+                                </div>
+                            </div>
                         </div>
-                        <pre id="raw-{{ operation.id }}" class="mt-3 max-h-[320px] overflow-auto border border-zinc-800 p-4 text-xs text-zinc-300">Run execute to view raw response...</pre>
                     </div>
                 </article>
                 {% endfor %}
@@ -256,23 +283,23 @@
 
         const snippets = {
             curl: [
-                `curl -X '${request.method}' \\\\`,
-                `    '${absoluteUrl}' \\\\`,
+                `curl -X '${request.method}' \\`,
+                `    '${absoluteUrl}' \\`,
                 "    -H 'accept: application/json'",
             ],
             python: [
                 "import requests",
                 "",
-                `url = \"${absoluteUrl}\"`,
+                `url = "${absoluteUrl}"`,
                 "headers = {",
                 "    \"accept\": \"application/json\",",
                 "}",
-                `response = requests.request(\"${request.method}\", url, headers=headers${bodyText ? ", json=payload" : ""})`,
+                `response = requests.request("${request.method}", url, headers=headers${bodyText ? ", json=payload" : ""})`,
                 "print(response.text)",
             ],
             javascript: [
-                `const response = await fetch(\"${absoluteUrl}\", {`,
-                `    method: \"${request.method}\",`,
+                `const response = await fetch("${absoluteUrl}", {`,
+                `    method: "${request.method}",`,
                 "    headers: {",
                 "        \"accept\": \"application/json\",",
                 ...(bodyText ? ["        \"content-type\": \"application/json\","] : []),
@@ -292,7 +319,7 @@
                 ")",
                 "",
                 "func main() {",
-                `    req, _ := http.NewRequest(\"${request.method}\", \"${absoluteUrl}\", nil)`,
+                `    req, _ := http.NewRequest("${request.method}", "${absoluteUrl}", nil)`,
                 "    req.Header.Set(\"accept\", \"application/json\")",
                 "    res, _ := http.DefaultClient.Do(req)",
                 "    defer res.Body.Close()",
@@ -305,8 +332,8 @@
                 "",
                 "async function run() {",
                 "    const response = await axios({",
-                `        method: \"${request.method.toLowerCase()}\",`,
-                `        url: \"${absoluteUrl}\",`,
+                `        method: "${request.method.toLowerCase()}",`,
+                `        url: "${absoluteUrl}",`,
                 "        headers: {",
                 "            accept: \"application/json\",",
                 "        },",
@@ -319,7 +346,7 @@
             ],
             php: [
                 "<?php",
-                `$ch = curl_init(\"${absoluteUrl}\");`,
+                `$ch = curl_init("${absoluteUrl}");`,
                 "curl_setopt($ch, CURLOPT_CUSTOMREQUEST, \"" + request.method + "\");",
                 "curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);",
                 "curl_setopt($ch, CURLOPT_HTTPHEADER, [",
@@ -332,8 +359,8 @@
             java: [
                 "HttpClient client = HttpClient.newHttpClient();",
                 "HttpRequest request = HttpRequest.newBuilder()",
-                `    .uri(URI.create(\"${absoluteUrl}\"))`,
-                `    .method(\"${request.method}\", HttpRequest.BodyPublishers.noBody())`,
+                `    .uri(URI.create("${absoluteUrl}"))`,
+                `    .method("${request.method}", HttpRequest.BodyPublishers.noBody())`,
                 "    .header(\"accept\", \"application/json\")",
                 "    .build();",
                 "HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());",
@@ -343,7 +370,7 @@
                 "using var client = new HttpClient();",
                 "using var request = new HttpRequestMessage();",
                 `request.Method = HttpMethod.${request.method === "GET" ? "Get" : request.method === "POST" ? "Post" : request.method === "PUT" ? "Put" : request.method === "DELETE" ? "Delete" : "Get"};`,
-                `request.RequestUri = new Uri(\"${absoluteUrl}\");`,
+                `request.RequestUri = new Uri("${absoluteUrl}");`,
                 "request.Headers.Add(\"accept\", \"application/json\");",
                 "var response = await client.SendAsync(request);",
                 "var content = await response.Content.ReadAsStringAsync();",
@@ -388,7 +415,7 @@
     function renderReadable(operationId, payload) {
         const target = document.getElementById(`readable-${operationId}`);
         if (!payload || typeof payload !== "object") {
-            target.innerHTML = `<p class=\"text-xs text-zinc-400\">${escapeHtml(String(payload))}</p>`;
+            target.innerHTML = `<p class="text-sm text-slate-500">${escapeHtml(String(payload))}</p>`;
             return;
         }
 
@@ -396,11 +423,11 @@
         const htmlRows = rows
             .map(
                 (row) =>
-                    `<tr class=\"border-b border-zinc-900\"><td class=\"px-2 py-1 align-top text-zinc-200\" style=\"padding-left:${8 + row.level * 16}px\">${escapeHtml(row.key)}</td><td class=\"px-2 py-1 align-top text-zinc-500\">${escapeHtml(row.type)}</td><td class=\"px-2 py-1 text-zinc-400 break-all\">${escapeHtml(row.value)}</td></tr>`
+                    `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="px-3 py-2 align-top text-slate-800 font-medium whitespace-nowrap" style="padding-left:${12 + row.level * 16}px">${escapeHtml(row.key)}</td><td class="px-3 py-2 align-top text-slate-400 text-xs uppercase tracking-wider">${escapeHtml(row.type)}</td><td class="px-3 py-2 text-slate-600 break-all font-mono text-xs">${escapeHtml(row.value)}</td></tr>`
             )
             .join("");
 
-        target.innerHTML = `<table class=\"w-full min-w-[680px] text-xs\"><thead><tr class=\"border-b border-zinc-800\"><th class=\"px-2 py-1 text-left text-zinc-500 font-normal\">Key</th><th class=\"px-2 py-1 text-left text-zinc-500 font-normal\">Type</th><th class=\"px-2 py-1 text-left text-zinc-500 font-normal\">Value</th></tr></thead><tbody>${htmlRows}</tbody></table>`;
+        target.innerHTML = `<table class="w-full min-w-full text-sm"><thead><tr class="border-b border-slate-200 bg-slate-50/50"><th class="px-3 py-2.5 text-left text-slate-500 font-semibold uppercase tracking-wider text-xs">Key</th><th class="px-3 py-2.5 text-left text-slate-500 font-semibold uppercase tracking-wider text-xs w-24">Type</th><th class="px-3 py-2.5 text-left text-slate-500 font-semibold uppercase tracking-wider text-xs">Value</th></tr></thead><tbody class="divide-y divide-slate-100">${htmlRows}</tbody></table>`;
     }
 
     function refreshSnippet(operationId) {
@@ -429,35 +456,45 @@
         copySnippetButton.addEventListener("click", async () => {
             try {
                 await navigator.clipboard.writeText(document.getElementById(`snippet-${operationId}`).textContent || "");
-                copySnippetButton.textContent = "Copied";
+                copySnippetButton.textContent = "Copied!";
+                copySnippetButton.classList.add("text-emerald-600", "bg-emerald-50");
                 setTimeout(() => {
-                    copySnippetButton.textContent = "Copy Snippet";
-                }, 1200);
+                    copySnippetButton.textContent = "Copy";
+                    copySnippetButton.classList.remove("text-emerald-600", "bg-emerald-50");
+                }, 1500);
             } catch (_) {
-                copySnippetButton.textContent = "Copy Failed";
+                copySnippetButton.textContent = "Failed";
                 setTimeout(() => {
-                    copySnippetButton.textContent = "Copy Snippet";
-                }, 1200);
+                    copySnippetButton.textContent = "Copy";
+                }, 1500);
             }
         });
 
         copyRawButton.addEventListener("click", async () => {
             try {
                 await navigator.clipboard.writeText(rawBox.textContent || "");
-                copyRawButton.textContent = "Copied";
+                copyRawButton.textContent = "Copied!";
+                copyRawButton.classList.add("text-emerald-600", "bg-emerald-50");
                 setTimeout(() => {
-                    copyRawButton.textContent = "Copy Response";
-                }, 1200);
+                    copyRawButton.textContent = "Copy JSON";
+                    copyRawButton.classList.remove("text-emerald-600", "bg-emerald-50");
+                }, 1500);
             } catch (_) {
-                copyRawButton.textContent = "Copy Failed";
+                copyRawButton.textContent = "Failed";
                 setTimeout(() => {
-                    copyRawButton.textContent = "Copy Response";
-                }, 1200);
+                    copyRawButton.textContent = "Copy JSON";
+                }, 1500);
             }
         });
 
         form.addEventListener("submit", async (event) => {
             event.preventDefault();
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.textContent = "Executing...";
+            submitBtn.disabled = true;
+            submitBtn.classList.add("opacity-75", "cursor-not-allowed");
+
             try {
                 const request = buildRequestParts(operationId);
                 const fetchOptions = {
@@ -482,11 +519,15 @@
                     pretty = JSON.stringify(parsed, null, 2);
                 } catch (_) {}
 
-                rawBox.textContent = `Status: ${response.status} ${response.statusText}\n\n${pretty}`;
+                rawBox.textContent = `// Status: ${response.status} ${response.statusText}\n\n${pretty}`;
                 renderReadable(operationId, parsed);
             } catch (error) {
-                rawBox.textContent = `Error: ${error.message}`;
+                rawBox.textContent = `// Error\n\n${error.message}`;
                 renderReadable(operationId, `Error: ${error.message}`);
+            } finally {
+                submitBtn.textContent = originalBtnText;
+                submitBtn.disabled = false;
+                submitBtn.classList.remove("opacity-75", "cursor-not-allowed");
             }
         });
 
