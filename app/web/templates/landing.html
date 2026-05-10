@@ -2,123 +2,72 @@
 
 {% block title %}Home | PDDikti API{% endblock %}
 {% block meta_description %}PDDikti API production gateway with direct access to docs, route explorer, and higher education data endpoints.{% endblock %}
-{% block canonical_url %}{{ public_base_url }}/{% endblock %}
-{% block og_title %}Home | PDDikti API{% endblock %}
-{% block twitter_title %}Home | PDDikti API{% endblock %}
 
 {% block content %}
-<main class="mx-auto flex w-full flex-col pb-12 pt-6">
-    <!-- Hero Section -->
-    <header class="relative overflow-hidden rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-200 sm:p-12 lg:p-16">
-        <!-- Decorative background gradient inside the card -->
-        <div class="absolute -right-20 -top-20 -z-10 h-64 w-64 rounded-full bg-gradient-to-br from-indigo-100 to-violet-50 opacity-50 blur-3xl"></div>
+<main class="mx-auto flex w-full flex-col pb-16 pt-10">
+    <header class="relative flex flex-col items-start pt-12 pb-16">
+        <p class="mb-6 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.25em] text-gold-500">
+            <span class="h-px w-8 bg-gold-500/50"></span>
+            Data Gateway
+        </p>
         
-        <div class="flex max-w-4xl flex-col items-start">
-            <p class="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-3 py-1.5 text-xs font-semibold tracking-wide text-indigo-600 uppercase ring-1 ring-inset ring-indigo-500/10">
-                Indonesia Higher Education Data Gateway
-            </p>
-            
-            <h1 class="mt-6 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
-                {{ project_name }}
-            </h1>
-            
-            <p class="mt-5 max-w-2xl text-lg text-slate-500 sm:text-xl leading-relaxed">
-                FastAPI platform to explore Indonesian higher-education data with a clean web playground, production docs, and structured endpoint discovery.
-            </p>
+        <h1 class="font-serif text-5xl font-normal leading-tight tracking-tight text-zinc-100 sm:text-6xl lg:text-7xl">
+            {{ project_name }}
+        </h1>
+        
+        <p class="mt-8 max-w-2xl text-lg font-light leading-relaxed text-zinc-400 sm:text-xl">
+            A refined FastAPI platform to explore Indonesian higher-education data. Featuring a pristine web playground, production documentation, and structured endpoint discovery.
+        </p>
 
-            <!-- Metadata Pills -->
-            <div class="mt-8 flex flex-wrap items-center gap-3 text-sm font-medium text-slate-600">
-                <span class="flex items-center gap-1.5 rounded-md bg-slate-100 px-3 py-1.5 ring-1 ring-inset ring-slate-200">
-                    <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                    </svg>
-                    v{{ api_version }}
-                </span>
-                <span class="flex items-center gap-1.5 rounded-md bg-slate-100 px-3 py-1.5 ring-1 ring-inset ring-slate-200">
-                    <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Updated {{ last_updated }}
-                </span>
-                <span class="flex items-center gap-1.5 rounded-md bg-emerald-50 px-3 py-1.5 text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
-                    <span class="relative flex h-2 w-2">
-                        {% if api_available %}
-                            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-                            <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
-                        {% else %}
-                            <span class="relative inline-flex h-2 w-2 rounded-full bg-amber-500"></span>
-                        {% endif %}
-                    </span>
-                    {% if api_available %}Operational{% else %}Limited Service{% endif %}
-                </span>
-            </div>
+        <div class="mt-10 flex flex-wrap items-center gap-4 text-xs font-medium tracking-wide text-zinc-500">
+            <span class="rounded-full border border-zinc-800 bg-zinc-900/50 px-4 py-1.5">Version {{ api_version }}</span>
+            <span class="rounded-full border border-zinc-800 bg-zinc-900/50 px-4 py-1.5">Updated {{ last_updated }}</span>
+            <span class="flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/50 px-4 py-1.5">
+                {% if api_available %}
+                    <span class="h-1.5 w-1.5 rounded-full bg-gold-500 shadow-[0_0_8px_rgba(200,169,126,0.6)]"></span> Operational
+                {% else %}
+                    <span class="h-1.5 w-1.5 rounded-full bg-red-900"></span> Limited Service
+                {% endif %}
+            </span>
+        </div>
 
-            <!-- Action Buttons -->
-            <div class="mt-10 flex flex-wrap items-center gap-4">
-                <a
-                    href="/web"
-                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 hover:shadow-indigo-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                >
-                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Open Web Playground
-                </a>
-                <a
-                    href="/api/docs"
-                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm ring-1 ring-inset ring-slate-300 transition-all hover:bg-slate-50 hover:text-slate-900"
-                >
-                    Open Swagger Docs
-                </a>
-                <a
-                    href="/api/redoc"
-                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm ring-1 ring-inset ring-slate-300 transition-all hover:bg-slate-50 hover:text-slate-900"
-                >
-                    Open ReDoc
-                </a>
-            </div>
+        <div class="mt-14 flex flex-wrap items-center gap-5">
+            <a href="/web" class="group relative inline-flex items-center justify-center bg-gold-500 px-8 py-3.5 text-sm font-medium tracking-wide text-[#09090b] transition-all hover:bg-gold-400">
+                Open Web Playground
+            </a>
+            <a href="/api/docs" class="inline-flex items-center justify-center border border-zinc-700 px-8 py-3.5 text-sm font-medium tracking-wide text-zinc-300 transition-colors hover:border-gold-500/50 hover:text-gold-500">
+                Swagger Docs
+            </a>
+            <a href="/api/redoc" class="inline-flex items-center justify-center border border-zinc-700 px-8 py-3.5 text-sm font-medium tracking-wide text-zinc-300 transition-colors hover:border-gold-500/50 hover:text-gold-500">
+                ReDoc
+            </a>
         </div>
     </header>
 
-    <!-- Features Grid -->
-    <section class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <!-- Playground Card -->
-        <article class="group relative flex flex-col items-start overflow-hidden rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition-shadow hover:shadow-md sm:p-8">
-            <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 ring-1 ring-inset ring-indigo-500/10 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                </svg>
-            </div>
-            <h2 class="text-xl font-semibold text-slate-900">Web Playground</h2>
-            <p class="mt-3 text-sm leading-relaxed text-slate-500">
-                Group-based endpoint cards with execute form, language snippets, and response views for seamless testing.
+    <div class="my-8 h-px w-full bg-gradient-to-r from-transparent via-zinc-800 to-transparent"></div>
+
+    <section class="grid gap-8 pt-8 sm:grid-cols-3">
+        <article class="group relative p-6 transition-all hover:bg-zinc-900/30">
+            <div class="mb-6 h-px w-12 bg-gold-500/40 transition-all group-hover:w-20 group-hover:bg-gold-500"></div>
+            <h2 class="font-serif text-xl font-medium text-zinc-100">Interactive Playground</h2>
+            <p class="mt-4 text-sm font-light leading-relaxed text-zinc-400">
+                Elegantly grouped endpoint cards featuring execute forms, multi-language snippets, and perfectly formatted response views.
             </p>
         </article>
 
-        <!-- OpenAPI Card -->
-        <article class="group relative flex flex-col items-start overflow-hidden rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition-shadow hover:shadow-md sm:p-8">
-            <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-50 text-sky-600 ring-1 ring-inset ring-sky-500/10 group-hover:bg-sky-500 group-hover:text-white transition-colors duration-300">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-            </div>
-            <h2 class="text-xl font-semibold text-slate-900">OpenAPI Docs</h2>
-            <p class="mt-3 text-sm leading-relaxed text-slate-500">
-                Standardized Swagger and ReDoc interfaces to accelerate your integration and verify endpoints instantly.
+        <article class="group relative p-6 transition-all hover:bg-zinc-900/30">
+            <div class="mb-6 h-px w-12 bg-gold-500/40 transition-all group-hover:w-20 group-hover:bg-gold-500"></div>
+            <h2 class="font-serif text-xl font-medium text-zinc-100">OpenAPI Docs</h2>
+            <p class="mt-4 text-sm font-light leading-relaxed text-zinc-400">
+                Access standardized Swagger and ReDoc interfaces designed for rapid integration and immediate endpoint verification.
             </p>
         </article>
 
-        <!-- Service Status Card -->
-        <article class="group relative flex flex-col items-start overflow-hidden rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition-shadow hover:shadow-md sm:p-8 sm:col-span-2 lg:col-span-1">
-            <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 ring-1 ring-inset ring-emerald-500/10 group-hover:bg-emerald-500 group-hover:text-white transition-colors duration-300">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
-                </svg>
-            </div>
-            <h2 class="text-xl font-semibold text-slate-900">Service Status</h2>
-            <p class="mt-3 text-sm leading-relaxed text-slate-500">
-                API root includes detailed metadata and real-time traffic-availability signals for data consumers.
+        <article class="group relative p-6 transition-all hover:bg-zinc-900/30">
+            <div class="mb-6 h-px w-12 bg-gold-500/40 transition-all group-hover:w-20 group-hover:bg-gold-500"></div>
+            <h2 class="font-serif text-xl font-medium text-zinc-100">Service Status</h2>
+            <p class="mt-4 text-sm font-light leading-relaxed text-zinc-400">
+                The API root provides refined metadata and traffic-availability signals to ensure consumers are always informed.
             </p>
         </article>
     </section>
