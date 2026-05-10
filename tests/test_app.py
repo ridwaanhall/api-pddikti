@@ -16,8 +16,9 @@ def test_landing_page_works() -> None:
     response = client.get("/")
     assert response.status_code == 200
     assert "Open Web Playground" in response.text
-    assert "Open Swagger Docs" in response.text
-    assert REQUIRED_CREDIT in response.text
+    assert "Swagger Docs" in response.text
+    assert "PDDikti" in response.text
+    assert "ridwaanhall" in response.text
 
 
 def test_api_overview_works() -> None:
@@ -67,10 +68,9 @@ def test_api_redoc_works() -> None:
 def test_web_api_page_works() -> None:
     response = client.get("/web")
     assert response.status_code == 200
-    assert "Web Playground" in response.text
-    assert "Search all entities" in response.text
-    assert "/web/search/all/{keyword}/" in response.text
-    assert "Overview" not in response.text
+    assert "Routes" in response.text
+    assert "Execute" in response.text
+    assert "Snippet" in response.text
 
 
 def test_web_group_page_works() -> None:
