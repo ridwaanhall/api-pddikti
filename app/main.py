@@ -18,7 +18,10 @@ app = FastAPI(
     title="PDDikti API",
     description=(
         "Provides structured access to data from Pangkalan Data Pendidikan Tinggi "
-        "(PDDikti), Indonesia's Higher Education Database"
+        "(PDDikti), Indonesia's Higher Education Database. "
+        "Use pddikti.fastapicloud.dev for high traffic applications. "
+        "Use pddikti.rone.dev for low traffic applications or testing. "
+        "Data includes universities, study programs, lecturers, and students. "
     ),
     version=settings.api_version,
     docs_url="/api/docs",
