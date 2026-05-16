@@ -61,6 +61,17 @@
             code, pre, kbd, samp { font-family: 'JetBrains Mono', monospace; }
         </style>
         {% block head %}{% endblock %}
+        {% if 'pddikti.fastapicloud.dev' in public_base_url|default('') %}
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-F5QLVZY6DX"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-F5QLVZY6DX');
+        </script>
+        {% endif %}
     </head>
     <body class="min-h-screen bg-[#09090b] text-zinc-300 antialiased selection:bg-gold-500/30 selection:text-gold-400">
         {% set active = active_page|default('landing') %}
@@ -98,7 +109,7 @@
                 <div class="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-4 px-6 py-8 sm:flex-row lg:px-8">
                     <div class="flex flex-col gap-1">
                         <p class="font-serif text-lg text-zinc-400">PDDikti API Platform</p>
-                        <p class="text-xs text-zinc-600">v{{ api_version|default('4.2.0') }} &bull; Higher Education Data</p>
+                        <p class="text-xs text-zinc-600">v{{ api_version|default('4.2.1') }} &bull; Higher Education Data</p>
                     </div>
                     <div class="flex flex-col items-end gap-1 text-right">
                         <p class="text-[11px] tracking-wider text-zinc-500 uppercase">Data &copy; PDDikti</p>

@@ -62,6 +62,38 @@
             </div>
         </div>
         {% endif %}
+
+        <!-- Integrated Endpoint Specification -->
+        <div class="mt-16 flex w-full max-w-4xl flex-col border border-zinc-800/60 bg-[#0c0c0e]/50">
+            <div class="flex items-center gap-3 border-b border-zinc-800/60 bg-zinc-900/30 px-6 py-4">
+                <div class="h-1.5 w-1.5 rounded-full bg-gold-500"></div>
+                <h2 class="font-serif text-sm font-medium text-zinc-200">Active Endpoints</h2>
+            </div>
+            
+            <div class="grid divide-y divide-zinc-800/60 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+                <!-- High Traffic -->
+                <a href="https://pddikti.fastapicloud.dev" target="_blank" rel="noopener noreferrer" class="group flex flex-col p-6 transition-colors hover:bg-zinc-900/40">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-mono text-sm text-gold-400 transition-colors group-hover:text-gold-300">pddikti.fastapicloud.dev</h3>
+                        <span class="border border-gold-500/20 bg-gold-500/5 px-2 py-0.5 text-[9px] uppercase tracking-wider text-gold-500">High Volume</span>
+                    </div>
+                    <p class="mt-4 text-xs font-light leading-relaxed text-zinc-400">
+                        Optimized for high-throughput scaling. Recommended for applications exceeding <span class="text-zinc-300 font-medium">&gt; 2,000 requests/day</span>.
+                    </p>
+                </a>
+
+                <!-- Standard Traffic -->
+                <a href="https://pddikti.rone.dev" target="_blank" rel="noopener noreferrer" class="group flex flex-col p-6 transition-colors hover:bg-zinc-900/40">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-mono text-sm text-zinc-300 transition-colors group-hover:text-zinc-100">pddikti.rone.dev</h3>
+                        <span class="border border-zinc-700 bg-zinc-800/50 px-2 py-0.5 text-[9px] uppercase tracking-wider text-zinc-400">Standard</span>
+                    </div>
+                    <p class="mt-4 text-xs font-light leading-relaxed text-zinc-400">
+                        Reliable gateway for standard integrations and development expecting under <span class="text-zinc-300 font-medium">&lt; 2,000 requests/day</span>.
+                    </p>
+                </a>
+            </div>
+        </div>
     </header>
 
     <div class="my-8 h-px w-full bg-gradient-to-r from-transparent via-zinc-800 to-transparent"></div>

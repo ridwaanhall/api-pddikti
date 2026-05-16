@@ -53,6 +53,30 @@
                 </div>
             </header>
 
+            <!-- API Endpoint Selection Notice (Refined for Editorial Theme) -->
+            <div class="border border-zinc-800/80 bg-[#0c0c0e] p-6 shadow-sm">
+                <div class="flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2">
+                            <div class="h-1.5 w-1.5 bg-gold-500"></div>
+                            <p class="font-serif text-sm font-medium text-zinc-200">API Base URL Routing</p>
+                        </div>
+                        <p class="mt-3 text-xs leading-relaxed text-zinc-400">
+                            Use <span class="font-mono text-gold-400">https://pddikti.fastapicloud.dev</span> for <span class="text-zinc-300 font-medium">&gt; 2,000 req/day</span>. <br class="hidden sm:block"/>
+                            Use <span class="font-mono text-zinc-300">https://pddikti.rone.dev</span> for <span class="text-zinc-300 font-medium">&lt; 2,000 req/day</span>.
+                        </p>
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="https://pddikti.fastapicloud.dev" target="_blank" rel="noopener noreferrer" class="whitespace-nowrap border border-gold-500/30 bg-gold-500/5 px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-gold-400 transition-colors hover:border-gold-500 hover:bg-gold-500/10">
+                            High Traffic
+                        </a>
+                        <a href="https://pddikti.rone.dev" target="_blank" rel="noopener noreferrer" class="whitespace-nowrap border border-zinc-700 bg-zinc-800/30 px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-zinc-300 transition-colors hover:border-zinc-500 hover:bg-zinc-800/50">
+                            Standard
+                        </a>
+                    </div>
+                </div>
+            </div>
+
             <!-- Endpoints Feed -->
             <div class="space-y-16">
                 {% for operation in rendered_operations %}
@@ -71,7 +95,7 @@
                     </div>
 
                     <!-- Form Area -->
-                    <div class="rounded-none border border-zinc-800 bg-[#0c0c0e] p-6 sm:p-8">
+                    <div class="border border-zinc-800 bg-[#0c0c0e] p-6 sm:p-8">
                         <form id="form-{{ operation.id }}" class="grid gap-6" data-operation-id="{{ operation.id }}">
                             <div class="grid gap-6 sm:grid-cols-2">
                                 {% for parameter in operation.parameters %}
@@ -137,7 +161,6 @@
     </section>
 </main>
 
-<!-- Using your exact same JS logic, untouched functionally, just styling output classes -->
 <script>
     const operations = {{ selected_group.operations | tojson }};
     const publicApiBaseUrl = {{ public_api_base_url | tojson }};
