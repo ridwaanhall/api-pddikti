@@ -12,7 +12,7 @@ KeywordParam = Annotated[
     str,
     Path(
         title="Search keyword",
-        description="Keyword text used to search PDDikti entities.",
+        description="Keyword text used to search higher-education entities.",
         min_length=1,
     ),
 ]

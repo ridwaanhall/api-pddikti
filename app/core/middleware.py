@@ -73,24 +73,13 @@ class APIStatusMiddleware(BaseHTTPMiddleware):
                         "redoc": f"{base_url}/api/redoc",
                         "openapi": f"{base_url}/api/openapi.json",
                     },
-                    "alternative_endpoints": [
-                        {
-                            "name": "High Availability Endpoint",
-                            "url": "https://pddikti.fastapicloud.dev",
-                            "description": (
-                                "Alternative endpoint designed to remain available "
-                                "during high traffic periods."
-                            ),
-                        }
-                    ],
+                    "alternative_endpoints": settings.alternative_endpoints,
                     "support": {
                         "message": (
                             "If this issue persists, please check service status on "
                             "the overview endpoint and contact support."
                         ),
-                        "live_chat": "https://ridwaanhall.com/guestbook",
-                        "email": "hi@ridwaanhall.com",
-                        "contact_form": "https://ridwaanhall.com/contact",
+                        **settings.support_links,
                     },
                     "retry_after_seconds": 3600,
                 }

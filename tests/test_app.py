@@ -1,15 +1,13 @@
 from fastapi.testclient import TestClient
 
+from app.core.config import get_settings
 from app.main import app
 
 
 client = TestClient(app)
+settings = get_settings()
 
-
-REQUIRED_CREDIT = (
-    "Powered by PDDikti Public Data API Web, Data © PDDikti, "
-    "API maintained by ridwaanhall / RoneAI"
-)
+REQUIRED_CREDIT = settings.required_credit_line
 
 
 def test_landing_page_works() -> None:
@@ -17,17 +15,17 @@ def test_landing_page_works() -> None:
     assert response.status_code == 200
     assert "Open Web Playground" in response.text
     assert "Swagger Docs" in response.text
-    assert "PDDikti" in response.text
-    assert "ridwaanhall" in response.text
+    assert settings.brand_name in response.text
+    assert settings.maintainer in response.text
+    # Non-affiliation notice must be present on the public landing page.
+    assert "Not affiliated with" in response.text
 
 
 def test_api_overview_works() -> None:
     response = client.get("/api/")
     assert response.status_code == 200
     assert response.headers.get("X-Project-Credit")
-    assert "Powered by PDDikti Public Data API Web" in response.headers.get(
-        "X-Project-Credit", ""
-    )
+    assert settings.brand_name in response.headers.get("X-Project-Credit", "")
     payload = response.json()
     assert payload.get("success") is True
     assert payload.get("credit") == REQUIRED_CREDIT
@@ -36,15 +34,15 @@ def test_api_overview_works() -> None:
     assert "documentation" in payload
     assert "support" in payload
     assert "alternative_endpoints" in payload
+    assert payload.get("disclaimer")
+    assert "not affiliated" in payload["disclaimer"].lower()
 
 
 def test_blocked_api_response_includes_credit_header() -> None:
     response = client.get("/api/search/all/informatika/")
     if response.status_code == 503:
         assert response.headers.get("X-Project-Credit")
-        assert "Powered by PDDikti Public Data API Web" in response.headers.get(
-            "X-Project-Credit", ""
-        )
+        assert settings.brand_name in response.headers.get("X-Project-Credit", "")
         payload = response.json()
         assert payload.get("success") is False
         assert payload.get("status", {}).get("code") == "API_TEMPORARILY_UNAVAILABLE"

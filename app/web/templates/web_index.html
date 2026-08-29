@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ selected_group.label }} | PDDikti API{% endblock %}
+{% block title %}{{ selected_group.label }} | {{ brand_name }}{% endblock %}
 
 {% block content %}
 <main class="mx-auto w-full pb-16 pt-6">
@@ -73,6 +73,8 @@
             </div>
         </div>
     </section>
+
+    {% include "_disclaimer.html" %}
 </main>
 {% endblock %}
 

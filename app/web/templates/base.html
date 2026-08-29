@@ -3,30 +3,30 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>{% block title %}Home | PDDikti API{% endblock %}</title>
+        <title>{% block title %}Home | {{ brand_name|default('API') }}{% endblock %}</title>
         <meta
             name="description"
-            content="{% block meta_description %}PDDikti API provides structured access to Indonesian higher education data including universities, study programs, lecturers, and students.{% endblock %}"
+            content="{% block meta_description %}{{ brand_tagline|default('Structured access to Indonesian higher-education data.') }}{% endblock %}"
         />
-        <meta name="author" content="ridwaanhall" />
+        <meta name="author" content="{{ maintainer|default('') }}" />
         <meta name="theme-color" content="#09090b" />
-        <link rel="canonical" href="{% block canonical_url %}{{ request.url if request is defined else 'https://pddikti.rone.dev/' }}{% endblock %}" />
+        <link rel="canonical" href="{% block canonical_url %}{{ request.url }}{% endblock %}" />
 
         <script type="application/ld+json">
             {
                 "@context": "https://schema.org",
                 "@type": "WebSite",
-                "name": "PDDikti API",
-                "url": "{{ public_base_url|default('https://pddikti.rone.dev') }}/"
+                "name": "{{ brand_name|default('API') }}",
+                "url": "{{ canonical_base_url|default('') }}/"
             }
         </script>
 
-        <!-- Elegant Typography: Playfair Display for headings, Plus Jakarta Sans for UI, JetBrains Mono for code -->
+        <!-- Playfair Display for headings, Plus Jakarta Sans for UI, JetBrains Mono for code -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..800;1,400..800&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
-        <link rel="icon" href="https://mlbb-card.rone.dev/static/favicon.ico" />
+        {% if favicon_url %}<link rel="icon" href="{{ favicon_url }}" />{% endif %}
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
             tailwind.config = {
@@ -61,21 +61,19 @@
             code, pre, kbd, samp { font-family: 'JetBrains Mono', monospace; }
         </style>
         {% block head %}{% endblock %}
-        {% if 'pddikti.fastapicloud.dev' in public_base_url|default('') %}
-        <!-- Google tag (gtag.js) -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-F5QLVZY6DX"></script>
+        {% if analytics_id %}
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ analytics_id }}"></script>
         <script>
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-
-            gtag('config', 'G-F5QLVZY6DX');
+            gtag('config', '{{ analytics_id }}');
         </script>
         {% endif %}
     </head>
     <body class="min-h-screen bg-[#09090b] text-zinc-300 antialiased selection:bg-gold-500/30 selection:text-gold-400">
         {% set active = active_page|default('landing') %}
-        
+
         <!-- Subtle radial background glow -->
         <div class="fixed inset-0 z-[-1] bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(200,169,126,0.05),transparent)]"></div>
 
@@ -84,7 +82,7 @@
                 <nav class="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-5 lg:px-8">
                     <a href="/" class="group flex items-center gap-3">
                         <span class="font-serif text-xl font-medium tracking-wide text-zinc-100 transition-colors group-hover:text-gold-500">
-                            PDDikti API
+                            {{ brand_name|default('API') }}
                         </span>
                     </a>
 
@@ -106,15 +104,22 @@
             </main>
 
             <footer class="mt-auto border-t border-zinc-900 bg-[#060608]">
-                <div class="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-4 px-6 py-8 sm:flex-row lg:px-8">
-                    <div class="flex flex-col gap-1">
-                        <p class="font-serif text-lg text-zinc-400">PDDikti API Platform</p>
-                        <p class="text-xs text-zinc-600">v{{ api_version|default('4.2.3') }} &bull; Higher Education Data</p>
+                <div class="mx-auto flex w-full max-w-7xl flex-col gap-6 px-6 py-8 lg:px-8">
+                    <div class="flex flex-col justify-between gap-4 sm:flex-row">
+                        <div class="flex flex-col gap-1">
+                            <p class="font-serif text-lg text-zinc-400">{{ brand_name|default('API') }}</p>
+                            <p class="text-xs text-zinc-600">v{{ api_version|default('') }} &bull; Higher Education Data</p>
+                        </div>
+                        <div class="flex flex-col gap-1 text-left sm:items-end sm:text-right">
+                            <p class="text-[11px] uppercase tracking-wider text-zinc-500">Independent project</p>
+                            <p class="text-xs text-zinc-600">Maintained by <span class="text-gold-600">{{ maintainer|default('') }}</span>{% if brand_owner %} / {{ brand_owner }}{% endif %}</p>
+                        </div>
                     </div>
-                    <div class="flex flex-col items-end gap-1 text-right">
-                        <p class="text-[11px] tracking-wider text-zinc-500 uppercase">Data &copy; PDDikti</p>
-                        <p class="text-xs text-zinc-600">Maintained by <span class="text-gold-600">ridwaanhall</span> / RoneAI</p>
-                    </div>
+                    <p class="border-t border-zinc-900 pt-5 text-[11px] font-light leading-relaxed text-zinc-600">
+                        Not affiliated with, endorsed by, or operated by {{ data_source_name|default('the data source') }}
+                        or any government body. Data is provided as-is with no warranty of accuracy,
+                        completeness, or availability.
+                    </p>
                 </div>
             </footer>
         </div>

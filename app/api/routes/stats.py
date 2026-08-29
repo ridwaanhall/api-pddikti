@@ -5,7 +5,7 @@ from app.api.common import api_client, as_json
 
 router = APIRouter(tags=["statistics"])
 
-# PDDikti retired the whole `visualisasi/*` dataset along with `mahasiswa/count` and
+# The upstream retired the whole `visualisasi/*` dataset along with `mahasiswa/count` and
 # `dosen/count`; those paths now 404 upstream with no replacement, so the endpoints that
 # wrapped them have been removed. What remains below is the set that still returns data.
 

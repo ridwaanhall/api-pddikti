@@ -12,9 +12,9 @@ from app.core.config import get_settings
 from app.core.request_context import get_request_client_ip
 
 
-# One coherent browser identity. Cloudflare in front of PDDikti rejects unknown clients
-# outright (a default python UA gets a hard 403), and a User-Agent that disagrees with the
-# sec-ch-ua client hints is itself a bot signal -- so these values must be kept in sync.
+# One coherent browser identity. The upstream edge rejects unknown clients outright (a
+# default python UA gets a hard 403), and a User-Agent that disagrees with the sec-ch-ua
+# client hints is itself a bot signal -- so these values must be kept in sync.
 BROWSER_USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36 Edg/151.0.0.0"
@@ -42,7 +42,7 @@ def _is_public_ip(value: str | None) -> bool:
 
 
 class _PublicIPCache:
-    """Caches this server's own public IP so ipify is not called per request."""
+    """Caches this server's own public IP so the lookup is not repeated per request."""
 
     def __init__(self) -> None:
         self._value: str | None = None
@@ -85,22 +85,24 @@ class _PublicIPCache:
 
 
 class APIClient:
-    """HTTP client for forwarding requests to the upstream PDDikti API.
+    """HTTP client for forwarding requests to the configured upstream.
 
-    Requests go to the public PDDikti web API first. That surface needs no credentials but
-    returns some payloads encrypted, in which case the ciphertext is transparently exchanged
-    for plaintext via the site's own decrypt endpoint before the caller ever sees it. An
-    authenticated upstream can be configured as a fallback for when the public host is
-    unreachable.
+    Requests go to the primary upstream first. That surface needs no credentials but
+    returns some payloads encrypted, in which case the ciphertext is transparently
+    exchanged for plaintext via the upstream's own decrypt endpoint before the caller
+    ever sees it. An authenticated upstream can be configured as a fallback for when the
+    primary host is unreachable.
+
+    Every host involved comes from the environment; none is hardcoded here.
     """
 
     def __init__(self) -> None:
         settings = get_settings()
         self.settings = settings
-        self.public_base = settings.pddikti_public_base.rstrip("/")
+        self.public_base = settings.upstream_base_url.rstrip("/")
         self.fallback_base = settings.ridwaanhall_main_api.rstrip("/")
-        self.site_origin = settings.pddikti_site_origin.rstrip("/")
-        self.decrypt_url = settings.pddikti_decrypt_url
+        self.site_origin = settings.upstream_origin.rstrip("/")
+        self.decrypt_url = settings.upstream_decrypt_url
         self.timeout = settings.api_timeout
 
         # Only populated when an authenticated upstream is actually configured.
@@ -134,17 +136,19 @@ class APIClient:
     def _client_ip(self) -> str | None:
         """Resolve the IP to advertise upstream.
 
-        Prefers the IP of whoever called this API, so PDDikti sees the end user's location
-        rather than the hosting platform's egress. Falls back to this server's own public
-        address only when the caller's IP is missing or not routable (local development,
-        internal health checks).
+        Prefers the IP of whoever called this API, so the upstream sees the end user's
+        location rather than the hosting platform's egress. Falls back to this server's
+        own public address only when the caller's IP is missing or not routable (local
+        development, internal health checks).
         """
         caller_ip = get_request_client_ip()
         if _is_public_ip(caller_ip):
             return caller_ip
+        if not self.settings.ip_lookup_url:
+            return None
         return self._public_ip.get(
             self.session,
-            self.settings.ipify_url,
+            self.settings.ip_lookup_url,
             self.timeout,
             self.settings.ip_cache_ttl,
         )
@@ -183,7 +187,10 @@ class APIClient:
         )
 
     def _decrypt(self, ciphertext: str) -> Any:
-        """Exchange an encrypted payload for plaintext JSON via the site's decrypt endpoint."""
+        """Exchange an encrypted payload for plaintext JSON via the decrypt endpoint."""
+        if not self.decrypt_url:
+            raise RuntimeError("no decrypt endpoint configured")
+
         headers = self._browser_headers()
         headers["accept"] = "*/*"
         headers["content-type"] = "text/plain"
@@ -261,7 +268,7 @@ class APIClient:
                 "code": 503,
                 "error": "No upstream configured",
                 "message": (
-                    "No upstream base URL is configured. Set PDDIKTI_PUBLIC_BASE or "
+                    "No upstream base URL is configured. Set UPSTREAM_BASE_URL or "
                     "RIDWAANHALL_MAIN_API in the deployment environment."
                 ),
             }
@@ -335,8 +342,8 @@ class APIClient:
 
     @staticmethod
     def _quote_segment(value: str) -> str:
-        # '=' must survive: PDDikti entity IDs are URL-safe base64 and reject %3D padding
-        # with "invalid id". Spaces and other unsafe characters are still encoded.
+        # '=' must survive: upstream entity IDs are URL-safe base64 and reject %3D
+        # padding with "invalid id". Spaces and other unsafe characters are still encoded.
         return quote(unquote(value), safe="=")
 
     def get_with_keyword(self, endpoint: str, keyword: str) -> Any:

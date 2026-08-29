@@ -1,7 +1,7 @@
 [project]
-name = "api-pddikti"
-version = "4.2.3"
-description = "Production API service for structured access to Indonesia higher-education data (PDDikti), including universities, study programs, lecturers, and students."
+name = "sivitas-api"
+version = "5.0.0"
+description = "Sivitas API - structured access to Indonesian higher-education data: universities, study programs, lecturers, and students. Independent project, not affiliated with any government body."
 license = { file = "LICENSE" }
 authors = [
     { name = "RoneAI", email = "founder@rone.dev" },

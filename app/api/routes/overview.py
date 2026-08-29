@@ -25,28 +25,14 @@ def api_overview():
         "web_explorer": f"{public_base_url}/web",
     }
 
-    support = {
-        "live_chat": "https://ridwaanhall.com/guestbook",
-        "email": "hi@ridwaanhall.com",
-        "contact_form": "https://ridwaanhall.com/contact",
-    }
-
-    alternatives = [
-        {
-            "name": "High Availability Endpoint",
-            "url": "https://pddikti.fastapicloud.dev",
-            "description": "Alternative endpoint optimized for high traffic periods.",
-        }
-    ]
+    support = settings.support_links
+    alternatives = settings.alternative_endpoints
 
     service = {
-        "name": "PDDikti Public Data API Web",
+        "name": settings.brand_name,
         "version": settings.api_version,
         "base_url": f"{api_base_url}/",
-        "description": (
-            "Structured public-data API for Indonesian higher education entities, "
-            "including universities, study programs, lecturers, and students."
-        ),
+        "description": settings.brand_tagline,
         "last_update": settings.last_update,
         "generated_at": now_iso,
     }
@@ -82,12 +68,12 @@ def api_overview():
     # against a host that was never set.
     upstream = {
         "primary": {
-            "name": "PDDikti public web API",
-            "configured": bool(settings.pddikti_public_base),
+            "name": "Primary upstream",
+            "configured": bool(settings.upstream_base_url),
             "requires_credentials": False,
         },
         "fallback": {
-            "name": "Authenticated PDDikti upstream",
+            "name": "Authenticated fallback upstream",
             "configured": bool(settings.ridwaanhall_main_api),
             "requires_credentials": True,
         },
@@ -101,6 +87,7 @@ def api_overview():
             "message": "API overview retrieved successfully.",
         },
         "credit": settings.required_credit_line,
+        "disclaimer": settings.disclaimer,
         "service": service,
         "availability": availability,
         "upstream": upstream,

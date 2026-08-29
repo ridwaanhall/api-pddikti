@@ -75,7 +75,7 @@ def client(monkeypatch) -> APIClient:
     instance = APIClient()
     instance.session = FakeSession()
     instance._public_ip.clear()
-    # A public caller IP by default, so ipify is not consulted.
+    # A public caller IP by default, so the public-IP lookup is not consulted.
     monkeypatch.setattr(
         api_client_module, "get_request_client_ip", lambda: "158.140.170.57"
     )
@@ -192,13 +192,13 @@ def test_caller_ip_is_forwarded_upstream(client) -> None:
 
 def test_private_caller_ip_falls_back_to_public_lookup(client, monkeypatch) -> None:
     monkeypatch.setattr(api_client_module, "get_request_client_ip", lambda: "127.0.0.1")
-    # First GET answers the ipify lookup, second is the real upstream call.
+    # First GET answers the public-IP lookup, second is the real upstream call.
     client.session.get_results.append(FakeResponse({"ip": "45.64.99.10"}))
     client.session.get_results.append(FakeResponse({"status": "success", "data": []}))
 
     client.get("pt/count")
 
-    assert client.session.get_calls[0]["url"] == client.settings.ipify_url
+    assert client.session.get_calls[0]["url"] == client.settings.ip_lookup_url
     assert client.session.get_calls[1]["headers"]["x-user-ip"] == "45.64.99.10"
 
 
@@ -211,10 +211,10 @@ def test_public_ip_lookup_is_cached_across_requests(client, monkeypatch) -> None
     client.get("pt/count")
     client.get("prodi/count")
 
-    ipify_calls = [
-        call for call in client.session.get_calls if call["url"] == client.settings.ipify_url
+    lookup_calls = [
+        call for call in client.session.get_calls if call["url"] == client.settings.ip_lookup_url
     ]
-    assert len(ipify_calls) == 1
+    assert len(lookup_calls) == 1
 
 
 @pytest.mark.parametrize(

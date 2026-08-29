@@ -1,4 +1,4 @@
-/* PDDikti API web playground.
+/* Web playground.
  *
  * Execution deliberately goes through POST /web/execute with the typed values in the
  * request body: nothing the user types is ever placed in a URL, so it stays out of the

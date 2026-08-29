@@ -18,13 +18,11 @@ settings = get_settings()
 
 app = FastAPI(
     debug=settings.debug,
-    title="PDDikti API",
+    title=settings.brand_name,
     description=(
-        "Provides structured access to data from Pangkalan Data Pendidikan Tinggi "
-        "(PDDikti), Indonesia's Higher Education Database. "
-        "Use pddikti.fastapicloud.dev for high traffic applications. "
-        "Use pddikti.rone.dev for low traffic applications or testing. "
-        "Data includes universities, study programs, lecturers, and students. "
+        f"{settings.brand_tagline} Covers universities, study programs, lecturers, "
+        "and students.\n\n"
+        f"{settings.disclaimer}"
     ),
     version=settings.api_version,
     docs_url="/api/docs",

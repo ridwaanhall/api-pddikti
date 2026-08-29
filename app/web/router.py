@@ -21,6 +21,28 @@ templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 PROXY_TIMEOUT = settings.api_timeout + 5
 
 
+def _brand_context(request: Request) -> dict[str, Any]:
+    """Branding and chrome shared by every rendered page."""
+    current_base_url = str(request.base_url).rstrip("/")
+    return {
+        "request": request,
+        "project_name": settings.brand_name,
+        "brand_name": settings.brand_name,
+        "brand_owner": settings.brand_owner,
+        "brand_tagline": settings.brand_tagline,
+        "maintainer": settings.maintainer,
+        "data_source_name": settings.data_source_name,
+        "disclaimer": settings.disclaimer,
+        "credit_line": settings.required_credit_line,
+        "public_base_url": current_base_url,
+        "canonical_base_url": settings.public_base_url or current_base_url,
+        "alternative_endpoints": settings.alternative_endpoints,
+        "favicon_url": settings.favicon_url,
+        "analytics_id": settings.analytics_id,
+        "api_version": settings.api_version,
+    }
+
+
 def _group_label(group_key: str) -> str:
     mapping = {
         "overview": "Overview Routes",
@@ -197,10 +219,8 @@ def _build_web_context(
     rendered_operations = [selected_operation] if is_single_view else selected_group["operations"]
 
     return {
-        "request": request,
+        **_brand_context(request),
         "active_page": "web",
-        "project_name": "PDDikti API Web",
-        "public_base_url": current_base_url,
         "groups": groups,
         "selected_group": selected_group,
         "selected_operation": selected_operation,
@@ -213,13 +233,9 @@ def _build_web_context(
 
 @router.get("/")
 def landing_page(request: Request):
-    current_base_url = str(request.base_url).rstrip("/")
     context = {
-        "request": request,
+        **_brand_context(request),
         "active_page": "landing",
-        "project_name": "PDDikti API Web",
-        "public_base_url": current_base_url,
-        "api_version": settings.api_version,
         "api_available": settings.api_availability,
         "last_updated": settings.last_update,
     }

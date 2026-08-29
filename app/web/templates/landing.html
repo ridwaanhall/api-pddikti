@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Home | PDDikti API{% endblock %}
-{% block meta_description %}PDDikti API production gateway with direct access to docs, route explorer, and higher education data endpoints.{% endblock %}
+{% block title %}Home | {{ brand_name }}{% endblock %}
+{% block meta_description %}{{ brand_name }} — {{ brand_tagline }} Interactive playground, OpenAPI docs, and structured endpoint discovery.{% endblock %}
 
 {% block content %}
 <main class="mx-auto flex w-full flex-col pb-16 pt-10">
@@ -10,13 +10,14 @@
             <span class="h-px w-8 bg-gold-500/50"></span>
             Data Gateway
         </p>
-        
+
         <h1 class="font-serif text-5xl font-normal leading-tight tracking-tight text-zinc-100 sm:text-6xl lg:text-7xl">
-            {{ project_name }}
+            {{ brand_name }}
         </h1>
-        
+
         <p class="mt-8 max-w-2xl text-lg font-light leading-relaxed text-zinc-400 sm:text-xl">
-            A refined FastAPI platform to explore Indonesian higher-education data. Featuring a pristine web playground, production documentation, and structured endpoint discovery.
+            {{ brand_tagline }} A refined FastAPI platform with a pristine web playground,
+            production documentation, and structured endpoint discovery.
         </p>
 
         <div class="mt-10 flex flex-wrap items-center gap-4 text-xs font-medium tracking-wide text-zinc-500">
@@ -31,7 +32,6 @@
             </span>
         </div>
 
-        <!-- Conditional UI based on API availability -->
         {% if api_available %}
         <div class="mt-14 flex flex-wrap items-center gap-5">
             <a href="/api/docs" class="group relative inline-flex items-center justify-center bg-gold-500 px-8 py-3.5 text-sm font-medium tracking-wide text-[#09090b] transition-all hover:bg-gold-400">
@@ -49,13 +49,16 @@
             <div class="flex flex-col gap-2">
                 <h3 class="font-serif text-2xl font-medium text-red-400/90">Primary Service Unavailable</h3>
                 <p class="max-w-xl text-sm font-light leading-relaxed text-zinc-400">
-                    Our primary PDDikti connection is currently experiencing limited service. Please route your active requests through our high-availability fallback endpoint to maintain access.
+                    This gateway is currently running with limited service.
+                    {% if alternative_endpoints %}Route active requests through the high-availability fallback to maintain access.{% else %}Please retry later.{% endif %}
                 </p>
             </div>
             <div class="mt-2 flex flex-wrap items-center gap-4">
-                <a href="https://pddikti.fastapicloud.dev" target="_blank" rel="noopener noreferrer" class="group relative inline-flex items-center justify-center border border-red-900/50 bg-red-950/30 px-8 py-3 text-sm font-medium tracking-wide text-red-300 transition-all hover:border-red-500/50 hover:bg-red-900/20">
+                {% for endpoint in alternative_endpoints %}
+                <a href="{{ endpoint.url }}" target="_blank" rel="noopener noreferrer" class="group relative inline-flex items-center justify-center border border-red-900/50 bg-red-950/30 px-8 py-3 text-sm font-medium tracking-wide text-red-300 transition-all hover:border-red-500/50 hover:bg-red-900/20">
                     Open Alternative Gateway <span class="ml-2 opacity-70 transition-transform group-hover:translate-x-1">&rarr;</span>
                 </a>
+                {% endfor %}
                 <a href="/api/docs" class="inline-flex items-center justify-center px-6 py-3 text-sm font-medium tracking-wide text-zinc-500 transition-colors hover:text-zinc-300">
                     View Local Docs
                 </a>
@@ -63,35 +66,34 @@
         </div>
         {% endif %}
 
-        <!-- Integrated Endpoint Specification -->
         <div class="mt-16 flex w-full max-w-4xl flex-col border border-zinc-800/60 bg-[#0c0c0e]/50">
             <div class="flex items-center gap-3 border-b border-zinc-800/60 bg-zinc-900/30 px-6 py-4">
                 <div class="h-1.5 w-1.5 rounded-full bg-gold-500"></div>
                 <h2 class="font-serif text-sm font-medium text-zinc-200">Active Endpoints</h2>
             </div>
-            
-            <div class="grid divide-y divide-zinc-800/60 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
-                <!-- High Traffic -->
-                <a href="https://pddikti.fastapicloud.dev" target="_blank" rel="noopener noreferrer" class="group flex flex-col p-6 transition-colors hover:bg-zinc-900/40">
-                    <div class="flex items-center justify-between">
-                        <h3 class="font-mono text-sm text-gold-400 transition-colors group-hover:text-gold-300">pddikti.fastapicloud.dev</h3>
-                        <span class="border border-gold-500/20 bg-gold-500/5 px-2 py-0.5 text-[9px] uppercase tracking-wider text-gold-500">High Volume</span>
+
+            <div class="grid divide-y divide-zinc-800/60 {% if alternative_endpoints %}sm:grid-cols-2 sm:divide-x sm:divide-y-0{% endif %}">
+                <a href="{{ canonical_base_url }}" target="_blank" rel="noopener noreferrer" class="group flex flex-col p-6 transition-colors hover:bg-zinc-900/40">
+                    <div class="flex items-center justify-between gap-3">
+                        <h3 class="break-all font-mono text-sm text-zinc-300 transition-colors group-hover:text-zinc-100">{{ canonical_base_url | replace('https://', '') }}</h3>
+                        <span class="shrink-0 border border-zinc-700 bg-zinc-800/50 px-2 py-0.5 text-[9px] uppercase tracking-wider text-zinc-400">Standard</span>
                     </div>
                     <p class="mt-4 text-xs font-light leading-relaxed text-zinc-400">
-                        Optimized for high-throughput scaling. Recommended for applications exceeding <span class="text-zinc-300 font-medium">&gt; 500 requests/day</span>.
+                        Reliable gateway for standard integrations and development.
                     </p>
                 </a>
 
-                <!-- Standard Traffic -->
-                <a href="https://pddikti.rone.dev" target="_blank" rel="noopener noreferrer" class="group flex flex-col p-6 transition-colors hover:bg-zinc-900/40">
-                    <div class="flex items-center justify-between">
-                        <h3 class="font-mono text-sm text-zinc-300 transition-colors group-hover:text-zinc-100">pddikti.rone.dev</h3>
-                        <span class="border border-zinc-700 bg-zinc-800/50 px-2 py-0.5 text-[9px] uppercase tracking-wider text-zinc-400">Standard</span>
+                {% for endpoint in alternative_endpoints %}
+                <a href="{{ endpoint.url }}" target="_blank" rel="noopener noreferrer" class="group flex flex-col p-6 transition-colors hover:bg-zinc-900/40">
+                    <div class="flex items-center justify-between gap-3">
+                        <h3 class="break-all font-mono text-sm text-gold-400 transition-colors group-hover:text-gold-300">{{ endpoint.url | replace('https://', '') }}</h3>
+                        <span class="shrink-0 border border-gold-500/20 bg-gold-500/5 px-2 py-0.5 text-[9px] uppercase tracking-wider text-gold-500">High Volume</span>
                     </div>
                     <p class="mt-4 text-xs font-light leading-relaxed text-zinc-400">
-                        Reliable gateway for standard integrations and development expecting under <span class="text-zinc-300 font-medium">&lt; 500 requests/day</span>.
+                        {{ endpoint.description }}
                     </p>
                 </a>
+                {% endfor %}
             </div>
         </div>
     </header>
@@ -103,7 +105,8 @@
             <div class="mb-6 h-px w-12 bg-gold-500/40 transition-all group-hover:w-20 group-hover:bg-gold-500"></div>
             <h2 class="font-serif text-xl font-medium text-zinc-100">Interactive Playground</h2>
             <p class="mt-4 text-sm font-light leading-relaxed text-zinc-400">
-                Elegantly grouped endpoint cards featuring execute forms, multi-language snippets, and perfectly formatted response views.
+                Grouped endpoint cards with execute forms, multi-language snippets, and readable
+                response views. Values you type are sent in the request body, never in a URL.
             </p>
         </article>
 
@@ -111,7 +114,8 @@
             <div class="mb-6 h-px w-12 bg-gold-500/40 transition-all group-hover:w-20 group-hover:bg-gold-500"></div>
             <h2 class="font-serif text-xl font-medium text-zinc-100">OpenAPI Docs</h2>
             <p class="mt-4 text-sm font-light leading-relaxed text-zinc-400">
-                Access standardized Swagger and ReDoc interfaces designed for rapid integration and immediate endpoint verification.
+                Standardized Swagger and ReDoc interfaces designed for rapid integration and
+                immediate endpoint verification.
             </p>
         </article>
 
@@ -119,9 +123,12 @@
             <div class="mb-6 h-px w-12 bg-gold-500/40 transition-all group-hover:w-20 group-hover:bg-gold-500"></div>
             <h2 class="font-serif text-xl font-medium text-zinc-100">Service Status</h2>
             <p class="mt-4 text-sm font-light leading-relaxed text-zinc-400">
-                The API root provides refined metadata and traffic-availability signals to ensure consumers are always informed.
+                The API root exposes service metadata, upstream configuration, and traffic
+                availability signals so consumers are always informed.
             </p>
         </article>
     </section>
+
+    {% include "_disclaimer.html" %}
 </main>
 {% endblock %}
