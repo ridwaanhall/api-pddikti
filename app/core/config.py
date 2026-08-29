@@ -143,7 +143,7 @@ class Settings:
         self.ip_cache_ttl = _env_int("IP_CACHE_TTL", 3600)
 
         # -------------------------------------------------------------- this service
-        self.api_availability = _env_bool("API_AVAILABILITY", True)
+        self.api_availability = _env_bool("API_AVAILABILITY", False)
         self.api_version = _env("API_VERSION", "5.0.0")
         self.last_update = _env("LAST_UPDATE", "2026-08-29T00:00:00+07:00")
         self.api_timeout = _env_int("API_TIMEOUT", 10)
