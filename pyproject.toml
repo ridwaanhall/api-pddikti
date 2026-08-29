@@ -9,6 +9,7 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "curl-cffi>=0.16.2",
     "fastapi[standard]>=0.116.1",
     "requests>=2.33.0",
 ]

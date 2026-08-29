@@ -40,6 +40,28 @@ environment is diagnosable without reading logs.
 See `.env.example` for the full annotated surface, including branding, the optional
 authenticated fallback upstream, caller-IP forwarding, support links, and analytics.
 
+### Getting past upstream bot protection
+
+The upstream sits behind an edge that fingerprints the **TLS handshake**, not just the
+request headers. A plain Python HTTP client is rejected from datacenter IP ranges even
+when every header is byte-identical to a browser, which is why a deployment can return
+`403` while the same code works from a laptop.
+
+Two things address this:
+
+1. **Header parity** — the client sends the complete browser header set: the full
+   `sec-ch-ua-*` client-hint family, `accept-encoding`, `accept-language`, `priority`,
+   `dnt`, `sec-fetch-*`, and a contextual `referer`. It deliberately does *not* send
+   `X-Forwarded-For` or `X-Real-IP`, because no browser does and a client-supplied
+   forwarding header reads as proxy spoofing.
+2. **TLS impersonation** — `UPSTREAM_IMPERSONATE=chrome` (the default) makes the
+   client perform a real Chrome handshake via `curl_cffi`. This is the part that
+   actually gets a datacenter IP through. Set it to `none` to opt out.
+
+When a request still fails, the error body names the cause rather than hiding it:
+`upstreams_tried` lists each base and why it failed, `decrypt_failure` gives the reason
+the second leg failed, and `transport` reports which HTTP stack was used.
+
 ## Endpoints
 
 Set `PUBLIC_BASE_URL` to your deployment, then:
@@ -105,7 +127,8 @@ uv run fastapi dev app/main.py
 
 - FastAPI
 - Starlette
-- Requests
+- Requests (fallback HTTP transport)
+- curl_cffi (primary HTTP transport, browser TLS impersonation)
 - httpx
 - uv (dependency and lock management)
 

@@ -133,6 +133,10 @@ def test_encrypted_envelope_is_decrypted_and_rewrapped(client) -> None:
     assert post["url"] == client.decrypt_url
     assert post["data"] == ciphertext.encode("utf-8")
     assert post["headers"]["content-type"] == "text/plain"
+    assert post["headers"]["accept"] == "*/*"
+    assert post["headers"]["origin"] == client.site_origin
+    # The site does not send x-user-ip on the decrypt call, so neither do we.
+    assert "x-user-ip" not in post["headers"]
 
     # Shape matches the plain endpoints so callers see one envelope.
     assert result == {
@@ -168,6 +172,21 @@ def test_decrypt_failure_reports_502(client) -> None:
     result = client.get("pencarian/enc/all/x")
     assert result["code"] == 502
     assert result["error"] == "Decryption failed"
+    # The underlying reason must survive, or a block is indistinguishable from a timeout.
+    assert result["decrypt_failure"] == "connection error; connection error"
+    assert result["transport"]
+
+
+def test_decrypt_http_block_reports_the_status(client) -> None:
+    client.session.get_results.append(
+        FakeResponse({"status": "success", "data": "9lqDIEAB" + "x" * 90})
+    )
+    client.session.post_results.extend(
+        [FakeResponse(status_code=403), FakeResponse(status_code=403)]
+    )
+
+    result = client.get("pencarian/enc/all/x")
+    assert result["decrypt_failure"] == "http 403; http 403"
 
 
 def test_image_response_returns_raw_bytes(client) -> None:
@@ -186,8 +205,64 @@ def test_caller_ip_is_forwarded_upstream(client) -> None:
 
     headers = client.session.get_calls[0]["headers"]
     assert headers["x-user-ip"] == "158.140.170.57"
-    assert headers["X-Forwarded-For"] == "158.140.170.57"
     assert "Chrome" in headers["user-agent"]
+
+
+def test_proxy_forwarding_headers_are_never_sent(client) -> None:
+    """No browser sends these, and a protective edge reads them as proxy spoofing."""
+    client.session.get_results.append(FakeResponse({"status": "success", "data": []}))
+    client.get("pt/count")
+
+    headers = client.session.get_calls[0]["headers"]
+    assert "X-Forwarded-For" not in headers
+    assert "X-Real-IP" not in headers
+
+
+def test_full_client_hint_set_is_sent(client) -> None:
+    """The UA and the sec-ch-ua hints must describe the same browser build."""
+    client.session.get_results.append(FakeResponse({"status": "success", "data": []}))
+    client.get("pt/count")
+
+    headers = client.session.get_calls[0]["headers"]
+    for header in (
+        "sec-ch-ua",
+        "sec-ch-ua-arch",
+        "sec-ch-ua-bitness",
+        "sec-ch-ua-full-version",
+        "sec-ch-ua-full-version-list",
+        "sec-ch-ua-mobile",
+        "sec-ch-ua-model",
+        "sec-ch-ua-platform",
+        "sec-ch-ua-platform-version",
+        "sec-fetch-dest",
+        "sec-fetch-mode",
+        "sec-fetch-site",
+        "accept-encoding",
+        "accept-language",
+        "priority",
+        "dnt",
+    ):
+        assert header in headers, header
+    assert "151" in headers["sec-ch-ua-full-version"]
+
+
+def test_search_referer_mirrors_the_browser(client) -> None:
+    client.session.get_results.append(FakeResponse({"status": "success", "data": []}))
+    client.get_with_keyword("pencarian/pt", "gadjah mada")
+
+    referer = client.session.get_calls[0]["headers"]["referer"]
+    assert referer.endswith("/search/gadjah%20mada")
+
+
+def test_configured_cookie_is_replayed(client) -> None:
+    client.settings.upstream_cookie = "cf_clearance=abc123"
+    try:
+        client.session.get_results.append(FakeResponse({"status": "success", "data": []}))
+        client.get("pt/count")
+    finally:
+        client.settings.upstream_cookie = ""
+
+    assert client.session.get_calls[0]["headers"]["cookie"] == "cf_clearance=abc123"
 
 
 def test_private_caller_ip_falls_back_to_public_lookup(client, monkeypatch) -> None:
@@ -313,3 +388,27 @@ def test_no_upstream_configured_is_distinguishable(client) -> None:
     result = client.get("pt/count")
     assert result["code"] == 503
     assert result["error"] == "No upstream configured"
+
+
+def test_impersonation_opt_out_uses_requests_transport(monkeypatch) -> None:
+    """Blank means 'use the default' everywhere else, so opting out needs a keyword."""
+    from app.core import config as config_module
+
+    monkeypatch.setenv("UPSTREAM_IMPERSONATE", "none")
+    config_module.get_settings.cache_clear()
+    try:
+        assert config_module.Settings().upstream_impersonate == ""
+        assert APIClient().transport_name == "requests"
+    finally:
+        config_module.get_settings.cache_clear()
+
+
+def test_impersonation_defaults_to_a_browser_profile(monkeypatch) -> None:
+    from app.core import config as config_module
+
+    monkeypatch.delenv("UPSTREAM_IMPERSONATE", raising=False)
+    config_module.get_settings.cache_clear()
+    try:
+        assert config_module.Settings().upstream_impersonate == "chrome"
+    finally:
+        config_module.get_settings.cache_clear()

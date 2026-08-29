@@ -12,15 +12,57 @@ from app.core.config import get_settings
 from app.core.request_context import get_request_client_ip
 
 
-# One coherent browser identity. The upstream edge rejects unknown clients outright (a
-# default python UA gets a hard 403), and a User-Agent that disagrees with the sec-ch-ua
-# client hints is itself a bot signal -- so these values must be kept in sync.
+# Optional TLS-fingerprint impersonation. Header spoofing alone does not get past an edge
+# that fingerprints the TLS handshake (JA3) -- which is what rejects datacenter egress
+# while the same headers succeed from a residential connection. When curl_cffi is
+# installed the client performs a real Chrome handshake; otherwise it falls back to
+# requests, which still works wherever the IP itself is not the problem.
+try:  # pragma: no cover - import guard depends on the deployment image
+    from curl_cffi import requests as curl_requests
+except ImportError:  # pragma: no cover
+    curl_requests = None
+
+
+def _transport_error_types() -> tuple[type[BaseException], ...]:
+    """Exception classes both transports can raise, resolved defensively.
+
+    curl_cffi has moved its error class between `errors` and `exceptions` across
+    versions, so look in both rather than pinning to one layout.
+    """
+    types: tuple[type[BaseException], ...] = (requests.exceptions.RequestException,)
+    if curl_requests is not None:
+        for module_name in ("errors", "exceptions"):
+            module = getattr(curl_requests, module_name, None)
+            candidate = getattr(module, "RequestsError", None) if module else None
+            if isinstance(candidate, type) and issubclass(candidate, BaseException):
+                types += (candidate,)
+    return types
+
+
+TRANSPORT_ERRORS = _transport_error_types()
+
+
+# One coherent browser identity, mirroring a real session against the upstream site. The
+# User-Agent, the sec-ch-ua hints and the TLS profile all describe the same browser
+# build; a mismatch between any of them is itself a bot signal.
 BROWSER_USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36 Edg/151.0.0.0"
 )
-SEC_CH_UA = '"Not=A?Brand";v="99", "Microsoft Edge";v="151", "Chromium";v="151"'
-SEC_CH_UA_PLATFORM = '"Windows"'
+CLIENT_HINT_HEADERS = {
+    "sec-ch-ua": '"Not=A?Brand";v="99", "Microsoft Edge";v="151", "Chromium";v="151"',
+    "sec-ch-ua-arch": '"x86"',
+    "sec-ch-ua-bitness": '"64"',
+    "sec-ch-ua-full-version": '"151.0.4129.107"',
+    "sec-ch-ua-full-version-list": (
+        '"Not=A?Brand";v="99.0.0.0", "Microsoft Edge";v="151.0.4129.107", '
+        '"Chromium";v="151.0.7922.174"'
+    ),
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-model": '""',
+    "sec-ch-ua-platform": '"Windows"',
+    "sec-ch-ua-platform-version": '"19.0.0"',
+}
 
 
 def _is_public_ip(value: str | None) -> bool:
@@ -41,6 +83,21 @@ def _is_public_ip(value: str | None) -> bool:
     )
 
 
+def _classify_error(exc: BaseException) -> str:
+    """Normalize a transport failure into one of our reason strings."""
+    if isinstance(exc, requests.exceptions.Timeout):
+        return "timeout"
+    if isinstance(exc, requests.exceptions.ConnectionError):
+        return "connection error"
+    if isinstance(exc, requests.exceptions.RequestException):
+        return "request error"
+    # curl_cffi surfaces everything as one class; fall back to the message.
+    message = str(exc).lower()
+    if "timed out" in message or "timeout" in message:
+        return "timeout"
+    return "connection error"
+
+
 class _PublicIPCache:
     """Caches this server's own public IP so the lookup is not repeated per request."""
 
@@ -49,7 +106,7 @@ class _PublicIPCache:
         self._expires_at = 0.0
         self._lock = threading.Lock()
 
-    def get(self, session: requests.Session, url: str, timeout: int, ttl: int) -> str | None:
+    def get(self, session: Any, url: str, timeout: int, ttl: int) -> str | None:
         # Guard on the deadline, not on _value: a failed lookup must back off too.
         if time.monotonic() < self._expires_at:
             return self._value
@@ -68,7 +125,7 @@ class _PublicIPCache:
                     },
                 )
                 resolved = response.json().get("ip")
-            except (requests.exceptions.RequestException, ValueError, AttributeError):
+            except (*TRANSPORT_ERRORS, ValueError, AttributeError):
                 resolved = None
 
             if _is_public_ip(resolved):
@@ -104,17 +161,34 @@ class APIClient:
         self.site_origin = settings.upstream_origin.rstrip("/")
         self.decrypt_url = settings.upstream_decrypt_url
         self.timeout = settings.api_timeout
+        self.decrypt_timeout = settings.decrypt_timeout
 
         # Only populated when an authenticated upstream is actually configured.
         self.fallback_headers: dict[str, str] = {}
         if self.fallback_base:
             self.fallback_headers = {
-                settings.ridwaanhall_api_x: settings.ridwaanhall_api_key,
-                settings.ridwaanhall_x: settings.ridwaanhall_key,
-                settings.ridwaanhall_hash_x: settings.ridwaanhall_hash_key,
+                key: value
+                for key, value in (
+                    (settings.ridwaanhall_api_x, settings.ridwaanhall_api_key),
+                    (settings.ridwaanhall_x, settings.ridwaanhall_key),
+                    (settings.ridwaanhall_hash_x, settings.ridwaanhall_hash_key),
+                )
+                if key
             }
 
-        self.session = requests.Session()
+        self.session, self.transport_name = self._build_session()
+        self.accept_encoding = self._supported_accept_encoding()
+        self._public_ip = _PublicIPCache()
+
+    def _build_session(self) -> tuple[Any, str]:
+        impersonate = self.settings.upstream_impersonate
+        if curl_requests is not None and impersonate:
+            return (
+                curl_requests.Session(impersonate=impersonate),
+                f"curl_cffi:{impersonate}",
+            )
+
+        session = requests.Session()
         adapter = HTTPAdapter(
             pool_connections=10,
             pool_maxsize=20,
@@ -127,9 +201,30 @@ class APIClient:
                 allowed_methods=frozenset({"GET", "POST"}),
             ),
         )
-        self.session.mount("https://", adapter)
-        self.session.mount("http://", adapter)
-        self._public_ip = _PublicIPCache()
+        session.mount("https://", adapter)
+        session.mount("http://", adapter)
+        return session, "requests"
+
+    def _supported_accept_encoding(self) -> str:
+        """Advertise only what this transport can actually decode.
+
+        Claiming br/zstd without a decoder available would hand us undecodable
+        response bodies, so the header tracks real capability rather than copying
+        the browser blindly.
+        """
+        if self.transport_name.startswith("curl_cffi"):
+            return "gzip, deflate, br, zstd"
+
+        codings = ["gzip", "deflate"]
+        for module_name, coding in (("brotli", "br"), ("brotlicffi", "br"), ("zstandard", "zstd")):
+            if coding in codings:
+                continue
+            try:
+                __import__(module_name)
+            except ImportError:
+                continue
+            codings.append(coding)
+        return ", ".join(codings)
 
     # ------------------------------------------------------------------ headers
 
@@ -153,26 +248,28 @@ class APIClient:
             self.settings.ip_cache_ttl,
         )
 
-    def _browser_headers(self) -> dict[str, str]:
+    def _browser_headers(self, referer: str | None = None) -> dict[str, str]:
+        """The exact header set a browser sends to the upstream site.
+
+        Deliberately does NOT include X-Forwarded-For or X-Real-IP: no browser sends
+        those, and a client-supplied forwarding header reads as proxy spoofing to a
+        protective edge. The upstream's own `x-user-ip` carries the caller IP instead.
+        """
         headers = {
             "accept": "application/json, text/plain, */*",
+            "accept-encoding": self.accept_encoding,
             "accept-language": "en-US,en;q=0.9,id;q=0.8",
             "dnt": "1",
             "priority": "u=1, i",
-            "referer": f"{self.site_origin}/",
-            "sec-ch-ua": SEC_CH_UA,
-            "sec-ch-ua-mobile": "?0",
-            "sec-ch-ua-platform": SEC_CH_UA_PLATFORM,
+            "referer": referer or f"{self.site_origin}/",
+            **CLIENT_HINT_HEADERS,
             "sec-fetch-dest": "empty",
             "sec-fetch-mode": "cors",
             "sec-fetch-site": "same-origin",
             "user-agent": BROWSER_USER_AGENT,
         }
-        client_ip = self._client_ip()
-        if client_ip:
-            headers["x-user-ip"] = client_ip
-            headers["X-Forwarded-For"] = client_ip
-            headers["X-Real-IP"] = client_ip
+        if self.settings.upstream_cookie:
+            headers["cookie"] = self.settings.upstream_cookie
         return headers
 
     # ------------------------------------------------------------------ decrypt
@@ -186,34 +283,46 @@ class APIClient:
             and len(payload["data"]) > 32
         )
 
-    def _decrypt(self, ciphertext: str) -> Any:
+    def _decrypt(self, ciphertext: str, referer: str | None = None) -> Any:
         """Exchange an encrypted payload for plaintext JSON via the decrypt endpoint."""
         if not self.decrypt_url:
             raise RuntimeError("no decrypt endpoint configured")
 
-        headers = self._browser_headers()
+        # Matches the browser exactly: */* accept, text/plain body, origin set, and no
+        # x-user-ip (the site does not send it on this call).
+        headers = self._browser_headers(referer)
         headers["accept"] = "*/*"
         headers["content-type"] = "text/plain"
         headers["origin"] = self.site_origin
 
-        last_error: Exception | None = None
+        reasons: list[str] = []
         for _ in range(2):
             try:
                 response = self.session.post(
                     self.decrypt_url,
                     data=ciphertext.encode("utf-8"),
                     headers=headers,
-                    timeout=self.timeout,
+                    timeout=self.decrypt_timeout,
                 )
-                response.raise_for_status()
-                return response.json()
-            except (requests.exceptions.RequestException, ValueError) as exc:
-                last_error = exc
-        raise RuntimeError("decrypt step failed") from last_error
+            except TRANSPORT_ERRORS as exc:
+                reasons.append(_classify_error(exc))
+                continue
+
+            if response.status_code < 400:
+                try:
+                    return response.json()
+                except ValueError:
+                    reasons.append("invalid json")
+                    continue
+            reasons.append(f"http {response.status_code}")
+
+        # Carry the reason out: a generic "decryption failed" hides whether this was a
+        # block, a timeout, or a misconfiguration.
+        raise RuntimeError("; ".join(reasons) or "unknown error")
 
     # ------------------------------------------------------------------ responses
 
-    def _handle_response(self, response: requests.Response) -> Any:
+    def _handle_response(self, response: Any, referer: str | None = None) -> Any:
         content_type = response.headers.get("Content-Type", "")
 
         if "image" in content_type:
@@ -233,8 +342,8 @@ class APIClient:
 
         # Second leg of the two-step flow: the first response carried ciphertext.
         try:
-            decrypted = self._decrypt(payload["data"])
-        except RuntimeError:
+            decrypted = self._decrypt(payload["data"], referer)
+        except RuntimeError as exc:
             return {
                 "code": 502,
                 "error": "Decryption failed",
@@ -242,27 +351,44 @@ class APIClient:
                     "The external API returned an encrypted payload that could not be "
                     "decrypted. Please try again later."
                 ),
+                "decrypt_failure": str(exc),
+                "transport": self.transport_name,
             }
         # Re-wrap so encrypted and plain endpoints share one response shape.
         return {"status": "success", "data": decrypted}
 
     # ------------------------------------------------------------------ requests
 
-    def _attempts(self) -> list[tuple[str, str, dict[str, str]]]:
+    def _attempts(
+        self, referer: str | None = None
+    ) -> list[tuple[str, str, dict[str, str]]]:
         attempts: list[tuple[str, str, dict[str, str]]] = []
+
         if self.public_base:
-            attempts.append(("public", self.public_base, self._browser_headers()))
+            headers = self._browser_headers(referer)
+            client_ip = self._client_ip()
+            if client_ip:
+                headers["x-user-ip"] = client_ip
+            attempts.append(("public", self.public_base, headers))
+
         if self.fallback_base:
             headers = {
                 "accept": "application/json, text/plain, */*",
+                "accept-language": "en-US,en;q=0.9,id;q=0.8",
                 "user-agent": BROWSER_USER_AGENT,
                 **self.fallback_headers,
             }
             attempts.append(("authenticated", self.fallback_base, headers))
+
         return attempts
 
-    def _make_request(self, endpoint: str, params: dict[str, str] | None = None) -> Any:
-        attempts = self._attempts()
+    def _make_request(
+        self,
+        endpoint: str,
+        params: dict[str, str] | None = None,
+        referer: str | None = None,
+    ) -> Any:
+        attempts = self._attempts(referer)
         if not attempts:
             return {
                 "code": 503,
@@ -285,25 +411,22 @@ class APIClient:
                     timeout=self.timeout,
                     params=params,
                 )
-            except requests.exceptions.Timeout:
-                timed_out = True
-                failures.append({"upstream": name, "reason": "timeout"})
-                continue
-            except requests.exceptions.ConnectionError:
-                failures.append({"upstream": name, "reason": "connection error"})
-                continue
-            except requests.exceptions.RequestException:
-                failures.append({"upstream": name, "reason": "request error"})
+            except TRANSPORT_ERRORS as exc:
+                reason = _classify_error(exc)
+                timed_out = timed_out or reason == "timeout"
+                failures.append({"upstream": name, "reason": reason})
                 continue
 
             # A block or an upstream fault is worth retrying on the other base; any other
             # status is a real answer and belongs to the caller.
             if response.status_code == 403 or response.status_code >= 500:
-                failures.append({"upstream": name, "reason": f"http {response.status_code}"})
+                failures.append(
+                    {"upstream": name, "reason": f"http {response.status_code}"}
+                )
                 continue
 
-            if response.ok:
-                return self._handle_response(response)
+            if response.status_code < 400:
+                return self._handle_response(response, referer)
 
             try:
                 message = response.json()
@@ -325,6 +448,7 @@ class APIClient:
                 ),
                 "timeout_seconds": self.timeout,
                 "upstreams_tried": failures,
+                "transport": self.transport_name,
             }
 
         return {
@@ -332,6 +456,7 @@ class APIClient:
             "error": "Connection error",
             "message": "Unable to connect to the external API. Please try again later.",
             "upstreams_tried": failures,
+            "transport": self.transport_name,
         }
 
     # ------------------------------------------------------------------ public API
@@ -346,8 +471,19 @@ class APIClient:
         # padding with "invalid id". Spaces and other unsafe characters are still encoded.
         return quote(unquote(value), safe="=")
 
+    def _search_referer(self, endpoint: str, encoded_value: str) -> str | None:
+        """Mirror the referer a browser would carry into this call."""
+        if not self.site_origin:
+            return None
+        if endpoint.startswith("pencarian"):
+            return f"{self.site_origin}/search/{encoded_value}"
+        return f"{self.site_origin}/"
+
     def get_with_keyword(self, endpoint: str, keyword: str) -> Any:
-        return self._make_request(f"{endpoint}/{self._quote_segment(keyword)}")
+        encoded = self._quote_segment(keyword)
+        return self._make_request(
+            f"{endpoint}/{encoded}", referer=self._search_referer(endpoint, encoded)
+        )
 
     def get_with_id_and_semester(self, endpoint: str, item_id: str, id_thsmt: str) -> Any:
         encoded_id = self._quote_segment(item_id)

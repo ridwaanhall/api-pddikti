@@ -113,6 +113,21 @@ class Settings:
         self.upstream_base_url = _env("UPSTREAM_BASE_URL", "").rstrip("/")
         self.upstream_decrypt_url = _env("UPSTREAM_DECRYPT_URL", "")
 
+        # Browser TLS/JA3 impersonation profile, used when curl_cffi is installed.
+        # Plain header spoofing is not enough for edges that fingerprint the TLS
+        # handshake itself; this is what gets a datacenter IP past that check.
+        # A blank value means "use the default" like every other setting here, so
+        # disabling needs an explicit opt-out keyword.
+        impersonate = _env("UPSTREAM_IMPERSONATE", "chrome")
+        if impersonate.strip().lower() in {"none", "off", "false", "disabled", "0"}:
+            impersonate = ""
+        self.upstream_impersonate = impersonate
+
+        # Optional cookie header replayed on every upstream call. Escape hatch for an
+        # edge that demands a clearance cookie; note such cookies are usually bound to
+        # the IP and User-Agent that obtained them.
+        self.upstream_cookie = _env("UPSTREAM_COOKIE", "")
+
         # ------------------------------------------ optional authenticated fallback
         self.ridwaanhall_main_api = _env("RIDWAANHALL_MAIN_API", "").rstrip("/")
         self.ridwaanhall_api_x = _env("RIDWAANHALL_API_X", "")
@@ -132,6 +147,9 @@ class Settings:
         self.api_version = _env("API_VERSION", "5.0.0")
         self.last_update = _env("LAST_UPDATE", "2026-08-29T00:00:00+07:00")
         self.api_timeout = _env_int("API_TIMEOUT", 10)
+        # The decrypt leg uploads and downloads far more than a normal call, so it
+        # gets its own budget instead of silently blowing the standard timeout.
+        self.decrypt_timeout = _env_int("DECRYPT_TIMEOUT", max(self.api_timeout, 20))
         self.public_base_url = _env("PUBLIC_BASE_URL", "").rstrip("/")
 
         # Optional second deployment advertised when this one is rate-limited.
