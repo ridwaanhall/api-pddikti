@@ -73,8 +73,27 @@ class Settings:
         self.secret_key = _env("SECRET_KEY", "")
         self.debug = _env_bool("DEBUG", False)
 
-        self.ridwaanhall_main_api = _env("RIDWAANHALL_MAIN_API", "https://internal.invalid")
+        # Primary upstream: the public PDDikti web API. Needs no credentials -- the only
+        # gate is a browser-shaped User-Agent. Left as the default so a deployment that
+        # forgets every optional env var still works.
+        self.pddikti_site_origin = _env(
+            "PDDIKTI_SITE_ORIGIN", "https://pddikti.kemdiktisaintek.go.id"
+        ).rstrip("/")
+        self.pddikti_public_base = _env(
+            "PDDIKTI_PUBLIC_BASE", f"{self.pddikti_site_origin}/api"
+        ).rstrip("/")
+        self.pddikti_decrypt_url = _env(
+            "PDDIKTI_DECRYPT_URL", f"{self.pddikti_site_origin}/internal/decrypt"
+        )
+
+        # Optional authenticated fallback. Empty means "no fallback configured" -- never
+        # point this at an unresolvable host, or a missing env var looks like an outage.
+        self.ridwaanhall_main_api = _env("RIDWAANHALL_MAIN_API", "").rstrip("/")
         self.api_key = _env("API_KEY", "")
+
+        # Public-IP lookup used only when the caller's own IP is unusable.
+        self.ipify_url = _env("IPIFY_URL", "https://api.ipify.org/?format=json")
+        self.ip_cache_ttl = _env_int("IP_CACHE_TTL", 3600)
 
         self.ridwaanhall_api_x = _env("RIDWAANHALL_API_X", "X-Private-Api-Host")
         self.ridwaanhall_x = _env("RIDWAANHALL_X", "X-Private-Origin")
@@ -84,10 +103,10 @@ class Settings:
         self.ridwaanhall_key = _env("RIDWAANHALL_KEY", "private-origin")
         self.ridwaanhall_hash_key = _env("RIDWAANHALL_HASH_KEY", "private-referer")
 
-        self.api_availability = _env_bool("API_AVAILABILITY", False)
+        self.api_availability = _env_bool("API_AVAILABILITY", True)
         self.api_version = _env("API_VERSION", "4.2.3")
         self.last_update = _env("LAST_UPDATE", "2026-06-15T23:39:00+07:00")
-        self.api_timeout = _env_int("API_TIMEOUT", 8)
+        self.api_timeout = _env_int("API_TIMEOUT", 10)
         self.public_base_url = _env("PUBLIC_BASE_URL", "https://pddikti.rone.dev").rstrip("/")
 
 

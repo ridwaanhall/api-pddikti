@@ -1,32 +1,32 @@
 {% extends "base.html" %}
 
-{% block title %}Web API | PDDikti API{% endblock %}
+{% block title %}{{ selected_group.label }} | PDDikti API{% endblock %}
 
 {% block content %}
 <main class="mx-auto w-full pb-16 pt-6">
-    <section class="grid gap-12 xl:grid-cols-[280px_1fr]">
-        
-        <!-- Elegant Sidebar -->
+    <section class="grid gap-10 xl:grid-cols-[280px_1fr]">
+
+        <!-- Sidebar -->
         <aside class="h-fit max-h-[calc(100vh-8rem)] overflow-y-auto pr-4 xl:sticky xl:top-24">
             <p class="mb-4 text-[10px] font-semibold uppercase tracking-[0.25em] text-zinc-500">Routes</p>
-            
             <div class="grid gap-1">
                 {% for group in groups %}
-                <a href="/web?group={{ group.key }}" class="group relative flex flex-col border-l-2 {% if group.key == selected_group.key %}border-gold-500 bg-zinc-900/40{% else %}border-transparent hover:border-zinc-700 hover:bg-zinc-900/20{% endif %} py-3 pl-4 transition-all">
+                <a href="/web/routes/{{ group.key }}" class="group flex flex-col border-l-2 py-3 pl-4 transition-all {% if group.key == selected_group.key %}border-gold-500 bg-zinc-900/40{% else %}border-transparent hover:border-zinc-700 hover:bg-zinc-900/20{% endif %}">
                     <p class="font-serif text-sm font-medium {% if group.key == selected_group.key %}text-gold-400{% else %}text-zinc-300 group-hover:text-zinc-100{% endif %}">{{ group.label }}</p>
                     <p class="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-600">{{ group.id }} &bull; {{ group.operations|length }}</p>
                 </a>
                 {% endfor %}
             </div>
 
-            <div class="mt-8 pt-8 border-t border-zinc-800/50">
-                <p class="mb-4 text-[10px] font-semibold uppercase tracking-[0.25em] text-zinc-500">Endpoints</p>
+            <div class="mt-8 border-t border-zinc-800/50 pt-8">
+                <p class="mb-3 text-[10px] font-semibold uppercase tracking-[0.25em] text-zinc-500">Endpoints</p>
+                <input type="search" data-endpoint-filter placeholder="Filter endpoints" autocomplete="off"
+                       class="mb-3 w-full border-b border-zinc-800 bg-transparent py-2 text-xs text-zinc-300 outline-none transition placeholder:text-zinc-700 focus:border-gold-500" />
                 <div class="grid gap-1">
                     {% for endpoint in selected_group.operations %}
-                    <a href="/web?group={{ selected_group.key }}&operation={{ endpoint.id }}&view=single" class="group flex items-center gap-3 border-l-2 {% if is_single_view and selected_operation and selected_operation.id == endpoint.id %}border-zinc-500 bg-zinc-900/40{% else %}border-transparent hover:border-zinc-800{% endif %} py-2 pl-4 transition-all">
-                        <span class="text-[9px] font-bold uppercase tracking-wider {% if endpoint.method == 'GET' %}text-emerald-500/70{% elif endpoint.method == 'POST' %}text-sky-500/70{% elif endpoint.method == 'PUT' %}text-amber-500/70{% elif endpoint.method == 'DELETE' %}text-rose-500/70{% else %}text-zinc-500/70{% endif %}">
-                            {{ endpoint.method }}
-                        </span>
+                    <a href="#endpoint-{{ endpoint.id }}" data-sidebar-entry="{{ (endpoint.summary ~ ' ' ~ endpoint.api_path)|lower }}"
+                       class="group flex items-center gap-3 border-l-2 border-transparent py-2 pl-4 transition-all hover:border-zinc-700 hover:bg-zinc-900/20">
+                        <span class="text-[9px] font-bold uppercase tracking-wider {% if endpoint.method == 'GET' %}text-emerald-500/70{% else %}text-sky-500/70{% endif %}">{{ endpoint.method }}</span>
                         <p class="truncate font-mono text-[11px] text-zinc-400 group-hover:text-zinc-200">{{ endpoint.web_path }}</p>
                     </a>
                     {% endfor %}
@@ -34,241 +34,49 @@
             </div>
         </aside>
 
-        <!-- Main Explorer -->
-        <div class="space-y-12">
-            <!-- Header -->
+        <!-- Explorer -->
+        <div class="min-w-0 space-y-8">
             <header class="border-b border-zinc-800/50 pb-8">
-                <h1 class="font-serif text-4xl font-normal text-zinc-100">{{ selected_group.label }}</h1>
-                <p class="mt-4 max-w-3xl text-sm font-light leading-relaxed text-zinc-400">Map endpoints directly with form inputs, code snippets, and readable response tracking.</p>
-                
-                <div class="mt-6 flex flex-wrap gap-4 text-xs">
-                    <a href="/web?group={{ selected_group.key }}" class="border border-zinc-700 px-4 py-2 uppercase tracking-widest text-zinc-300 transition-colors hover:border-gold-500 hover:text-gold-500">
-                        View All
-                    </a>
-                    {% if is_single_view and selected_operation %}
-                    <a href="#endpoint-{{ selected_operation.id }}" class="border border-gold-500/30 px-4 py-2 uppercase tracking-widest text-gold-400">
-                        Focus: {{ selected_operation.method }}
-                    </a>
-                    {% endif %}
+                <p class="text-[10px] font-semibold uppercase tracking-[0.3em] text-gold-600">Web Playground</p>
+                <h1 class="mt-3 font-serif text-4xl font-normal text-zinc-100">{{ selected_group.label }}</h1>
+                <p class="mt-4 max-w-3xl text-sm font-light leading-relaxed text-zinc-400">{{ selected_group.description }}</p>
+
+                <div class="mt-6 flex flex-wrap items-center gap-4 text-xs">
+                    <a href="/web/routes/{{ selected_group.key }}" class="border border-zinc-700 px-4 py-2 uppercase tracking-widest text-zinc-300 transition-colors hover:border-gold-500 hover:text-gold-500">View All</a>
+                    <span class="text-[10px] uppercase tracking-wider text-zinc-600">{{ rendered_operations|length }} of {{ selected_group.operations|length }} shown &bull; {{ total_endpoints }} total</span>
                 </div>
             </header>
 
-            <!-- API Endpoint Selection Notice (Refined for Editorial Theme) -->
-            <div class="border border-zinc-800/80 bg-[#0c0c0e] p-6 shadow-sm">
-                <div class="flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between">
-                    <div class="flex-1">
-                        <div class="flex items-center gap-2">
-                            <div class="h-1.5 w-1.5 bg-gold-500"></div>
-                            <p class="font-serif text-sm font-medium text-zinc-200">API Base URL Routing</p>
-                        </div>
-                        <p class="mt-3 text-xs leading-relaxed text-zinc-400">
-                            Use <span class="font-mono text-gold-400">https://pddikti.fastapicloud.dev</span> for <span class="text-zinc-300 font-medium">&gt; 500 req/day</span>. <br class="hidden sm:block"/>
-                            Use <span class="font-mono text-zinc-300">https://pddikti.rone.dev</span> for <span class="text-zinc-300 font-medium">&lt; 500 req/day</span>.
-                        </p>
-                    </div>
-                    <div class="flex gap-3">
-                        <a href="https://pddikti.fastapicloud.dev" target="_blank" rel="noopener noreferrer" class="whitespace-nowrap border border-gold-500/30 bg-gold-500/5 px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-gold-400 transition-colors hover:border-gold-500 hover:bg-gold-500/10">
-                            High Traffic
-                        </a>
-                        <a href="https://pddikti.rone.dev" target="_blank" rel="noopener noreferrer" class="whitespace-nowrap border border-zinc-700 bg-zinc-800/30 px-4 py-2 text-[10px] font-semibold uppercase tracking-widest text-zinc-300 transition-colors hover:border-zinc-500 hover:bg-zinc-800/50">
-                            Standard
-                        </a>
-                    </div>
+            <div class="border border-zinc-800/80 bg-[#0c0c0e] p-6">
+                <div class="flex items-center gap-2">
+                    <div class="h-1.5 w-1.5 bg-gold-500"></div>
+                    <p class="font-serif text-sm font-medium text-zinc-200">Active API Base</p>
                 </div>
+                <p class="mt-3 font-mono text-xs text-gold-400">{{ public_api_base_url }}</p>
+                <p class="mt-2 text-[11px] leading-relaxed text-zinc-500">
+                    Snippets below target this base and are ready to copy. Executing from this page routes
+                    through an internal proxy, so nothing you type appears in a URL.
+                </p>
             </div>
 
-            <!-- Endpoints Feed -->
-            <div class="space-y-16">
+            <!-- Mobile jump strip -->
+            <div class="-mx-6 flex gap-2 overflow-x-auto px-6 pb-2 xl:hidden">
+                {% for endpoint in selected_group.operations %}
+                <a href="#endpoint-{{ endpoint.id }}" class="whitespace-nowrap border border-zinc-800 px-3 py-1.5 font-mono text-[10px] text-zinc-400">{{ endpoint.web_path }}</a>
+                {% endfor %}
+            </div>
+
+            <div class="space-y-10">
                 {% for operation in rendered_operations %}
-                <article id="endpoint-{{ operation.id }}" class="scroll-mt-32">
-                    
-                    <div class="mb-6 flex items-baseline gap-4">
-                        <span class="text-xs font-bold uppercase tracking-widest {% if operation.method == 'GET' %}text-emerald-500{% elif operation.method == 'POST' %}text-sky-500{% elif operation.method == 'PUT' %}text-amber-500{% elif operation.method == 'DELETE' %}text-rose-500{% else %}text-zinc-500{% endif %}">
-                            {{ operation.method }}
-                        </span>
-                        <h2 class="font-serif text-2xl font-medium text-zinc-200">{{ operation.summary }}</h2>
-                    </div>
-                    
-                    <div class="mb-8 flex flex-col gap-2">
-                        <p class="font-mono text-xs text-zinc-400">{{ operation.web_path }}</p>
-                        <p class="text-sm font-light text-zinc-500">{{ operation.description }}</p>
-                    </div>
-
-                    <!-- Form Area -->
-                    <div class="border border-zinc-800 bg-[#0c0c0e] p-6 sm:p-8">
-                        <form id="form-{{ operation.id }}" class="grid gap-6" data-operation-id="{{ operation.id }}">
-                            <div class="grid gap-6 sm:grid-cols-2">
-                                {% for parameter in operation.parameters %}
-                                <label class="flex flex-col gap-2">
-                                    <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">{{ parameter.name }} <span class="text-gold-600/50">[{{ parameter.in }}]</span></span>
-                                    {% if parameter.enum %}
-                                    <select name="{{ parameter.name }}" class="w-full border-b border-zinc-700 bg-transparent py-2 text-sm text-zinc-200 outline-none transition focus:border-gold-500">
-                                        {% for enum_value in parameter.enum %}
-                                        <option value="{{ enum_value }}" class="bg-zinc-900" {% if parameter.default == enum_value %}selected{% endif %}>{{ enum_value }}</option>
-                                        {% endfor %}
-                                    </select>
-                                    {% else %}
-                                    <input name="{{ parameter.name }}" value="{{ parameter.default }}" placeholder="{{ parameter.description }}" class="w-full border-b border-zinc-700 bg-transparent py-2 text-sm text-zinc-200 placeholder:text-zinc-700 outline-none transition focus:border-gold-500" />
-                                    {% endif %}
-                                </label>
-                                {% endfor %}
-                            </div>
-
-                            {% if operation.request_body %}
-                            <label class="flex flex-col gap-2 mt-4">
-                                <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">Payload [JSON]</span>
-                                <textarea id="body-{{ operation.id }}" rows="5" class="w-full border border-zinc-800 bg-[#09090b] p-4 font-mono text-xs text-zinc-300 outline-none transition focus:border-gold-500">{{ operation.request_body.schema | tojson(indent=2) }}</textarea>
-                            </label>
-                            {% endif %}
-
-                            <div class="mt-4">
-                                <button type="submit" class="bg-zinc-100 px-8 py-2.5 text-xs font-semibold uppercase tracking-widest text-[#09090b] transition-all hover:bg-gold-500">
-                                    Execute
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Output Area -->
-                    <div class="mt-8 grid gap-8 lg:grid-cols-2">
-                        <!-- Snippet -->
-                        <div>
-                            <div class="mb-3 flex items-center justify-between">
-                                <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">Snippet</p>
-                                <select id="lang-{{ operation.id }}" class="bg-transparent text-[10px] font-medium uppercase tracking-wider text-gold-500 outline-none">
-                                    <option value="curl" class="bg-zinc-900">cURL</option>
-                                    <option value="python" class="bg-zinc-900">Python</option>
-                                    <option value="javascript" class="bg-zinc-900">JavaScript</option>
-                                    <option value="php" class="bg-zinc-900">PHP</option>
-                                </select>
-                            </div>
-                            <pre id="snippet-{{ operation.id }}" class="h-[280px] overflow-auto border border-zinc-800 bg-[#060608] p-5 font-mono text-[11px] leading-relaxed text-zinc-400"></pre>
-                        </div>
-
-                        <!-- Response -->
-                        <div>
-                            <div class="mb-3 flex items-center justify-between">
-                                <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">Response</p>
-                                <button type="button" id="copy-raw-{{ operation.id }}" class="text-[10px] font-medium uppercase tracking-wider text-gold-500 hover:text-gold-400">Copy JSON</button>
-                            </div>
-                            <pre id="raw-{{ operation.id }}" class="h-[280px] overflow-auto border border-zinc-800 bg-[#060608] p-5 font-mono text-[11px] leading-relaxed text-zinc-400">Awaiting execution...</pre>
-                        </div>
-                    </div>
-                </article>
+                    {% include "_endpoint_card.html" %}
                 {% endfor %}
             </div>
         </div>
     </section>
 </main>
+{% endblock %}
 
-<script>
-    const operations = {{ selected_group.operations | tojson }};
-    const publicApiBaseUrl = {{ public_api_base_url | tojson }};
-    const operationMap = new Map(operations.map((item) => [item.id, item]));
-
-    function buildRequestParts(operationId) {
-        const operation = operationMap.get(operationId);
-        const form = document.getElementById(`form-${operationId}`);
-        let webPath = operation.web_path;
-        let apiPath = operation.api_path;
-        const query = new URLSearchParams();
-
-        for (const parameter of operation.parameters) {
-            const field = form.elements.namedItem(parameter.name);
-            const value = (field?.value || "").trim();
-
-            if (parameter.in === "path") {
-                if (!value) throw new Error(`Missing required path parameter: ${parameter.name}`);
-                webPath = webPath.replace(`{${parameter.name}}`, encodeURIComponent(value));
-                apiPath = apiPath.replace(`{${parameter.name}}`, encodeURIComponent(value));
-            } else if (parameter.in === "query" && value) {
-                query.append(parameter.name, value);
-            }
-        }
-
-        let requestBody = null;
-        const bodyField = document.getElementById(`body-${operationId}`);
-        if (bodyField && bodyField.value.trim()) {
-            requestBody = JSON.parse(bodyField.value.trim());
-        }
-
-        const queryString = query.toString();
-        return {
-            method: operation.method,
-            webTarget: queryString ? `${webPath}?${queryString}` : webPath,
-            apiTarget: queryString ? `${apiPath}?${queryString}` : apiPath,
-            requestBody,
-        };
-    }
-
-    function buildSnippets(language, request) {
-        const absoluteUrl = `${publicApiBaseUrl}${request.apiTarget.replace(/^\/api/, "")}`;
-        const bodyText = request.requestBody ? JSON.stringify(request.requestBody, null, 4) : null;
-        const snippets = {
-            curl: [`curl -X '${request.method}' \\`, `    '${absoluteUrl}' \\`, "    -H 'accept: application/json'"],
-            python: ["import requests", "", `url = "${absoluteUrl}"`, "headers = {\"accept\": \"application/json\"}", `response = requests.request("${request.method}", url, headers=headers${bodyText ? ", json=payload" : ""})`, "print(response.text)"],
-            javascript: [`const response = await fetch("${absoluteUrl}", {`, `    method: "${request.method}",`, "    headers: {\"accept\": \"application/json\"" + (bodyText ? ", \"content-type\": \"application/json\"" : "") + "}", ...(bodyText ? [`    body: JSON.stringify(payload)`] : []), "});", "const data = await response.json();", "console.log(data);"],
-            php: ["<?php", `$ch = curl_init("${absoluteUrl}");`, "curl_setopt($ch, CURLOPT_CUSTOMREQUEST, \"" + request.method + "\");", "curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);", "curl_setopt($ch, CURLOPT_HTTPHEADER, [\"accept: application/json\"]);", "$response = curl_exec($ch);", "curl_close($ch);", "echo $response;"]
-        };
-        const selected = snippets[language] || snippets.curl;
-        if (bodyText && ["python", "javascript"].includes(language)) {
-            return [...selected.slice(0, 2), "payload = " + bodyText, ...selected.slice(2)].join("\n");
-        }
-        return selected.join("\n");
-    }
-
-    function refreshSnippet(operationId) {
-        const language = document.getElementById(`lang-${operationId}`).value;
-        const snippetBox = document.getElementById(`snippet-${operationId}`);
-        try {
-            snippetBox.textContent = buildSnippets(language, buildRequestParts(operationId));
-        } catch (error) {
-            snippetBox.textContent = `Error: ${error.message}`;
-        }
-    }
-
-    operations.forEach((operation) => {
-        const operationId = operation.id;
-        const form = document.getElementById(`form-${operationId}`);
-        const langSelect = document.getElementById(`lang-${operationId}`);
-        const rawBox = document.getElementById(`raw-${operationId}`);
-        const copyRawButton = document.getElementById(`copy-raw-${operationId}`);
-
-        langSelect.addEventListener("change", () => refreshSnippet(operationId));
-        form.addEventListener("input", () => refreshSnippet(operationId));
-
-        copyRawButton.addEventListener("click", async () => {
-            await navigator.clipboard.writeText(rawBox.textContent || "");
-            copyRawButton.textContent = "COPIED";
-            setTimeout(() => { copyRawButton.textContent = "COPY JSON"; }, 1500);
-        });
-
-        form.addEventListener("submit", async (event) => {
-            event.preventDefault();
-            const btn = form.querySelector('button[type="submit"]');
-            btn.textContent = "EXECUTING...";
-            try {
-                const request = buildRequestParts(operationId);
-                const fetchOptions = { method: request.method, headers: { Accept: "application/json" } };
-                if (request.requestBody) {
-                    fetchOptions.headers["Content-Type"] = "application/json";
-                    fetchOptions.body = JSON.stringify(request.requestBody);
-                }
-                const response = await fetch(request.webTarget, fetchOptions);
-                const rawText = await response.text();
-                try {
-                    rawBox.textContent = JSON.stringify(JSON.parse(rawText), null, 2);
-                } catch {
-                    rawBox.textContent = rawText;
-                }
-            } catch (error) {
-                rawBox.textContent = `Error: ${error.message}`;
-            } finally {
-                btn.textContent = "EXECUTE";
-            }
-        });
-
-        refreshSnippet(operationId);
-    });
-</script>
+{% block scripts %}
+<script type="application/json" id="playground-config">{{ {"publicApiBaseUrl": public_api_base_url} | tojson }}</script>
+<script src="/static/playground.js" defer></script>
 {% endblock %}

@@ -1,4 +1,5 @@
 from pathlib import Path
+from urllib.parse import quote
 import re
 from typing import Any
 
@@ -6,6 +7,7 @@ import httpx
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import PlainTextResponse, Response
 from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel, Field
 
 from app.api.router import API_ENDPOINT_CATALOG
 from app.core.config import get_settings
@@ -14,6 +16,9 @@ from app.core.config import get_settings
 router = APIRouter(tags=["web"])
 settings = get_settings()
 templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
+
+# The in-process hop is cheap, but the API route behind it makes a real upstream call.
+PROXY_TIMEOUT = settings.api_timeout + 5
 
 
 def _group_label(group_key: str) -> str:
@@ -268,6 +273,91 @@ def web_route_detail(request: Request, group_key: str, operation_id: str):
     return templates.TemplateResponse(request, "web_index.html", context)
 
 
+class ExecuteRequest(BaseModel):
+    """Playground execution request.
+
+    Parameter values travel in the body rather than the URL so that whatever the user types
+    never lands in the address bar, the browser's network log, or a server access log.
+    """
+
+    operation_id: str = Field(min_length=1)
+    group: str | None = None
+    params: dict[str, str] = Field(default_factory=dict)
+    body: Any = None
+
+
+async def _dispatch_internal(
+    request: Request,
+    method: str,
+    api_target: str,
+    params: dict[str, str] | None = None,
+    json_body: Any = None,
+) -> httpx.Response:
+    """Re-enter this same app over ASGI, without a network round trip."""
+    transport = httpx.ASGITransport(app=request.app)
+    async with httpx.AsyncClient(
+        transport=transport, base_url="http://local", timeout=PROXY_TIMEOUT
+    ) as client:
+        return await client.request(method, api_target, params=params, json=json_body)
+
+
+def _passthrough(proxied: httpx.Response) -> Response:
+    headers = {
+        key: value
+        for key, value in proxied.headers.items()
+        if key.lower() not in {"content-length", "transfer-encoding", "connection"}
+    }
+    return Response(
+        content=proxied.content,
+        status_code=proxied.status_code,
+        headers=headers,
+        media_type=proxied.headers.get("content-type"),
+    )
+
+
+@router.post("/web/execute", include_in_schema=False)
+async def web_execute(request: Request, payload: ExecuteRequest):
+    _, lookup = _collect_web_docs(request)
+
+    operation = None
+    for (group_key, operation_id), detail in lookup.items():
+        if operation_id != payload.operation_id:
+            continue
+        if payload.group and payload.group != group_key:
+            continue
+        operation = detail
+        break
+
+    # Only operations in the published catalog may be dispatched -- without this the
+    # endpoint would be an open proxy into any route the app happens to mount.
+    if operation is None:
+        raise HTTPException(status_code=404, detail="Unknown operation")
+
+    api_target = operation["api_path"]
+    query: dict[str, str] = {}
+    for parameter in operation["parameters"]:
+        name = parameter["name"]
+        value = (payload.params.get(name) or "").strip()
+        placeholder = "{" + name + "}"
+
+        if parameter["in"] == "path":
+            if not value:
+                raise HTTPException(
+                    status_code=422, detail=f"Missing required path parameter: {name}"
+                )
+            api_target = api_target.replace(placeholder, quote(value, safe="="))
+        elif parameter["in"] == "query" and value:
+            query[name] = value
+
+    if "{" in api_target:
+        raise HTTPException(status_code=422, detail="Unresolved path parameters")
+
+    proxied = await _dispatch_internal(
+        request, operation["method"], api_target, query, payload.body
+    )
+    return _passthrough(proxied)
+
+
 @router.get("/web/{forward_path:path}", include_in_schema=False)
 async def web_api_proxy(request: Request, forward_path: str):
     normalized = forward_path.strip("/")
@@ -279,22 +369,9 @@ async def web_api_proxy(request: Request, forward_path: str):
 
     api_target = "/api/" if normalized in {"api-overview", "api-overview/"} else f"/api/{forward_path}"
 
-    transport = httpx.ASGITransport(app=request.app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://local") as client:
-        proxied = await client.get(api_target, params=request.query_params)
+    proxied = await _dispatch_internal(request, "GET", api_target, dict(request.query_params))
 
-    passthrough_headers = {
-        key: value
-        for key, value in proxied.headers.items()
-        if key.lower() not in {"content-length", "transfer-encoding", "connection"}
-    }
-
-    return Response(
-        content=proxied.content,
-        status_code=proxied.status_code,
-        headers=passthrough_headers,
-        media_type=proxied.headers.get("content-type"),
-    )
+    return _passthrough(proxied)
 
 
 @router.get("/robots.txt")

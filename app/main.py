@@ -1,4 +1,7 @@
+from pathlib import Path
+
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
 from app.api.router import router as api_router
 from app.core.config import get_settings
@@ -32,6 +35,12 @@ app = FastAPI(
 app.add_middleware(SEOHeadersMiddleware)
 app.add_middleware(APIStatusMiddleware)
 app.add_middleware(RequestIdentityMiddleware)
+
+app.mount(
+    "/static",
+    StaticFiles(directory=str(Path(__file__).parent / "web" / "static")),
+    name="static",
+)
 
 app.include_router(api_router)
 app.include_router(web_router)
