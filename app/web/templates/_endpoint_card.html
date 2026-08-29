@@ -1,0 +1,105 @@
+{#
+  One playground card. The data-* attributes are the entire contract with playground.js:
+  the script never needs to know anything about the API schema.
+#}
+<article id="endpoint-{{ operation.id }}" data-endpoint-card class="scroll-mt-28 border border-zinc-800/80 bg-[#0c0c0e]">
+
+    <header class="border-b border-zinc-800/80 px-6 py-5 sm:px-8">
+        <div class="flex flex-wrap items-center gap-3">
+            <span class="border px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.15em] {% if operation.method == 'GET' %}border-emerald-600/40 bg-emerald-500/10 text-emerald-400{% elif operation.method == 'POST' %}border-sky-600/40 bg-sky-500/10 text-sky-400{% else %}border-zinc-700 text-zinc-400{% endif %}">
+                {{ operation.method }}
+            </span>
+            <h2 class="font-serif text-xl font-medium text-zinc-100">{{ operation.summary }}</h2>
+            <span data-part="status" hidden class="border border-zinc-700 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400"></span>
+            <span data-part="meta" class="text-[10px] uppercase tracking-wider text-zinc-600"></span>
+            <a href="/web/routes/{{ selected_group.key }}/{{ operation.id }}" class="ml-auto text-[10px] uppercase tracking-[0.2em] text-zinc-600 transition-colors hover:text-gold-500">Focus</a>
+        </div>
+        <p class="mt-3 font-mono text-[11px] text-zinc-500">{{ operation.api_path }}</p>
+        <p class="mt-2 max-w-3xl text-xs font-light leading-relaxed text-zinc-500">{{ operation.description }}</p>
+    </header>
+
+    <form data-part="form"
+          data-operation-id="{{ operation.id }}"
+          data-group="{{ selected_group.key }}"
+          data-method="{{ operation.method }}"
+          data-api-path="{{ operation.api_path }}"
+          class="grid gap-6 px-6 py-6 sm:px-8">
+
+        {% if operation.parameters %}
+        <div class="grid gap-5 sm:grid-cols-2">
+            {% for parameter in operation.parameters %}
+            <label class="flex flex-col gap-2">
+                <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                    {{ parameter.name }}
+                    <span class="text-gold-600/60">[{{ parameter.in }}]</span>
+                    {% if parameter.required %}<span class="text-rose-500/70">*</span>{% endif %}
+                </span>
+                {% if parameter.enum %}
+                <select data-param-name="{{ parameter.name }}" data-param-in="{{ parameter.in }}"
+                        class="w-full cursor-pointer border-b border-zinc-700 bg-transparent py-2 text-sm text-zinc-200 outline-none transition focus:border-gold-500">
+                    {% for enum_value in parameter.enum %}
+                    <option value="{{ enum_value }}" class="bg-zinc-900" {% if parameter.default == enum_value %}selected{% endif %}>{{ enum_value }}</option>
+                    {% endfor %}
+                </select>
+                {% else %}
+                <input data-param-name="{{ parameter.name }}" data-param-in="{{ parameter.in }}"
+                       value="{{ parameter.default }}" autocomplete="off" spellcheck="false"
+                       placeholder="{{ parameter.title }}"
+                       class="w-full border-b border-zinc-700 bg-transparent py-2 text-sm text-zinc-200 outline-none transition placeholder:text-zinc-700 focus:border-gold-500" />
+                {% endif %}
+                <span class="text-[10px] leading-relaxed text-zinc-600">{{ parameter.description }}</span>
+            </label>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-xs italic text-zinc-600">No parameters required.</p>
+        {% endif %}
+
+        {% if operation.request_body %}
+        <label class="flex flex-col gap-2">
+            <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">Payload [JSON]</span>
+            <textarea data-request-body rows="5" spellcheck="false"
+                      class="w-full border border-zinc-800 bg-[#09090b] p-4 font-mono text-xs text-zinc-300 outline-none transition focus:border-gold-500">{{ operation.request_body.schema | tojson(indent=2) }}</textarea>
+        </label>
+        {% endif %}
+
+        <div class="flex flex-wrap items-center gap-4">
+            <button type="submit" data-part="submit"
+                    class="bg-zinc-100 px-8 py-2.5 text-xs font-semibold uppercase tracking-widest text-[#09090b] transition-all hover:bg-gold-500 disabled:cursor-not-allowed disabled:opacity-50">
+                Execute
+            </button>
+            <p class="text-[10px] uppercase tracking-wider text-zinc-600">Values are sent in the request body, never in the URL</p>
+        </div>
+
+        <p data-part="error" hidden class="border-l-2 border-rose-600 bg-rose-500/5 px-3 py-2 text-xs text-rose-400"></p>
+    </form>
+
+    <div class="border-t border-zinc-800/80">
+        <div class="flex items-center gap-1 border-b border-zinc-800/80 px-6 sm:px-8">
+            <button type="button" data-tab="readable" class="border-b-2 border-transparent px-3 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-500 transition-colors">Readable</button>
+            <button type="button" data-tab="raw" class="border-b-2 border-transparent px-3 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-500 transition-colors">Raw JSON</button>
+            <button type="button" data-tab="snippet" class="border-b-2 border-transparent px-3 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-500 transition-colors">Snippet</button>
+
+            <div class="ml-auto flex items-center gap-4 py-2">
+                <select data-part="language" class="cursor-pointer bg-transparent text-[10px] font-medium uppercase tracking-wider text-gold-500 outline-none">
+                    <option value="curl" class="bg-zinc-900">cURL</option>
+                    <option value="python" class="bg-zinc-900">Python</option>
+                    <option value="javascript" class="bg-zinc-900">JavaScript</option>
+                    <option value="php" class="bg-zinc-900">PHP</option>
+                </select>
+                <button type="button" data-copy="raw" class="text-[10px] font-medium uppercase tracking-wider text-zinc-500 transition-colors hover:text-gold-500">Copy JSON</button>
+                <button type="button" data-copy="snippet" class="text-[10px] font-medium uppercase tracking-wider text-zinc-500 transition-colors hover:text-gold-500">Copy Snippet</button>
+            </div>
+        </div>
+
+        <div data-panel="readable" class="max-h-[420px] overflow-auto px-6 py-5 sm:px-8">
+            <div data-part="readable"><p class="text-xs italic text-zinc-600">Awaiting execution.</p></div>
+        </div>
+        <div data-panel="raw" hidden class="px-6 py-5 sm:px-8">
+            <pre data-part="raw" class="max-h-[420px] overflow-auto bg-[#060608] p-5 font-mono text-[11px] leading-relaxed text-zinc-400">Awaiting execution.</pre>
+        </div>
+        <div data-panel="snippet" hidden class="px-6 py-5 sm:px-8">
+            <pre data-part="snippet" class="max-h-[420px] overflow-auto bg-[#060608] p-5 font-mono text-[11px] leading-relaxed text-zinc-400"></pre>
+        </div>
+    </div>
+</article>

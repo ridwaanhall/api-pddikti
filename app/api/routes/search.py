@@ -24,7 +24,9 @@ KeywordParam = Annotated[
     description="Search universities, study programs, lecturers, and students in one request.",
 )
 def search_all(keyword: KeywordParam):
-    return as_json(api_client.get_with_keyword("pencarian/all", keyword))
+    # Upstream serves the combined search only as an encrypted payload; the client
+    # transparently performs the decrypt leg before this returns.
+    return as_json(api_client.get_with_keyword("pencarian/enc/all", keyword))
 
 
 @router.get(

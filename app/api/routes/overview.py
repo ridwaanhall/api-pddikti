@@ -77,6 +77,22 @@ def api_overview():
             ],
         }
 
+    # Surfaced so a misconfigured deployment is diagnosable without reading logs: a
+    # connection error against a configured host means something very different from one
+    # against a host that was never set.
+    upstream = {
+        "primary": {
+            "name": "PDDikti public web API",
+            "configured": bool(settings.pddikti_public_base),
+            "requires_credentials": False,
+        },
+        "fallback": {
+            "name": "Authenticated PDDikti upstream",
+            "configured": bool(settings.ridwaanhall_main_api),
+            "requires_credentials": True,
+        },
+    }
+
     return {
         "success": True,
         "status": {
@@ -87,6 +103,7 @@ def api_overview():
         "credit": settings.required_credit_line,
         "service": service,
         "availability": availability,
+        "upstream": upstream,
         "documentation": documentation,
         "support": support,
         "alternative_endpoints": alternatives,
