@@ -52,5 +52,11 @@ Powered by Sivitas API, data sourced from PDDikti, maintained by <maintainer> / 
 
 ## Contact
 
-- Maintainer: ridwaanhall / RoneAI
-- Website: <https://ridwaanhall.com>
+- Operator: PT RoneAI Teknologi Internasional (RoneAI), Boyolali Regency, Central Java, Indonesia
+- Maintainer: ridwaanhall
+- General and commercial enquiries: <hello@rone.dev>
+- Security reports: <founder@rone.dev> — see <https://rone.dev/security>
+- Website: <https://rone.dev>
+
+Site-wide terms, including the position on non-affiliation and takedown, are at
+<https://rone.dev/terms>. Where this document is more specific, it governs.
